@@ -1,0 +1,38 @@
+# Node modules (dependencies)
+node_modules/
+
+# Build output
+dist/
+build/
+
+# Logs and debugging files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Local environment variables
+.env
+.env.local
+.env.development
+.env.production
+
+# Firebase & Firestore emulator data
+.firebase/
+firestore.indexes.json
+firestore.rules.bak
+
+# Editor/IDE settings
+.vscode/
+.idea/
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# Lint and test cache
+.eslintcache
+jest-cache/
+coverage/
+
+# Optional: Ignore TypeScript build files if using TypeScript
+*.tsbuildinfo
