@@ -1,8 +1,13 @@
 import React from 'react'
+import { Outlet } from 'react-router-dom'
 
 const Resourses = () => {
   return (
-    <h1>Resourses Page - "Notes" & "Courses" can be viewed by Student, and added by Admin.</h1>
+    <div>
+      <h1>Resourses Page - "Notes" & "Courses" can be viewed by Student, and added by Admin.</h1>
+      <Outlet/>
+    </div>
+    
   )
 }
 
