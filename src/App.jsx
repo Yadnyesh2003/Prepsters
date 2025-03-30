@@ -1,7 +1,11 @@
 import { useState } from 'react'
 import { Route, Routes, useMatch } from 'react-router-dom'
-import './App.css'
-import NavBar from './components/student/NavBar'
+// import './App.css'
+import Landing from './pages/Landing'
+import Login from './pages/Login'
+import Signup from './pages/Getstarted'
+
+// import NavBar from './components/student/NavBar'
 import Home from './pages/student/Home'
 import ExamPrep from './pages/student/ExamPrep'
 import Contributors from './pages/student/Contributors'
@@ -39,44 +43,46 @@ function App() {
 
   return (
     <div className='text-default min-h-screen bg-auto'>
-      {!isAdminRoute && <NavBar />}
+      {/* {!isAdminRoute && <NavBar />} */}
       <Routes>
 
-        <Route path = '/' element = {<Home />} />
-        <Route path = '/contributors' element = {<Contributors />} />
+        <Route path='/' element={<Landing />} />
+        <Route path='/login' element={<Login />} />
+        <Route path='/signup' element={<Signup />} />
+        <Route path='/contributors' element={<Contributors />} />
 
-        <Route path = '/exam-prep' element = {<ExamPrep />} >
-          <Route path = 'syllabus' element = {< Syllabus/>} />
-          <Route path = 'pyqs' element = {<PYQs />} />
-          <Route path = 'faqs' element = {<FAQs />} />
+        <Route path='/exam-prep' element={<ExamPrep />} >
+          <Route path='syllabus' element={< Syllabus />} />
+          <Route path='pyqs' element={<PYQs />} />
+          <Route path='faqs' element={<FAQs />} />
         </Route>
 
-        <Route path = '/resources' element = {<Resources />} >
-          <Route path = 'course-list' element = {<CoursesList />} />
-          <Route path = 'course-list/:input' element = {<CoursesList />} />
-          <Route path = 'course/:id' element={<CourseDetails />} />
-          <Route path = 'my-enrollments' element ={<MyEnrollments />} />
-          <Route path = 'player/:courseId' element ={<Player />} />
-          <Route path = 'loading/:path' element ={<Loading />} />
-          <Route path = 'notes' element = {<Notes />} />
+        <Route path='/resources' element={<Resources />} >
+          <Route path='course-list' element={<CoursesList />} />
+          <Route path='course-list/:input' element={<CoursesList />} />
+          <Route path='course/:id' element={<CourseDetails />} />
+          <Route path='my-enrollments' element={<MyEnrollments />} />
+          <Route path='player/:courseId' element={<Player />} />
+          <Route path='loading/:path' element={<Loading />} />
+          <Route path='notes' element={<Notes />} />
         </Route>
 
-        <Route path = '/ghost' element = {<Admin />} >
-          <Route path = '' element = {<Dashboard />} />
-          <Route path = 'students-enrolled' element = {<StudentsEnrolled/>} />
-          <Route path = 'my-contributors' element = {<MyContributors/>} />
-          <Route path = 'my-courses' element = {<MyCourses/>} />
-          <Route path = 'my-syllabus' element = {<MySyllabus/>} />
-          <Route path = 'my-pyqs' element = {<MyPYQs/>} />
-          <Route path = 'my-faqs' element = {<MyFAQs/>} />
-          <Route path = 'my-notes' element = {<MyNotes/>} />
+        <Route path='/ghost' element={<Admin />} >
+          <Route path='' element={<Dashboard />} />
+          <Route path='students-enrolled' element={<StudentsEnrolled />} />
+          <Route path='my-contributors' element={<MyContributors />} />
+          <Route path='my-courses' element={<MyCourses />} />
+          <Route path='my-syllabus' element={<MySyllabus />} />
+          <Route path='my-pyqs' element={<MyPYQs />} />
+          <Route path='my-faqs' element={<MyFAQs />} />
+          <Route path='my-notes' element={<MyNotes />} />
 
-          <Route path = 'add-contributors' element = {<AddContributors/>} />
-          <Route path = 'add-course' element = {<AddCourse/>} />
-          <Route path = 'add-syllabus' element = {<AddSyllabus/>} />
-          <Route path = 'add-pyqs' element = {<AddPYQs/>} />
-          <Route path = 'add-faqs' element = {<AddFAQs/>} />
-          <Route path = 'add-notes' element = {<AddNotes/>} />
+          <Route path='add-contributors' element={<AddContributors />} />
+          <Route path='add-course' element={<AddCourse />} />
+          <Route path='add-syllabus' element={<AddSyllabus />} />
+          <Route path='add-pyqs' element={<AddPYQs />} />
+          <Route path='add-faqs' element={<AddFAQs />} />
+          <Route path='add-notes' element={<AddNotes />} />
         </Route>
 
       </Routes>
