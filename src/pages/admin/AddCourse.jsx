@@ -26,7 +26,6 @@ export default function AddCourse() {
     if (!quillRef.current && editorRef.current) {
       quillRef.current = new Quill(editorRef.current, {
         theme: "snow",
-        placeholder: "Enter Course Description...",
       });
     }
   }, []);
@@ -63,7 +62,19 @@ export default function AddCourse() {
 
   };
 
-  // Handle checkbox selection for branches
+  const handleThumbnailChange = (e) => {
+    const inputUrl = e.target.value;
+    setCourseThumbnail(inputUrl); // Temporarily set the input value
+  
+    const match = inputUrl.match(/\/d\/([^/]+)\//); // Extract File ID correctly
+    if (match) {
+      const fileId = match[1];
+      const thumbnailUrl = `https://drive.google.com/thumbnail?id=${fileId}`;
+  
+      setCourseThumbnail(thumbnailUrl); // Update with the modified URL
+    }
+  };
+
   const handleBranchChange = (e) => {
     const { value, checked } = e.target;
     setSelectedBranches((prev) =>
@@ -71,7 +82,6 @@ export default function AddCourse() {
     );
   };
 
-  // Handle checkbox selection for years
   const handleYearChange = (e) => {
     const { value, checked } = e.target;
     setSelectedYears((prev) =>
@@ -79,14 +89,13 @@ export default function AddCourse() {
     );
   };
 
-  //Function to handle Add details of lecture & remove a lecture.
   const handleLecture = (action, chapterId, lectureIndex) => {
     if (action === 'add') {
       setCurrentChapterId(chapterId);
       setShowPopUp(true);
     } else if (action === 'remove') {
       setChapters(
-        chapters.map((chapter) =>                 //ChatGPT Optimised
+        chapters.map((chapter) =>
           chapter.chapterId === chapterId
             ? { ...chapter, chapterContent: chapter.chapterContent.filter((_, index) => index !== lectureIndex) }
             : chapter)
@@ -94,7 +103,6 @@ export default function AddCourse() {
     }
   };
 
-  //Funtion to Add lectures into the Chapter.
   const addLecture = () => {
     setChapters(
       chapters.map((chapter) =>
@@ -119,11 +127,9 @@ export default function AddCourse() {
     setLectureDetails({
       lectureTitle: '',
       lectureDuration: '',
-      lectureUrl: '',
-      isPreviewFree: false,
+      lectureUrl: ''
     });
   };
-
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -144,16 +150,10 @@ export default function AddCourse() {
         },
         chapters
       });
-
-      // for (const chapter of chapters) {
-      //   const chapterRef = await addDoc(collection(db, `courses/${courseRef.id}/courseContent`), {
-      //     chapters
-      //   });
-      // }
       alert("Course added successfully!");
 
       await updateDoc(courseRef, {
-        courseId: courseRef.id  // Add the courseId field with the generated ID
+        courseId: courseRef.id
       });
 
       setCourseTitle("");
@@ -164,222 +164,207 @@ export default function AddCourse() {
       setLectureDetails([]);
       setCurrentChapterId("");
       setChapters([]);
-
     } catch (error) {
       console.error("Error adding course:", error);
     }
   };
 
   return (
-    <div className="max-w-2xl mx-auto mt-10 p-6 bg-white rounded-lg shadow-md">
-      <h2 className="text-2xl font-semibold mb-4">Add New Course</h2>
-      <form onSubmit={handleSubmit}>
-        <label className="block mb-2">Course Title</label>
-        <input
-          type="text"
-          value={courseTitle}
-          onChange={(e) => setCourseTitle(e.target.value)}
-          className="w-full p-2 border rounded mb-4"
-          required
-        />
-
-
-        <label className="block mb-2">Course Thumbnail URL</label>
-        <input
-          type="text"
-          value={courseThumbnail}
-          onChange={(e) => setCourseThumbnail(e.target.value)}
-          className="w-full p-2 border rounded mb-4"
-          required
-        />
-
-        <label className="block mb-2">Course Description</label>
-        <div ref={editorRef} className="h-40 border rounded mb-4"></div>
-
-        <div>
-        <label>Category</label>
-
-        {/* Branch Selection */}
-        <div>
-          <label>Branch</label>
-          <div>
-            <label>
-              <input
-                type="checkbox"
-                value="Computer Engineering"
-                checked={selectedBranches.includes("Computer Engineering")}
-                onChange={handleBranchChange}
-              />
-              Computer Engineering
-            </label>
-            <label>
-              <input
-                type="checkbox"
-                value="Information Technology"
-                checked={selectedBranches.includes("Information Technology")}
-                onChange={handleBranchChange}
-              />
-              Information Technology
-            </label>
-            <label>
-              <input
-                type="checkbox"
-                value="Electronics"
-                checked={selectedBranches.includes("Electronics")}
-                onChange={handleBranchChange}
-              />
-              Electronics
-            </label>
-          </div>
+    <div className="h-screen overflow-scroll flex flex-col items-start justify-between p-8  text-gray-700">
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4 mx-w-md w-3/4 text-gray-500">
+        <div className="flex flex-col gap-2">
+          <label className="text-lg text-left">Course Title</label>
+          <input
+            type="text"
+            value={courseTitle}
+            onChange={(e) => setCourseTitle(e.target.value)}
+            className="w-full p-2 text-gray-700 rounded-lg border border-gray-700 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            required
+          />
         </div>
 
-        {/* Year Selection */}
-        <div>
-          <label>Year</label>
-          <div>
-            <label>
-              <input
-                type="checkbox"
-                value="FY"
-                checked={selectedYears.includes("FY")}
-                onChange={handleYearChange}
-              />
-              FY
-            </label>
-            <label>
-              <input
-                type="checkbox"
-                value="SY"
-                checked={selectedYears.includes("SY")}
-                onChange={handleYearChange}
-              />
-              SY
-            </label>
-            <label>
-              <input
-                type="checkbox"
-                value="TY"
-                checked={selectedYears.includes("TY")}
-                onChange={handleYearChange}
-              />
-              TY
-            </label>
-            <label>
-              <input
-                type="checkbox"
-                value="Btech"
-                checked={selectedYears.includes("Btech")}
-                onChange={handleYearChange}
-              />
-              Btech
-            </label>
-          </div>
+        <div className="flex flex-col gap-2">
+          <label className="text-lg text-left">Course Thumbnail URL</label>
+          <input
+            type="text"
+            value={courseThumbnail}
+            onChange={handleThumbnailChange}
+            className="w-full p-2 text-gray-700 rounded-lg border border-gray-700 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            required
+          />
         </div>
-      </div>
 
+        <div className="flex flex-col gap-2">
+          <label className="text-lg text-left">Course Description</label>
+          <div ref={editorRef} className='border border-gray-700'></div>
+        </div>
 
-        {/* Adding Chapters & Lectures */}
-        <div>
-          {chapters.map((chapter, chapterIndex)=>(
-            <div key={chapterIndex} className='bg-white border rounded-lg mb-4'>
-              <div className='flex justify-between items-center p-4 border-b'>
-                <div className='flex items-center'>
-                  <img onClick={()=> handleChapter('toggle', chapter.chapterId)}
-                  src={assets.dropdown_icon} width={14} alt="dropdown icon" 
-                  className={`mr-2 cursor-pointer hover:bg-blue-200 transition-all ${chapter.collapse && '-rotate-90'}`}
+        <div className="flex flex-col gap-4">
+          <p className="text-lg text-left">Category</p>
+
+          {/* Branch Selection */}
+          <div className="space-y-2">
+            <p className="text-lg text-left">Branch</p>
+            <div className="flex flex-col gap-2">
+              {[
+                "Computer Engineering",
+                "Information Technology",
+                "Electronics & Telecommunication",
+                "Artificial Intelligence & Data Science",
+                "Electronics & Computer Science",
+              ].map((branch) => (
+                <label key={branch} className="flex items-center gap-2 hover:text-amber-400">
+                  <input
+                    type="checkbox"
+                    value={branch}
+                    checked={selectedBranches.includes(branch)}
+                    onChange={handleBranchChange}
+                    className="accent-blue-600 "
                   />
-                  <span className='font-semibold'>{chapterIndex + 1} {chapter.chapterTitle}</span>
+                  <span>{branch}</span>
+                </label>
+              ))}
+            </div>
+          </div>
+
+          {/* Year Selection */}
+          <div className="space-y-2">
+            <p className="text-lg text-left ">Year</p>
+            <div className="flex flex-col gap-2">
+              {["First Year", "Second Year", "Third Year", "Final Year"].map((year) => (
+                <label key={year} className="flex items-center gap-2  hover:text-amber-300">
+                  <input
+                    type="checkbox"
+                    value={year}
+                    checked={selectedYears.includes(year)}
+                    onChange={handleYearChange}
+                    className="accent-blue-600"
+                  />
+                  <span>{year}</span>
+                </label>
+              ))}
+            </div>
+          </div>
+        </div>
+
+
+        <div>
+          {chapters.map((chapter, chapterIndex) => (
+            <div key={chapterIndex} className=" rounded-lg mb-4 shadow-md">
+              <div className="flex justify-between items-center p-4 border-b-1 border-gray-700">
+                <div className="flex items-center space-x-2">
+                  <img
+                    onClick={() => handleChapter('toggle', chapter.chapterId)}
+                    src={assets.dropdown_icon}
+                    width={14}
+                    alt="dropdown icon"
+                    className={`cursor-pointer hover:bg-blue-500 transition-transform ${chapter.collapse ? 'rotate-90' : ''}`}
+                  />
+                  <span className="font-semibold">{chapterIndex + 1}. {chapter.chapterTitle}</span>
                 </div>
-                <span className='text-gray-500'>{chapter.chapterContent.length} Lectures</span>
-                <img onClick={()=> handleChapter('remove', chapter.chapterId)}
-                src={assets.cross_icon} alt="cross icon" className='cursor-pointer hover:bg-blue-200'/>
+                <span className="text-gray-400">{chapter.chapterContent.length} Lectures</span>
+                <img
+                  onClick={() => handleChapter('remove', chapter.chapterId)}
+                  src={assets.cross_icon}
+                  alt="remove chapter"
+                  className="cursor-pointer hover:bg-blue-500"
+                />
               </div>
               {!chapter.collapse && (
-                <div className='p-4'>
-                  {chapter.chapterContent.map((lecture, lectureIndex)=> (
-                    <div key={lectureIndex} className='flex justify-between items-center mb-2'>
-                      <span>
-                        {lectureIndex+1} {lecture.lectureTitle} - {lecture.lectureDuration} mins - 
-                        <a href={lecture.lectureUrl} target="_blank" className='text-blue-500'>Link</a> -
-                        {lecture.isPreviewFree ? 'Free Preview' : 'Paid'}
+                <div className="p-4">
+                  {chapter.chapterContent.map((lecture, lectureIndex) => (
+                    <div key={lectureIndex} className="flex justify-between items-center mb-2">
+                      <span>{lectureIndex + 1}. {lecture.lectureTitle} - {lecture.lectureDuration} mins -
+                        <a href={lecture.lectureUrl} target="_blank" className="text-blue-400">Link</a>
                       </span>
-                      <img src={assets.cross_icon} alt="cross icon" className='cursor-pointer hover:bg-blue-200'
-                      onClick={()=> handleLecture('remove', chapter.chapterId, lectureIndex)}/>
+                      <img
+                        src={assets.cross_icon}
+                        alt="remove lecture"
+                        className="cursor-pointer hover:bg-blue-500"
+                        onClick={() => handleLecture('remove', chapter.chapterId, lectureIndex)}
+                      />
                     </div>
                   ))}
-                  <div className='inline-flex bg-gray-100 p-2 rounded cursor-pointer mt-2 hover:bg-gray-300 hover:text-black' 
-                  onClick={()=> handleLecture('add', chapter.chapterId)}>
+                  <div
+                    className="bg-blue-100 text-gray-500 p-2 rounded cursor-pointer mt-2 w-auto hover:bg-blue-400 hover:text-gray-800"
+                    onClick={() => handleLecture('add', chapter.chapterId)}
+                  >
                     + Add Lecture
                   </div>
                 </div>
               )}
-
             </div>
           ))}
-          <div className='flex justify-center items-center bg-blue-100 p-2 rounded-lg cursor-pointer hover:bg-blue-400 hover:text-black'
-          onClick={()=> handleChapter('add')}>
+          <div
+            className = 'flex justify-center items-center bg-blue-100 p-2 rounded-lg cursor-pointer hover:bg-blue-400 hover:text-black'
+            onClick={() => handleChapter('add')}
+          >
             + Add Chapter
           </div>
-          {showPopUp && (
-            <div className='fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50'>
-              <div className="bg-white text-gray-700 p-4 rounded relative w-full max-w-80">
-                <h2 className="text-lg font-semibold mb-4">Add Lecture</h2>
-                <div className="mb-2">
-                  <p>Lecture Title</p>
-                  <input
-                    type="text"
-                    className="mt-1 block w-full border rounded py-1 px-2"
-                    value={lectureDetails.lectureTitle}
-                    onChange={(e) =>
-                      setLectureDetails({ ...lectureDetails, lectureTitle: e.target.value })}
-                  />
-                </div>
-                <div className="mb-2">
-                  <p>Duration (minutes)</p>
-                  <input
-                    type="number"
-                    className="mt-1 block w-full border rounded py-1 px-2"
-                    value={lectureDetails.lectureDuration}
-                    onChange={(e) =>
-                      setLectureDetails({ ...lectureDetails, lectureDuration: e.target.value })}
-                  />
-                </div>
-                <div className="mb-2">
-                  <p>Lecture URL</p>
-                  <input
-                    type="text"
-                    className="mt-1 block w-full border rounded py-1 px-2"
-                    value={lectureDetails.lectureUrl}
-                    onChange={(e) =>
-                      setLectureDetails({ ...lectureDetails, lectureUrl: e.target.value })}
-                  />
-                </div>
-                <div className="mb-2">
-                  <p>Is Preview Free?</p>
-                  <input
-                    type="checkbox"
-                    className="mt-1 scale-125"
-                    checked={lectureDetails.isPreviewFree}
-                    onChange={(e) =>
-                      setLectureDetails({ ...lectureDetails, isPreviewFree: e.target.checked })}
-                  />
-                </div>
-
-                <button type='button' onClick={addLecture} className='w-full bg-blue-400 text-white px-4 py-2 rounded hover:bg-blue-600 hover:text-black'>Add</button>
-
-                <img onClick={() => setShowPopUp(false)} src={assets.cross_icon} alt="cross icon" 
-                className='absolute top-4 right-4 w-4 cursor-pointer hover:bg-blue-200'/>
-
-              </div>
-            </div>
-          )}
         </div>
 
+        {showPopUp && (
+          <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-50">
+            <div className="bg-white text-gray-700 p-6 rounded-lg relative w-full max-w-md">
+              <h2 className="text-lg mb-4 font-semibold">Add Lecture</h2>
+              <div className="mb-4">
+                <label className="text-lg ">Lecture Title</label>
+                <input
+                  type="text"
+                  value={lectureDetails.lectureTitle}
+                  onChange={(e) =>
+                    setLectureDetails({ ...lectureDetails, lectureTitle: e.target.value })}
+                  className="w-full p-3 text-gray-700 rounded-lg border-1 border-gray-700 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                />
+              </div>
+              <div className="mb-4">
+                <label className="text-lg">Duration (minutes)</label>
+                <input
+                  type="number"
+                  value={lectureDetails.lectureDuration}
+                  onChange={(e) =>
+                    setLectureDetails({ ...lectureDetails, lectureDuration: e.target.value })}
+                  className="w-full p-3 text-gray-700 rounded-lg border-1 border-gray-700 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                />
+              </div>
+              <div className="mb-4">
+                <label className="text-lg ">Lecture URL</label>
+                <input
+                  type="text"
+                  value={lectureDetails.lectureUrl}
+                  onChange={(e) => {
+                    const inputUrl = e.target.value;
+                    const cleanUrl = inputUrl.split("?")[0]; 
+                    setLectureDetails({ ...lectureDetails, lectureUrl: cleanUrl });
+                  }}
+                  className="w-full p-3 text-gray-700 rounded-lg border-1 border-gray-700 focus:outline-none focus:ring-1 focus:ring-blue-500"
+                />
+              </div>
+
+
+              <button
+                type="button"
+                onClick={addLecture}
+                className="w-full bg-blue-500 text-white p-3 rounded-lg hover:bg-blue-600"
+              >
+                Add Lecture
+              </button>
+
+              <img
+                onClick={() => setShowPopUp(false)}
+                src={assets.cross_icon}
+                alt="close"
+                className="absolute top-4 right-4 w-4 cursor-pointer hover:bg-blue-200"
+              />
+            </div>
+          </div>
+        )}
+        
         <button
           type="submit"
-          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-700"
-        >
-          Add Course
+          className='bg-black text-white w-max py-2.5 px-8 rounded my-4 hover:bg-gray-400 hover:text-black'
+          >
+          ADD COURSE
         </button>
       </form>
     </div>
