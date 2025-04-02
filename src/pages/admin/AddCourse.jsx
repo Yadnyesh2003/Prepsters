@@ -190,7 +190,7 @@ export default function AddCourse() {
             type="text"
             value={courseTitle}
             onChange={(e) => setCourseTitle(e.target.value)}
-            className="w-full p-2 text-gray-700 rounded-lg border border-gray-700 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            className="w-full p-2 text-gray-700 rounded-lg border border-gray-700"
             required
           />
         </div>
