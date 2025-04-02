@@ -18,6 +18,9 @@ export default function AddCourse() {
   });
   const [selectedBranches, setSelectedBranches] = useState([]);
   const [selectedYears, setSelectedYears] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [adminId, setAdminId] = useState("");
+    const [error, setError] = useState("");
 
   const quillRef = useRef(null);
   const editorRef = useRef(null);
@@ -133,6 +136,8 @@ export default function AddCourse() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
+    setError("");
     const courseDescription = quillRef.current.root.innerHTML;
     try {
       const courseRef = await addDoc(collection(db, "courses"), {
@@ -143,7 +148,8 @@ export default function AddCourse() {
         createdAt: serverTimestamp(),
         updatedAt: null,
         courseRatings: [],
-        educator: "",
+        adminId: 'req.auth.id',
+        createdBy:'req.auth.userName',
         category: {
           branch: selectedBranches,
           year: selectedYears,
@@ -163,14 +169,20 @@ export default function AddCourse() {
       setSelectedYears([]);
       setLectureDetails([]);
       setCurrentChapterId("");
+      setAdminId("")
       setChapters([]);
     } catch (error) {
-      console.error("Error adding course:", error);
+      setError("Error adding course:", + error.message);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="h-screen overflow-scroll flex flex-col items-start justify-between p-8  text-gray-700">
+    <div className="overflow-scroll flex flex-col items-start justify-between p-8  text-gray-700">
+
+      {error && <div className="text-red-500 mb-4">{error}</div>}
+
       <form onSubmit={handleSubmit} className="flex flex-col gap-4 mx-w-md w-3/4 text-gray-500">
         <div className="flex flex-col gap-2">
           <label className="text-lg text-left">Course Title</label>
@@ -341,7 +353,6 @@ export default function AddCourse() {
                 />
               </div>
 
-
               <button
                 type="button"
                 onClick={addLecture}
@@ -363,8 +374,9 @@ export default function AddCourse() {
         <button
           type="submit"
           className='bg-black text-white w-max py-2.5 px-8 rounded my-4 hover:bg-gray-400 hover:text-black'
+          disabled={loading}
           >
-          ADD COURSE
+          {loading ? "Adding Course" : "ADD COURSE"}
         </button>
       </form>
     </div>
