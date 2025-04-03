@@ -1,9 +1,15 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
-import { createUserWithEmailAndPassword, signInWithPopup, signOut } from 'firebase/auth'
+import { Link, Navigate } from "react-router-dom";
+// import { createUserWithEmailAndPassword, signInWithPopup, signOut } from 'firebase/auth'
 import { auth, googleProvider } from '../config/firebase'
+import { toast } from "react-toastify";
+import Home from "./student/Home";
+
+// import { Link } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 const Signup = () => {
+    const { registerUser, signInWithGoogle } = useAuth();
     const [formData, setFormData] = useState({
         name: "",
         email: "",
@@ -18,19 +24,31 @@ const Signup = () => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
-    const handleSignup = (e) => {
+    const handleSignup = async (e) => {
         e.preventDefault();
-        console.log("Signup Data:", formData);
-        // Add signup logic here
-    };
+        if (formData.password !== formData.confirmPassword) {
+            alert("Passwords do not match!");
+            return;
+        }
 
-    const signInWithGoogle = async () => {
         try {
-            await signUpWithPopup(auth, googleProvider);
-        } catch (err) {
-            console.error(err);
+            demofunction();
+            await registerUser(formData.email, formData.password);
+            if (auth?.currentUser?.uid) {
+                Navigate("/Home")
+            }
+            alert("Registration successful!");
+        } catch (error) {
+            console.error("Signup Error:", error);
         }
     };
+    // const signInWithGoogle = async () => {
+    //     try {
+    //         await signUpWithPopup(auth, googleProvider);
+    //     } catch (err) {
+    //         console.error(err);
+    //     }
+    // };
 
     return (
         <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-[#1E2A38] to-[#243A5A] px-4 py-6">
