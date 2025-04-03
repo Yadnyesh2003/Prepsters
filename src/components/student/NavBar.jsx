@@ -1,8 +1,11 @@
 import React, { useState } from 'react';
 import { AiOutlineClose, AiOutlineMenu } from 'react-icons/ai';
 import { Link } from 'react-router-dom';
+import { useAuth } from "../../context/AuthContext";
 
 const Navbar = () => {
+  const { signInWithGoogle } = useAuth();
+  const { demofunction } = useAuth()
   const [navOpen, setNavOpen] = useState(false);
 
   // Toggle mobile menu
@@ -18,8 +21,10 @@ const Navbar = () => {
     { id: 5, text: 'Contact', path: '/contact' },
   ];
 
+  // bg - gradient - to - br from - [#1F2937] to - [#3B4864]
+
   return (
-    <nav className="bg-gradient-to-br from-[#1F2937] to-[#3B4864] text-white shadow-lg">
+    <nav className="bg-black text-white shadow-lg">
       <div className="container mx-auto flex justify-between items-center py-4 px-6">
         {/* Logo */}
         <Link to="/" className="text-3xl font-bold text-[#00DF9A]">
@@ -32,7 +37,7 @@ const Navbar = () => {
             <li key={item.id}>
               <Link
                 to={item.path}
-                className="text-lg font-medium hover:text-[#00DF9A] transition duration-300"
+                className="text-lg font-medium hover:text-[#c1c1c1] transition duration-300"
               >
                 {item.text}
               </Link>
@@ -41,12 +46,16 @@ const Navbar = () => {
         </ul>
 
         {/* Login Button (Desktop) */}
-        <Link
+        {/* <Link
           to="/login"
-          className="hidden md:block px-5 py-2 bg-[#00DF9A] text-gray-900 font-semibold rounded-lg hover:bg-[#00B383] transition duration-300"
+          className="hidden md:block px-5 py-2 bg-[#ffffff] text-gray-900 font-semibold rounded-lg hover:bg-[#c1c1c1] transition duration-300"
+          onClick={signInWithGoogle} // Call demo function on click
         >
           Login
-        </Link>
+        </Link> */}
+
+        <button className="hidden md:block px-5 py-2 bg-[#ffffff] text-gray-900 font-semibold rounded-lg hover:bg-[#c1c1c1] transition duration-300"
+          onClick={signInWithGoogle}>Get Started</button>
 
         {/* Mobile Menu Toggle Button */}
         <button onClick={toggleNav} className="md:hidden">
@@ -59,6 +68,8 @@ const Navbar = () => {
         className={`fixed md:hidden top-0 left-0 w-[70%] h-full bg-[#1F2937] shadow-lg transform ${navOpen ? 'translate-x-0' : '-translate-x-full'
           } transition-transform duration-300`}
       >
+
+        {/* text-[#00DF9A] */}
         {/* Mobile Logo & Close Button */}
         <div className="flex justify-between items-center p-6 border-b border-gray-700">
           <h1 className="text-3xl font-bold text-[#00DF9A]">TTE</h1>
@@ -73,7 +84,7 @@ const Navbar = () => {
             <li key={item.id}>
               <Link
                 to={item.path}
-                className="block text-lg font-medium hover:text-[#00DF9A] transition duration-300"
+                className="block text-lg font-medium hover:text-[#c1c1c1] transition duration-300"
                 onClick={toggleNav} // Close menu on item click
               >
                 {item.text}
@@ -81,13 +92,16 @@ const Navbar = () => {
             </li>
           ))}
           <li>
-            <Link
+            {/* <Link
               to="/login"
-              className="block w-full text-center bg-[#00DF9A] text-gray-900 py-2 rounded-lg font-semibold hover:bg-[#00B383] transition duration-300"
-              onClick={toggleNav}
+              className="block w-full text-center bg-[#ffffff] text-gray-900 py-2 rounded-lg font-semibold hover:bg-[#c1c1c1] transition duration-300"
+              onClick={signInWithGoogle}
             >
               Login
-            </Link>
+            </Link> */}
+
+            <button className="block w-full text-center bg-[#ffffff] text-gray-900 py-2 rounded-lg font-semibold hover:bg-[#c1c1c1] transition duration-300"
+              onClick={signInWithGoogle}>Get Started</button>
           </li>
         </ul>
       </div>
