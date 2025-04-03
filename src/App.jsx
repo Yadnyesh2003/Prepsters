@@ -36,58 +36,63 @@ import AddPYQs from './pages/admin/AddPYQs'
 import AddFAQs from './pages/admin/AddFAQs'
 import AddNotes from './pages/admin/AddNotes'
 
+import { AuthProvider } from "./context/AuthContext";
+
 
 
 function App() {
   const isAdminRoute = useMatch('/ghost/*')
 
   return (
-    <div className='text-default min-h-screen bg-auto'>
-      {/* {!isAdminRoute && <NavBar />} */}
-      <Routes>
+    <AuthProvider>
+      <div className='text-default min-h-screen bg-auto'>
+        {/* {!isAdminRoute && <NavBar />} */}
+        <Routes>
 
-        <Route path='/' element={<Landing />} />
-        <Route path='/login' element={<Login />} />
-        <Route path='/signup' element={<Signup />} />
-        <Route path='/contributors' element={<Contributors />} />
+          <Route path='/' element={<Landing />} />
+          <Route path='/login' element={<Login />} />
+          <Route path='/signup' element={<Signup />} />
+          <Route path='/contributors' element={<Contributors />} />
+          <Route path='/Home' element={<Home />} />
 
-        <Route path='/exam-prep' element={<ExamPrep />} >
-          <Route path='syllabus' element={< Syllabus />} />
-          <Route path='pyqs' element={<PYQs />} />
-          <Route path='faqs' element={<FAQs />} />
-        </Route>
+          <Route path='/exam-prep' element={<ExamPrep />} >
+            <Route path='syllabus' element={< Syllabus />} />
+            <Route path='pyqs' element={<PYQs />} />
+            <Route path='faqs' element={<FAQs />} />
+          </Route>
 
-        <Route path='/resources' element={<Resources />} >
-          <Route path='course-list' element={<CoursesList />} />
-          <Route path='course-list/:input' element={<CoursesList />} />
-          <Route path='course/:id' element={<CourseDetails />} />
-          <Route path='my-enrollments' element={<MyEnrollments />} />
-          <Route path='player/:courseId' element={<Player />} />
-          <Route path='loading/:path' element={<Loading />} />
-          <Route path='notes' element={<Notes />} />
-        </Route>
+          <Route path='/resources' element={<Resources />} >
+            <Route path='course-list' element={<CoursesList />} />
+            <Route path='course-list/:input' element={<CoursesList />} />
+            <Route path='course/:id' element={<CourseDetails />} />
+            <Route path='my-enrollments' element={<MyEnrollments />} />
+            <Route path='player/:courseId' element={<Player />} />
+            <Route path='loading/:path' element={<Loading />} />
+            <Route path='notes' element={<Notes />} />
+          </Route>
 
-        <Route path='/ghost' element={<Admin />} >
-          <Route path='' element={<Dashboard />} />
-          <Route path='students-enrolled' element={<StudentsEnrolled />} />
-          <Route path='my-contributors' element={<MyContributors />} />
-          <Route path='my-courses' element={<MyCourses />} />
-          <Route path='my-syllabus' element={<MySyllabus />} />
-          <Route path='my-pyqs' element={<MyPYQs />} />
-          <Route path='my-faqs' element={<MyFAQs />} />
-          <Route path='my-notes' element={<MyNotes />} />
+          <Route path='/ghost' element={<Admin />} >
+            <Route path='' element={<Dashboard />} />
+            <Route path='students-enrolled' element={<StudentsEnrolled />} />
+            <Route path='my-contributors' element={<MyContributors />} />
+            <Route path='my-courses' element={<MyCourses />} />
+            <Route path='my-syllabus' element={<MySyllabus />} />
+            <Route path='my-pyqs' element={<MyPYQs />} />
+            <Route path='my-faqs' element={<MyFAQs />} />
+            <Route path='my-notes' element={<MyNotes />} />
 
-          <Route path='add-contributors' element={<AddContributors />} />
-          <Route path='add-course' element={<AddCourse />} />
-          <Route path='add-syllabus' element={<AddSyllabus />} />
-          <Route path='add-pyqs' element={<AddPYQs />} />
-          <Route path='add-faqs' element={<AddFAQs />} />
-          <Route path='add-notes' element={<AddNotes />} />
-        </Route>
+            <Route path='add-contributors' element={<AddContributors />} />
+            <Route path='add-course' element={<AddCourse />} />
+            <Route path='add-syllabus' element={<AddSyllabus />} />
+            <Route path='add-pyqs' element={<AddPYQs />} />
+            <Route path='add-faqs' element={<AddFAQs />} />
+            <Route path='add-notes' element={<AddNotes />} />
+          </Route>
 
-      </Routes>
+        </Routes>
 
-    </div>
+      </div>
+    </AuthProvider>
   )
 }
 
