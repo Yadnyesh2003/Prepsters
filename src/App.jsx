@@ -5,6 +5,7 @@ import NavBar from './components/student/NavBar'
 import Home from './pages/student/Home'
 import ExamPrep from './pages/student/ExamPrep'
 import Contributors from './pages/student/Contributors'
+import AboutUs from './pages/student/AboutUs'
 import Syllabus from './pages/student/Syllabus'
 import PYQs from './pages/student/PYQs'
 import FAQs from './pages/student/FAQs'
@@ -44,6 +45,7 @@ function App() {
 
         <Route path = '/' element = {<Home />} />
         <Route path = '/contributors' element = {<Contributors />} />
+        <Route path = '/about-us' element = {<AboutUs />} />
 
         <Route path = '/exam-prep' element = {<ExamPrep />} >
           <Route path = 'syllabus' element = {< Syllabus/>} />
