@@ -133,7 +133,9 @@ const AddSyllabus = () => {
         <div className='space-y-2 '>
           <p className="text-lg text-left">Branch</p>
           <div className="flex flex-col gap-2 text-left">
-            {[  "Computer Engineering",
+            {[  
+                "General Science & Humanities",
+                "Computer Engineering",
                 "Information Technology",
                 "Electronics & Telecommunication",
                 "Artificial Intelligence & Data Science",

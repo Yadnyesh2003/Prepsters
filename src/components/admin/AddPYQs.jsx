@@ -192,7 +192,7 @@ const AddPYQs = () => {
             {["First Year", "Second Year", "Third Year", "Final Year"].map((year) => (
               <label key={year} className="flex items-center gap-2 hover:text-amber-300">
                 <input
-                  type="checkbox"
+                  type="radio"
                   value={year}
                   checked={formData.pyqsCategory.year === year} // Check if the year is selected
                   onChange={handleYearChange} // Handle year change

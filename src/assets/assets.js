@@ -46,6 +46,9 @@ import profile_img2 from './profile_img2.png'
 import profile_img3 from './profile_img3.png'
 import lesson_icon from './lesson_icon.svg'
 import tte_transparent_logo from './tte_transparent_logo.png'
+import edit_data from './edit_data.png'
+import delete_data from './delete_data.png'
+import view_data from './view_data.png'
 
 
 export const assets = {
@@ -96,7 +99,10 @@ export const assets = {
     play_icon,
     blue_tick_icon,
     lesson_icon,
-    tte_transparent_logo
+    tte_transparent_logo,
+    edit_data,
+    delete_data,
+    view_data
 }
 
 export const dummyEducatorData = {

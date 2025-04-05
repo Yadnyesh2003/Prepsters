@@ -1,6 +1,8 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { AppContext } from '../../context/AppContext';
-import { db, collection, updateDoc, doc, getDocs, deleteDoc } from "../../config/firebase";
+import { db, collection, updateDoc, doc, getDocs, deleteDoc, serverTimestamp } from "../../config/firebase";
+import Loading from '../../components/student/Loading'
+import { assets } from '../../assets/assets';
 
 const MyContributors = () => {
   const { isGhost } = useContext(AppContext); // Fetch user data/context
@@ -16,7 +18,7 @@ const MyContributors = () => {
   const getContributorData = async () => {
     try {
       // Reference to the 'contributors' collection in Firestore
-      const querySnapshot = await getDocs(collection(db, 'contributors'));
+      const querySnapshot = await getDocs(collection(db, 'Contributors'));
 
       // Create an array to store fetched data
       const contributors = [];
@@ -53,7 +55,7 @@ const MyContributors = () => {
 
   const handleDelete = async(id) => {
     try {
-      await deleteDoc(doc(db, 'contributors', id));
+      await deleteDoc(doc(db, 'Contributors', id));
       setContributorData(prevData =>
         prevData.filter(contributor => contributor.id !== id)
       );
@@ -74,7 +76,7 @@ const MyContributors = () => {
   // Save edited data to Firestore
   const handleSave = async (id) => {
     try {
-      const contributorRef = doc(db, 'contributors', id);
+      const contributorRef = doc(db, 'Contributors', id);
 
       // Update contributor data in Firestore
       await updateDoc(contributorRef, {
@@ -82,6 +84,7 @@ const MyContributors = () => {
         contributorRole: editedData.contributorRole,
         contributorContributions: editedData.contributorContributions,
         contributorSocial: editedData.contributorSocial,
+        updatedAt: serverTimestamp()
       });
 
       // Update the local state after saving
@@ -97,7 +100,7 @@ const MyContributors = () => {
   };
 
   if (loading) {
-    return <div>Loading...</div>; // Show loading indicator while fetching
+    return <Loading />; // Show loading indicator while fetching
   }
 
   if (error) {
@@ -105,65 +108,71 @@ const MyContributors = () => {
   }
 
   return (
-    <div className="container mx-auto py-8">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+    <div className="container mx-auto py-2 px-2">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 space-x-0.5">
         {contributorData.map((contributor) => (
-          <div key={contributor.id} className="contributor-card bg-white p-6 rounded-lg shadow-lg">
+          <div key={contributor.id} className="bg-sky-100 p-6 rounded-lg shadow-lg hover:bg-blue-200">
             {editingContributor === contributor.id ? (
               <div>
                 <div className="mb-4">
-                  <label className="block text-sm font-medium text-gray-700">Contributor Name</label>
+                  <label className="block text-sm text-left font-semibold text-black">Contributor Name</label>
                   <input
                     type="text"
                     name="contributorName"
                     value={editedData.contributorName}
                     onChange={handleChange}
-                    className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
+                    className="mt-1 block w-full p-2 border rounded-md"
                   />
                 </div>
                 <div className="mb-4">
-                  <label className="block text-sm font-medium text-gray-700">Role</label>
+                  <label className="block text-sm font-semibold text-left text-black">Role</label>
                   <input
                     type="text"
                     name="contributorRole"
                     value={editedData.contributorRole}
                     onChange={handleChange}
-                    className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
+                    className="mt-1 block w-full p-2 border rounded-md"
                   />
                 </div>
                 <div className="mb-4">
-                  <label className="block text-sm font-medium text-gray-700">Contributions</label>
+                  <label className="block text-sm font-semibold text-left text-black">Contributions</label>
                   <textarea
                     name="contributorContributions"
                     value={editedData.contributorContributions}
                     onChange={handleChange}
-                    className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
+                    className="mt-1 block w-full p-2 border rounded-md"
                   />
                 </div>
                 <div className="mb-4">
-                  <label className="block text-sm font-medium text-gray-700">Social Profile</label>
+                  <label className="block text-sm font-semibold text-left text-black">Social Profile</label>
                   <input
                     type="url"
                     name="contributorSocial"
                     value={editedData.contributorSocial}
                     onChange={handleChange}
-                    className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
+                    className="mt-1 block w-full p-2 border rounded-md"
                   />
                 </div>
                 <div className="flex gap-4">
-                  <button onClick={() => handleSave(contributor.id)} className="bg-blue-500 text-white px-4 py-2 rounded-md">Save</button>
-                  <button onClick={() => setEditingContributor(null)} className="bg-gray-300 text-gray-700 px-4 py-2 rounded-md">Cancel</button>
+                  <button onClick={() => handleSave(contributor.id)} className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-700">Save</button>
+                  <button onClick={() => setEditingContributor(null)} className="bg-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-red-400 hover:text-black">Cancel</button>
                 </div>
               </div>
             ) : (
               <div>
                 <h3 className="text-xl font-semibold">{contributor.contributorName}</h3>
-                <p><strong>Role:</strong> {contributor.contributorRole}</p>
-                <p><strong>Contributions:</strong> {contributor.contributorContributions}</p>
-                <p><strong>Social Profile:</strong> <a href={contributor.contributorSocial} target="_blank" rel="noopener noreferrer" className="text-blue-500">LinkedIn</a></p>
+                <p className='mt-2 text-gray-700 text-left'><strong>Role:</strong> {contributor.contributorRole}</p>
+                <p className='text-left text-gray-700'><strong>Contributions:</strong> {contributor.contributorContributions}</p>
+                <p className='text-left text-gray-700'><strong>Social Profile:</strong> <a href={contributor.contributorSocial} target="_blank" rel="noopener noreferrer" className="text-blue-500 hover:text-indigo-600">LinkedIn</a></p>
 
-                <button onClick={() => handleEdit(contributor)} className="mt-4 bg-yellow-500 text-white px-4 py-2 rounded-md">Edit Contributor</button>
-                <button onClick={() => handleDelete(contributor.id)} className="mt-4 bg-red-500 text-white px-4 py-2 rounded-md">Delete Contributor</button>
+                <button onClick={() => handleEdit(contributor)} className="mt-4 flex bg-yellow-500 text-white px-4 py-2 rounded-md hover:text-black">
+                  <img src={assets.edit_data} alt='edit' className='w-6 h-6 mr-2' />
+                  <span className="hidden md:inline">Edit Contributor</span>
+                </button>
+                <button onClick={() => handleDelete(contributor.id)} className="mt-4 flex bg-red-500 text-white px-4 py-2 rounded-md hover:text-black">
+                <img src={assets.delete_data} alt='delete' className='md:justify-center w-6 h-6 mr-2' />
+                <span className="hidden md:inline">Delete Contributor</span>
+                </button>
               </div>
             )}
           </div>

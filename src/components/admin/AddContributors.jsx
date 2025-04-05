@@ -17,12 +17,13 @@ const AddContributors = () => {
 
     try {
       // Save the contributor data to Firestore
-      const contributorRef = await addDoc(collection(db, "contributors"), { 
+      const contributorRef = await addDoc(collection(db, "Contributors"), { 
         adminId: 'user.auth.id',
         contributorName,
         contributorRole,
         contributorContributions,
         contributorSocial,
+        createdAt: serverTimestamp()
       });
 
       setAdminId("");
@@ -80,7 +81,7 @@ const AddContributors = () => {
         <div className="flex flex-col gap-2">
           <label className="text-lg text-left">Contributor Social URL</label>
           <input
-            type="url"
+            type="text"
             value={contributorSocial}
             onChange={(e) => setContributorSocial(e.target.value)}
             className="w-full p-2 border border-gray-300 rounded"
