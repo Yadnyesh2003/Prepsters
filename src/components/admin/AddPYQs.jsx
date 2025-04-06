@@ -204,7 +204,7 @@ const AddPYQs = () => {
           </div>
         </div>
 
-        {/* PYQS Link */}
+        {/* PYQS Link
         <div className='flex flex-col gap-2'>
           <p className="text-lg text-left">PYQs Link</p>
           <input
@@ -222,7 +222,35 @@ const AddPYQs = () => {
             required
             placeholder='Enter GDrive PDF Link...'
           />
+        </div> */}
+
+        
+        {/* PYQs Link */}
+        <div className='flex flex-col gap-2'>
+          <p className="text-lg text-left">PYQs Link</p>
+          <input
+            type="url"
+            name="pyqsLink"
+            value={formData.pyqsLink}
+            onChange={(e) => {
+              let modifiedLink = e.target.value;
+
+              // Check if the link matches the Google Drive view URL pattern
+              if (modifiedLink.includes("/view?usp=drive_link")) {
+                modifiedLink = modifiedLink.replace(/\/view\?usp=drive_link$/, '/preview');
+              }
+              
+              setFormData({
+                ...formData,
+                pyqsLink: modifiedLink,
+              });
+            }}
+            className="w-full p-2 border border-gray-300 rounded-md"
+            required
+            placeholder='Enter GDrive PDF Link...'
+          />
         </div>
+
 
 
         <button

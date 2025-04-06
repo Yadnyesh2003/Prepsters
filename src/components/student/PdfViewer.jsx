@@ -7,7 +7,7 @@ const PdfViewer = ({ pdfUrl, onClose }) => {
 
     return (
         <div className="fixed inset-0 backdrop-blur-sm flex justify-center items-center z-50">
-            <div className='bg-white w-full sm:w-3/4 md:w-3/4 lg:w-3/4 xl:w-3/4 2xl:w-3/4 h-full rounded-lg overflow-hidden border border-white'>
+            <div className='bg-white w-full sm:w-3/4 md:w-3/4 lg:w-3/4 xl:w-3/4 2xl:w-3/4 h-full rounded-lg overflow-hidden border-2 border-indigo-700'>
                 <div className="flex justify-between items-center bg-indigo-700 p-2">
                     {/* Logo image */}
                     <img

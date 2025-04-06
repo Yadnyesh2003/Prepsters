@@ -32,9 +32,8 @@ const MySyllabus = () => {
       setSyllabusData(syllabus);
       setFilteredData(syllabus); // Initially show all data
       setLoading(false);
-      console.log('Fetched Syllabus Data: ', syllabus);
     } catch (error) {
-      console.error('Error fetching syllabus:', error);
+      alert.error('Error fetching syllabus:', + error.message);
       setLoading(false);
     }
   };
@@ -66,7 +65,7 @@ const MySyllabus = () => {
       setEditedData({});
       getSyllabusData(); // Reload data from Firestore
     } catch (error) {
-      console.error('Error saving syllabus:', error);
+      alert.error('Error saving syllabus:', error);
     }
   };
 
@@ -77,7 +76,7 @@ const MySyllabus = () => {
       await deleteDoc(syllabusRef);
       getSyllabusData(); // Reload data from Firestore after deletion
     } catch (error) {
-      console.error('Error deleting syllabus:', error);
+      alert.error('Error deleting syllabus:', error);
     }
   };
 
