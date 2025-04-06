@@ -3,7 +3,7 @@ import { assets } from '../../assets/assets';
 import { AppContext } from '../../context/AppContext';
 
 const PdfViewer = ({ pdfUrl, onClose }) => {
-    const { navigate } = useContext(AppContext);
+    // const { navigate } = useContext(AppContext);
 
     return (
         <div className="fixed inset-0 backdrop-blur-sm flex justify-center items-center z-50">
@@ -14,14 +14,14 @@ const PdfViewer = ({ pdfUrl, onClose }) => {
                         src={assets.tte_transparent_logo}
                         alt="logo"
                         className="h-6 w-6 sm:h-8 sm:w-8 md:h-8 md:w-8 lg:h-10 lg:w-10 bg-white rounded-full object-cover border border-black cursor-pointer"
-                        onClick={() => navigate('/')} // Navigate to the home page on logo click
+                        // onClick={() => navigate('/')} // Navigate to the home page on logo click
                     />
                     {/* Close button */}
                     <button
-                        className="text-white font-bold hover:text-yellow-300"
+                        className="h-6 w-6 sm:h-8 sm:w-8 md:h-8 md:w-8 lg:h-10 lg:w-10 cursor-pointer"
                         onClick={onClose}
                     >
-                        Close
+                        <img src={assets.close_button} alt="Close" />
                     </button>
                 </div>
                 {/* PDF viewer */}

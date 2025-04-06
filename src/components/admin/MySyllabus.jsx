@@ -9,7 +9,7 @@ const MySyllabus = () => {
   const [syllabusData, setSyllabusData] = useState([]);
   const [filteredData, setFilteredData] = useState([]); // New state to hold the filtered syllabus data
   const [loading, setLoading] = useState(true);
-  const { isGhost } = useContext(AppContext);
+  const { isGhost, setIsGhost } = useContext(AppContext);
   const [pdfUrl, setPdfUrl] = useState(null);
 
   const [editingSyllabus, setEditingSyllabus] = useState(null);
@@ -107,7 +107,29 @@ const MySyllabus = () => {
     setFilteredData(filtered); // Update the filtered data
   };
 
+  // Handle Year Radio Selection
+  const handleYearChange = (e) => {
+    setEditedData({
+      ...editedData,
+      year: e.target.value, // Set selected year
+    });
+  };
 
+  // Handle Branch Checkbox Selection
+  const handleBranchChange = (e) => {
+    setEditedData({
+      ...editedData,
+      branch: e.target.value,
+    });
+  };
+
+  const openPdfViewer = (url) => {
+    setPdfUrl(url); // Set the PDF URL to be displayed in the viewer
+  };
+
+  const closePdfViewer = () => {
+    setPdfUrl(null); // Close the viewer by setting PDF URL to null
+  };
 
   if (loading) {
     return <Loading />;
@@ -144,7 +166,7 @@ const MySyllabus = () => {
               value={filter.institution}
               onChange={handleFilterChange}
               className="border p-2"
-              placeholder="Filter by Institution"
+              placeholder="Example: Mumbai University"
             />
           </div>
 

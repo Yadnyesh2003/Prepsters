@@ -1,4 +1,9 @@
-import React from 'react'
+import React, { useContext, useEffect, useState } from 'react';
+import { getDocs, collection, db, doc, updateDoc, deleteDoc, serverTimestamp } from '../../config/firebase'; 
+import { AppContext } from '../../context/AppContext';
+import Loading from '../../components/student/Loading';
+import PdfViewer from '../student/PdfViewer';
+import { assets } from '../../assets/assets';
 
 const MyPYQs = () => {
   return (

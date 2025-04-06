@@ -49,6 +49,7 @@ import tte_transparent_logo from './tte_transparent_logo.png'
 import edit_data from './edit_data.png'
 import delete_data from './delete_data.png'
 import view_data from './view_data.png'
+import close_button from './close_button.png'
 
 
 export const assets = {
@@ -102,7 +103,8 @@ export const assets = {
     tte_transparent_logo,
     edit_data,
     delete_data,
-    view_data
+    view_data,
+    close_button,
 }
 
 export const dummyEducatorData = {
