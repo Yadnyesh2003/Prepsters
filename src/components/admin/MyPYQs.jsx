@@ -5,6 +5,8 @@ import Loading from '../../components/student/Loading';
 import PdfViewer from '../student/PdfViewer';
 import { assets } from '../../assets/assets';
 
+import FilterComponent from './FilterComponent';
+
 const MyPYQs = () => {
   const [pyqData, setPyqData] = useState([]);
   const [filteredData, setFilteredData] = useState([]); // New state to hold the filtered PYQ data
@@ -24,6 +26,23 @@ const MyPYQs = () => {
     year: ''
   });
 
+//================================================================================================================================================================================================
+
+  //For FilterComponent.jsx 
+  const filterOptions = {
+    branches: [
+      "General Science & Humanities", 
+      "Computer Engineering", 
+      "Information Technology", 
+      "Electronics & Telecommunication", 
+      "Artificial Intelligence & Data Science", 
+      "Electronics & Computer Science"
+    ],
+    years: ["First Year", "Second Year", "Third Year", "Final Year"]
+  };
+
+//===============================================================================================================================================================================================
+
   // Fetch PYQ data from Firestore
   const getPYQData = async () => {
     try {
@@ -32,7 +51,6 @@ const MyPYQs = () => {
         id: doc.id,
         ...doc.data(),
       }));
-      console.log('PyqData is:-  ', pyqs)
       setPyqData(pyqs);
       setFilteredData(pyqs); // Initially show all data
       setLoading(false);
@@ -84,30 +102,14 @@ const MyPYQs = () => {
     }
   };
 
-  const handleFilterChange = (e) => {
-    const { name, value } = e.target;
-    const updatedFilter = { ...filter, [name]: value };
-    setFilter(updatedFilter); // Update filter state
-    filterPYQData(updatedFilter); // Immediately apply the filter with the updated state
-  };
-
-  // // Filter PYQ data based on selected filters
-  // const filterPYQData = (filterValues) => {
-  //   const filtered = pyqData.filter((doc) => {
-  //     const { branch, institution, year } = doc.pyqsCategory || {};
-
-  //     const institutionMatch = filterValues.institution
-  //       ? institution && institution.toLowerCase().includes(filterValues.institution.toLowerCase())
-  //       : true;
-
-  //     return (
-  //       (filterValues.branch ? branch === filterValues.branch : true) &&
-  //       institutionMatch &&
-  //       (filterValues.year ? year === filterValues.year : true)
-  //     );
-  //   });
-  //   setFilteredData(filtered); // Update the filtered data
+//======================================================================================================
+  // const handleFilterChange = (e) => {
+  //   const { name, value } = e.target;
+  //   const updatedFilter = { ...filter, [name]: value };
+  //   setFilter(updatedFilter); // Update filter state
+  //   filterPYQData(updatedFilter); // Immediately apply the filter with the updated state
   // };
+//=======================================================================================================
 
   // Filter PYQ data based on selected filters
 const filterPYQData = (filterValues) => {
@@ -141,13 +143,6 @@ const filterPYQData = (filterValues) => {
     });
   };
 
-  // // Handle Branch Checkbox Selection
-  // const handleBranchChange = (e) => {
-  //   setEditedData({
-  //     ...editedData,
-  //     branch: e.target.value,
-  //   });
-  // };
 
   const handleBranchChange = (e) => {
     const branch = e.target.value;
@@ -177,57 +172,16 @@ const filterPYQData = (filterValues) => {
   return isGhost && (
     <div className="max-w-6xl mx-auto p-4">
       {/* Filter Component */}
-      <div className="mb-4 p-4 bg-cyan-300 shadow-lg rounded-md">
-        <h2 className="text-lg font-semibold">Filter PYQ Documents</h2>
-        <div className="flex flex-col md:flex-row gap-4 mt-4">
-
-          <div className="w-full sm:w-auto md:w-auto lg:w-auto">
-            <label className="block text-sm font-semibold text-black mb-2">Branch</label>
-            <select
-              name="branch"
-              value={filter.branch}
-              onChange={handleFilterChange}
-              className="border p-2 w-full max-w-full md:w-3/4 lg:w-1/2 xl:w-1/4 mt-2 md:mt-0 overflow-auto"
-            >
-              <option value="">All Branches</option>
-              {["General Science & Humanities", "Computer Engineering", "Information Technology", "Electronics & Telecommunication", "Artificial Intelligence & Data Science", "Electronics & Computer Science"].map((branch) => (
-                <option key={branch} value={branch}>{branch}</option>
-              ))}
-            </select>
-          </div>
+      <FilterComponent 
+        filter={filter}
+        setFilter={setFilter}
+        filterOptions={filterOptions}
+        onFilterChange={filterPYQData}
+      />
 
 
-
-          {/* Institution Filter */}
-          <div>
-            <label className="block text-sm font-semibold text-black">Institution</label>
-            <input
-              type="text"
-              name="institution"
-              value={filter.institution}
-              onChange={handleFilterChange}
-              className="border p-2"
-              placeholder="Example: Mumbai University"
-            />
-          </div>
-
-          {/* Year Filter */}
-          <div>
-            <label className="block text-sm font-semibold text-black">Year</label>
-            <select
-              name="year"
-              value={filter.year}
-              onChange={handleFilterChange}
-              className="border p-2"
-            >
-              <option value="">All Years</option>
-              {["First Year", "Second Year", "Third Year", "Final Year"].map((year) => (
-                <option key={year} value={year}>{year}</option>
-              ))}
-            </select>
-          </div>
-        </div>
-      </div>
+      {/* INITIAL CODE PRESENT HERE HAS BEEN SHIFTER BELOW OUT OF THE RETURN STATEMENT */}
+  
 
       {/* Displaying Filtered PYQ Data */}
       <div className="space-y-4">
@@ -250,24 +204,6 @@ const filterPYQData = (filterValues) => {
                     />
                   </div>
 
-                  {/* Branches Checkboxes
-                  <div className="mt-2">
-                    <label className="block text-sm font-semibold text-black">Branch</label>
-                    <div className="flex flex-col md:flex-row gap-4 mt-2">
-                      {["General Science & Humanities", "Computer Engineering", "Information Technology", "Electronics & Telecommunication", "Artificial Intelligence & Data Science", "Electronics & Computer Science"].map((branch) => (
-                        <label key={branch} className="flex items-center hover:text-indigo-700">
-                          <input
-                            type="radio"
-                            value={branch}
-                            checked={editedData.branch === branch}
-                            onChange={handleBranchChange}
-                            className="mr-2"
-                          />
-                          {branch}
-                        </label>
-                      ))}
-                    </div>
-                  </div> */}
 
                   {/* Branches Checkboxes */}
                   <div className="mt-2">
@@ -366,3 +302,53 @@ const filterPYQData = (filterValues) => {
 };
 
 export default MyPYQs;
+
+
+
+
+{/* <div className="mb-4 p-4 bg-cyan-300 shadow-lg rounded-md">
+        <h2 className="text-lg font-semibold">Filter PYQ Documents</h2>
+        <div className="flex flex-col md:flex-row gap-4 mt-4">
+
+          <div className="w-full sm:w-auto md:w-auto lg:w-auto">
+            <label className="block text-sm font-semibold text-black mb-2">Branch</label>
+            <select
+              name="branch"
+              value={filter.branch}
+              onChange={handleFilterChange}
+              className="border p-2 w-full max-w-full md:w-3/4 lg:w-1/2 xl:w-1/4 mt-2 md:mt-0 overflow-auto"
+            >
+              <option value="">All Branches</option>
+              {["General Science & Humanities", "Computer Engineering", "Information Technology", "Electronics & Telecommunication", "Artificial Intelligence & Data Science", "Electronics & Computer Science"].map((branch) => (
+                <option key={branch} value={branch}>{branch}</option>
+              ))}
+            </select>
+          </div>
+         
+          <div>
+            <label className="block text-sm font-semibold text-black">Institution</label>
+            <input
+              type="text"
+              name="institution"
+              value={filter.institution}
+              onChange={handleFilterChange}
+              className="border p-2"
+              placeholder="Example: Mumbai University"
+            />
+          </div>
+         
+          <div>
+            <label className="block text-sm font-semibold text-black">Year</label>
+            <select
+              name="year"
+              value={filter.year}
+              onChange={handleFilterChange}
+              className="border p-2">
+              <option value="">All Years</option>
+              {["First Year", "Second Year", "Third Year", "Final Year"].map((year) => (
+                <option key={year} value={year}>{year}</option>
+              ))}
+            </select>
+          </div>
+        </div>
+      </div> */}
