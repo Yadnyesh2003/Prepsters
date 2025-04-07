@@ -224,6 +224,18 @@ const filterPYQData = (filterValues) => {
                     </div>
                   </div>
 
+                {/* Academic Year */}
+                  <div className="mt-2 flex flex-col md:flex-row md:items-center justify-between gap-2">
+                    <label className="block text-sm font-semibold text-black w-full md:w-1/4">Academic Year</label>
+                    <input
+                      type="text"
+                      value={editedData.academicYear}
+                      onChange={(e) => setEditedData({ ...editedData, academicYear: e.target.value })}
+                      className="border p-2 w-full md:w-3/4 mt-2 md:mt-0"
+                      required
+                    />
+                  </div>
+
 
                   {/* Institution */}
                   <div className="mt-2 flex flex-col md:flex-row md:items-center justify-between gap-2">

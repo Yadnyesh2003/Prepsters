@@ -154,8 +154,8 @@ const MyContributors = () => {
                   />
                 </div>
                 <div className="flex gap-4">
-                  <button onClick={() => handleSave(contributor.id)} className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-700">Save</button>
-                  <button onClick={() => setEditingContributor(null)} className="bg-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-red-400 hover:text-black">Cancel</button>
+                  <button onClick={() => handleSave(contributor.id)} className="bg-green-500 hover:bg-green-300 hover:text-black text-white px-4 py-2 rounded-md">Save</button>
+                  <button onClick={() => setEditingContributor(null)} className="bg-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-red-500 hover:text-black">Cancel</button>
                 </div>
               </div>
             ) : (

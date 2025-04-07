@@ -33,7 +33,7 @@ const AdminSidebar = ({ activeSidebarType }) => {
   
 
   return isGhost && (
-    <div className='bg-white md:w-64 w-16 border-r min-h-screen text-base border-gray-500 py-2 flex flex-col'>
+    <div className='bg-white md:w-55 w-16 border-r min-h-screen text-base border-gray-500 py-2 flex flex-col'>
       {menuItems.map((item) => (
         <NavLink 
           to={item.path}
