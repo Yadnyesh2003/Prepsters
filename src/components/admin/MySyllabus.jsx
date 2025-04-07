@@ -5,6 +5,8 @@ import Loading from '../../components/student/Loading';
 import PdfViewer from '../student/PdfViewer';
 import { assets } from '../../assets/assets';
 
+import FilterComponent from './FilterComponent';
+
 const MySyllabus = () => {
   const [syllabusData, setSyllabusData] = useState([]);
   const [filteredData, setFilteredData] = useState([]); // New state to hold the filtered syllabus data
@@ -20,6 +22,23 @@ const MySyllabus = () => {
     institution: '',
     year: ''
   });
+
+//================================================================================================================================================================================================
+
+  //For FilterComponent.jsx 
+  const filterOptions = {
+    branches: [
+      "General Science & Humanities", 
+      "Computer Engineering", 
+      "Information Technology", 
+      "Electronics & Telecommunication", 
+      "Artificial Intelligence & Data Science", 
+      "Electronics & Computer Science"
+    ],
+    years: ["First Year", "Second Year", "Third Year", "Final Year"]
+  };
+
+//===============================================================================================================================================================================================
 
   // Fetch syllabus data from Firestore
   const getSyllabusData = async () => {
@@ -80,12 +99,14 @@ const MySyllabus = () => {
     }
   };
 
-  const handleFilterChange = (e) => {
-    const { name, value } = e.target;
-    const updatedFilter = { ...filter, [name]: value };
-    setFilter(updatedFilter); // Update filter state
-    filterSyllabusData(updatedFilter); // Immediately apply the filter with the updated state
-  };
+//COMMENTED handleFilterChange() TO INTEGRATE FILTER COMPONENT
+
+  // const handleFilterChange = (e) => {
+  //   const { name, value } = e.target;
+  //   const updatedFilter = { ...filter, [name]: value };
+  //   setFilter(updatedFilter); // Update filter state
+  //   filterSyllabusData(updatedFilter); // Immediately apply the filter with the updated state
+  // };
 
   // Filter syllabus data based on selected filters
   const filterSyllabusData = (filterValues) => {
@@ -137,55 +158,15 @@ const MySyllabus = () => {
   return isGhost && (
     <div className="max-w-6xl mx-auto p-4">
       {/* Filter Component */}
-      <div className="mb-4 p-4 bg-cyan-300 shadow-lg rounded-md">
-        <h2 className="text-lg font-semibold">Filter Syllabus Documents</h2>
-        <div className="flex flex-col md:flex-row gap-4 mt-4">
-          {/* Branch Filter */}
-          <div>
-            <label className="block text-sm font-semibold text-black">Branch</label>
-            <select
-              name="branch"
-              value={filter.branch}
-              onChange={handleFilterChange}
-              className="border p-2"
-            >
-              <option value="">All Branches</option>
-              {["General Science & Humanities", "Computer Engineering", "Information Technology", "Electronics & Telecommunication", "Artificial Intelligence & Data Science", "Electronics & Computer Science"].map((branch) => (
-                <option key={branch} value={branch}>{branch}</option>
-              ))}
-            </select>
-          </div>
 
-          {/* Institution Filter */}
-          <div>
-            <label className="block text-sm font-semibold text-black">Institution</label>
-            <input
-              type="text"
-              name="institution"
-              value={filter.institution}
-              onChange={handleFilterChange}
-              className="border p-2"
-              placeholder="Example: Mumbai University"
-            />
-          </div>
+      <FilterComponent 
+        filter={filter}
+        setFilter={setFilter}
+        filterOptions={filterOptions}
+        onFilterChange={filterSyllabusData}
+      />
 
-          {/* Year Filter */}
-          <div>
-            <label className="block text-sm font-semibold text-black">Year</label>
-            <select
-              name="year"
-              value={filter.year}
-              onChange={handleFilterChange}
-              className="border p-2"
-            >
-              <option value="">All Years</option>
-              {["First Year", "Second Year", "Third Year", "Final Year"].map((year) => (
-                <option key={year} value={year}>{year}</option>
-              ))}
-            </select>
-          </div>
-        </div>
-      </div>
+ {/* INITIAL CODE PRESENT HERE HAS BEEN SHIFTER BELOW OUT OF THE RETURN STATEMENT */}
 
       {/* Displaying Filtered Syllabus Data */}
       <div className="space-y-4">
@@ -196,8 +177,8 @@ const MySyllabus = () => {
               {editingSyllabus === doc.id ? (
                 // Edit form here (same as your original code)
                 <div className="w-full max-w-5xl mx-auto p-4">
-{/* Syllabus Title */}
-<div className="mt-2 flex flex-col md:flex-row md:items-center justify-between gap-2">
+                {/* Syllabus Title */}
+                <div className="mt-2 flex flex-col md:flex-row md:items-center justify-between gap-2">
                   <label className="block text-sm font-semibold text-black w-full md:w-1/4">Syllabus Title</label>
                   <input
                     type="text"
@@ -328,3 +309,55 @@ const MySyllabus = () => {
 };
 
 export default MySyllabus;
+
+
+
+{/* <div className="mb-4 p-4 bg-cyan-300 shadow-lg rounded-md">
+<h2 className="text-lg font-semibold">Filter Syllabus Documents</h2>
+<div className="flex flex-col md:flex-row gap-4 mt-4">
+
+  <div>
+    <label className="block text-sm font-semibold text-black">Branch</label>
+    <select
+      name="branch"
+      value={filter.branch}
+      onChange={handleFilterChange}
+      className="border p-2"
+    >
+      <option value="">All Branches</option>
+      {["General Science & Humanities", "Computer Engineering", "Information Technology", "Electronics & Telecommunication", "Artificial Intelligence & Data Science", "Electronics & Computer Science"].map((branch) => (
+        <option key={branch} value={branch}>{branch}</option>
+      ))}
+    </select>
+  </div>
+
+  
+  <div>
+    <label className="block text-sm font-semibold text-black">Institution</label>
+    <input
+      type="text"
+      name="institution"
+      value={filter.institution}
+      onChange={handleFilterChange}
+      className="border p-2"
+      placeholder="Example: Mumbai University"
+    />
+  </div>
+
+ 
+  <div>
+    <label className="block text-sm font-semibold text-black">Year</label>
+    <select
+      name="year"
+      value={filter.year}
+      onChange={handleFilterChange}
+      className="border p-2"
+    >
+      <option value="">All Years</option>
+      {["First Year", "Second Year", "Third Year", "Final Year"].map((year) => (
+        <option key={year} value={year}>{year}</option>
+      ))}
+    </select>
+  </div>
+</div>
+</div>  */}
