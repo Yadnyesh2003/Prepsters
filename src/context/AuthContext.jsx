@@ -18,6 +18,8 @@ export const AuthProvider = ({ children }) => {
     const [isAuth, setIsAuth] = useState(false);
     const [role, setRole] = useState(null);
     const navigate = useNavigate();
+    const [loading, setLoading] = useState(true); // Add this
+
 
     // Function to fetch user role from Firestore based on email
     const fetchUserRoleByEmail = async (email) => {
@@ -71,6 +73,8 @@ export const AuthProvider = ({ children }) => {
                 setIsAuth(false);
                 setRole(null);
             }
+
+            setLoading(false);
         });
 
         return () => unsubscribe();
@@ -116,7 +120,7 @@ export const AuthProvider = ({ children }) => {
     };
 
     return (
-        <AuthContext.Provider value={{ user, isAuth, role, signInWithGoogle, logoutUser }}>
+        <AuthContext.Provider value={{ user, isAuth, role, loading, signInWithGoogle, logoutUser }}>
             {children}
         </AuthContext.Provider>
     );
