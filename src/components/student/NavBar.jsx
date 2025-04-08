@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { AiOutlineClose, AiOutlineMenu } from 'react-icons/ai';
 import { Link } from 'react-router-dom';
 import { useAuth } from "../../context/AuthContext";
+import img from '../../assets/tte_transparent_logo.png'
 
 const Navbar = () => {
   const { signInWithGoogle } = useAuth();
@@ -15,8 +16,6 @@ const Navbar = () => {
 
   const navItems = [
     { id: 1, text: 'Home', path: '/' },
-    { id: 2, text: 'Company', path: '/company' },
-    { id: 3, text: 'Resources', path: '/resources' },
     { id: 4, text: 'About', path: '/about' },
     { id: 5, text: 'Contact', path: '/contact' },
   ];
@@ -24,15 +23,17 @@ const Navbar = () => {
   // bg - gradient - to - br from - [#1F2937] to - [#3B4864]
 
   return (
-    <nav className="bg-black text-white shadow-lg">
-      <div className="container mx-auto flex justify-between items-center py-4 px-6">
+    <nav className="bg-black text-white z-50 relative shadow-lg">
+      <div className="container mx-auto flex justify-between items-center py-3 px-6">
         {/* Logo */}
-        <Link to="/" className="text-3xl font-bold text-[#00DF9A]">
-          TTE
+        <Link to="/" className="flex items-center space-x-2">
+          <div className="bg-white rounded-full p-1 shadow-md">
+            <img src={img} alt="TTE Logo" className="h-10 w-10 object-contain" />
+          </div>
         </Link>
 
         {/* Desktop Navigation */}
-        <ul className="hidden md:flex space-x-6">
+        <ul className="hidden md:flex space-x-6 ml-auto">
           {navItems.map(item => (
             <li key={item.id}>
               <Link
@@ -54,7 +55,7 @@ const Navbar = () => {
           Login
         </Link> */}
 
-        <button className="hidden md:block px-5 py-2 bg-[#ffffff] text-gray-900 font-semibold rounded-lg hover:bg-[#c1c1c1] transition duration-300"
+        <button className="hidden md:block ml-10 px-5 py-2 bg-[#ffffff] text-gray-900 font-semibold rounded-lg hover:bg-[#c1c1c1] transition duration-300"
           onClick={signInWithGoogle}>Get Started</button>
 
         {/* Mobile Menu Toggle Button */}
