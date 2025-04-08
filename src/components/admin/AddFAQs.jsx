@@ -11,6 +11,7 @@ const AddFAQs = () => {
     },
     faqsLink: '',
     faqsTitle: '',
+    contributorName: '',
     adminId: ''
   });
   const [loading, setLoading] = useState(false);
@@ -83,14 +84,15 @@ const AddFAQs = () => {
           branch: [],
           institution: '',
           year: '',
-          subjectName:''
+          subjectName:'',
         },
         faqsLink: '',
+        contributorName: '',
         faqsTitle: '',
       })
 
     } catch (error) {
-      setError('Error adding document: ', + error.message);
+      setError('Error adding document: ' + error.message);
     } finally {
       setLoading(false);
     }
@@ -185,6 +187,19 @@ const AddFAQs = () => {
               </label>
             ))}
           </div>
+        </div>
+
+       {/* Contributor Name */}
+        <div className='flex flex-col gap-2'>
+          <p className="text-lg text-left">Contributor Name</p>
+          <input
+            type="text"
+            name="contributorName"
+            value={formData.contributorName}
+            onChange={handleChange}
+            className="w-full p-2 border border-gray-300 rounded-md"
+            required
+          />
         </div>
 
         {/* FAQS Link */}

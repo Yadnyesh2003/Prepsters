@@ -46,7 +46,7 @@ const MyNotes = () => {
   
   const getNoteData = async () => {
     try {
-      const querySnapshot = await getDocs(collection(db, 'notes'));
+      const querySnapshot = await getDocs(collection(db, 'Notes'));
       const notes = querySnapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
@@ -78,7 +78,7 @@ const MyNotes = () => {
     if (!editingNote) return;
 
     try {
-      const noteRef = doc(db, 'notes', editingNote);
+      const noteRef = doc(db, 'Notes', editingNote);
       await updateDoc(noteRef, {
         notesCategory: editedData,
         notesTitle: editedData.notesTitle,
@@ -95,7 +95,7 @@ const MyNotes = () => {
   // Handle Delete - Delete the PYQ from Firestore
   const handleDelete = async (noteId) => {
     try {
-      const noteRef = doc(db, 'notes', noteId);
+      const noteRef = doc(db, 'Notes', noteId);
       await deleteDoc(noteRef);
       getNoteData(); // Reload data from Firestore after deletion
     } catch (error) {

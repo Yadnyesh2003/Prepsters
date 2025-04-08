@@ -68,7 +68,7 @@ const AddNotes = () => {
     setError("");
 
     try {
-      const notesRef = await addDoc(collection(db, 'notes'), {
+      const notesRef = await addDoc(collection(db, 'Notes'), {
         ...formData,
         createdAt: serverTimestamp(),
         createdBy: 'auth.currentUser.displayName', // Correct this line if you have Firebase Auth setup

@@ -18,6 +18,7 @@ const MyPYQs = () => {
   const [editedData, setEditedData] = useState({
     branch: [],
     pyqsTitle: '',
+    subjectName: [], 
   });
 
   const [filter, setFilter] = useState({
@@ -249,6 +250,24 @@ const filterPYQData = (filterValues) => {
                     />
                   </div>
 
+                  {/* Edit Subject Names */}
+                  <div className="mt-2">
+                    <label className="block text-sm font-semibold text-black">Subject Name</label>
+                    <input
+                      type="text"
+                      value={Array.isArray(editedData.subjectName) ? editedData.subjectName.join(', ') : ''} // Display comma-separated subjects
+                      onChange={(e) => {
+                        const subjects = e.target.value.split(',').map(subject => subject.trim());
+                        setEditedData({
+                          ...editedData,
+                          subjectName: subjects ||[]
+                        });
+                      }}
+                      className="border p-2 w-full md:w-3/4 mt-2 md:mt-0"
+                    />
+                    <p className="text-sm text-gray-500">Enter subject names separated by commas.</p>
+                  </div>
+
 
                   {/* Year Radio Buttons */}
                   <div className="mt-2">
@@ -294,6 +313,9 @@ const filterPYQData = (filterValues) => {
                   )}
                   {pyqsCategory.branch && (
                     <p className="text-gray-700">Branch: {pyqsCategory.branch.join(', ')}</p>
+                  )}
+                  {pyqsCategory.subjectName && (
+                    <p className="text-gray-700">Subject Name: {Array.isArray(pyqsCategory.subjectName) ? pyqsCategory.subjectName.join(', ') : ''}</p>
                   )}
                   {pyqsCategory.institution && (
                     <p className="text-gray-700">Institution: {pyqsCategory.institution}</p>

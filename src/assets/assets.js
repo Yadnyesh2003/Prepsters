@@ -50,6 +50,7 @@ import edit_data from './edit_data.png'
 import delete_data from './delete_data.png'
 import view_data from './view_data.png'
 import close_button from './close_button.png'
+import access_forbidden from './access_forbidden.png'
 
 
 export const assets = {
@@ -105,6 +106,7 @@ export const assets = {
     delete_data,
     view_data,
     close_button,
+    access_forbidden
 }
 
 export const dummyEducatorData = {
