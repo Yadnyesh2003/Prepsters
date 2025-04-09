@@ -31,10 +31,10 @@ export const AuthProvider = ({ children }) => {
             if (!querySnapshot.empty) {
                 const userData = querySnapshot.docs[0].data();
                 setRole(userData.role);
-                redirectUser(userData.role);
-                return true; // User already exists
+                // redirectUser(userData.role);
+                return userData.role; // User already exists
             }
-            return false; // User does not exist
+            return null; // User does not exist
         } catch (error) {
             console.error("Error fetching user role:", error);
         }
@@ -43,6 +43,7 @@ export const AuthProvider = ({ children }) => {
     // Function to save user details in Firestore if new
     const saveUserToFirestore = async (user) => {
         try {
+            // const userExists = await fetchUserRoleByEmail(user.email);
             const userExists = await fetchUserRoleByEmail(user.email);
 
             if (!userExists) {
@@ -55,6 +56,8 @@ export const AuthProvider = ({ children }) => {
                 });
                 setRole("student"); // Set default role
                 redirectUser("student"); // Redirect as a new student
+            } else {
+                redirectUser(userExists); // Redirect based on existing role
             }
         } catch (error) {
             console.error("Error saving user:", error);
@@ -85,16 +88,19 @@ export const AuthProvider = ({ children }) => {
         try {
             // Set Firebase authentication persistence
             await setPersistence(auth, browserLocalPersistence);
+            console.log("Persistence set to local");
+            console.log(isAuth)
+            // if (!isAuth) {
+            console.log(isAuth)
+            const userCredential = await signInWithPopup(auth, googleProvider);
 
-            if (!isAuth) {
-                const userCredential = await signInWithPopup(auth, googleProvider);
-                const loggedInUser = userCredential.user;
-                setUser(loggedInUser);
-                setIsAuth(true);
+            const loggedInUser = userCredential.user;
+            setUser(loggedInUser);
+            setIsAuth(true);
 
-                // Check if user exists & save if new
-                await saveUserToFirestore(loggedInUser);
-            }
+            // Check if user exists & save if new
+            await saveUserToFirestore(loggedInUser);
+            // }
         } catch (error) {
             console.error("Google Sign-in Error:", error.message);
             throw error;
