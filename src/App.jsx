@@ -52,12 +52,12 @@ const Resources = lazy(() => import('./pages/student/Resourses'));
 
 
 // Wrapper for role-based access
-const StudentRoute = ({ element, children }) => {
+// const StudentRoute = ({ element, children }) => {
 
-  const { user } = useAuth();
-  if (!user || user.role !== 'student') return <Navigate to="/" replace />;
-  return element || children;
-};
+//   const { user } = useAuth();
+//   if (!user || user.role !== 'student') return <Navigate to="/" replace />;
+//   return element || children;
+// };
 // const AdminRoute = ({ element }) => {
 //   const { user } = useAuth();
 //   return user && user.role === 'admin' ? element : <Navigate to="/" replace />;
@@ -84,7 +84,7 @@ function App() {
               path="/Home"
               element={
                 <ProtectedRouteStudent allowedRole="student">
-                  <StudentRoute element={<Home />} />
+                  <Home />
                 </ProtectedRouteStudent>
               }
             />
@@ -93,33 +93,33 @@ function App() {
               path="/exam-prep"
               element={
                 <ProtectedRouteStudent allowedRole="student">
-                  <StudentRoute element={<ExamPrep />} />
+                  <ExamPrep />
                 </ProtectedRouteStudent>
               }
             >
-              <Route path='syllabus' element={<StudentRoute element={<Syllabus />} />} />
-              <Route path='pyqs' element={<StudentRoute element={<PYQs />} />} />
-              <Route path='faqs' element={<StudentRoute element={<FAQs />} />} />
+              <Route path="syllabus" element={<Syllabus />} />
+              <Route path="pyqs" element={<PYQs />} />
+              <Route path="faqs" element={<FAQs />} />
             </Route>
 
             <Route
               path="/resources"
               element={
                 <ProtectedRouteStudent allowedRole="student">
-                  {<StudentRoute element={<Resources />} />}
+                  <Resources />
                 </ProtectedRouteStudent>
               }
             >
-              <Route path='course-list' element={<StudentRoute element={<CoursesList />} />} />
-              <Route path='course-list/:input' element={<StudentRoute element={<CoursesList />} />} />
-              <Route path='course/:id' element={<StudentRoute element={<CourseDetails />} />} />
-              <Route path='my-enrollments' element={<StudentRoute element={<MyEnrollments />} />} />
-              <Route path='player/:courseId' element={<StudentRoute element={<Player />} />} />
-              <Route path='loading/:path' element={<StudentRoute element={<Loading />} />} />
-              <Route path='notes' element={<StudentRoute element={<Notes />} />} />
-
+              <Route path="course-list" element={<CoursesList />} />
+              <Route path="course-list/:input" element={<CoursesList />} />
+              <Route path="course/:id" element={<CourseDetails />} />
+              <Route path="my-enrollments" element={<MyEnrollments />} />
+              <Route path="player/:courseId" element={<Player />} />
+              <Route path="loading/:path" element={<Loading />} />
+              <Route path="notes" element={<Notes />} />
               <Route path="unauthorized" element={<div>Unauthorized</div>} />
             </Route>
+
 
             <Route
               path="/ghost"
