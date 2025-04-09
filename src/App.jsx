@@ -66,7 +66,7 @@ const Resources = lazy(() => import('./pages/student/Resourses'));
 
 
 function App() {
-  // const isAdminRoute = useMatch('/ghost/*')
+  const isAdminRoute = useMatch('/ghost/*')
 
   return (
     <Suspense fallback={<Loader />}>
@@ -129,9 +129,7 @@ function App() {
                 </ProtectedRoute>
               }
             >
-
-              <Route path='' element={<Dashboard />} />
-              <Route path="unauthorized" element={<div>Unauthorized Access</div>} />
+              <Route index element={<Dashboard />} />
               <Route path='students-enrolled' element={<StudentsEnrolled />} />
               <Route path='my-contributors' element={<MyContributors />} />
               <Route path='my-courses' element={<MyCourses />} />
@@ -139,13 +137,13 @@ function App() {
               <Route path='my-pyqs' element={<MyPYQs />} />
               <Route path='my-faqs' element={<MyFAQs />} />
               <Route path='my-notes' element={<MyNotes />} />
-
               <Route path='add-contributors' element={<AddContributors />} />
               <Route path='add-course' element={<AddCourse />} />
               <Route path='add-syllabus' element={<AddSyllabus />} />
               <Route path='add-pyqs' element={<AddPYQs />} />
               <Route path='add-faqs' element={<AddFAQs />} />
               <Route path='add-notes' element={<AddNotes />} />
+              <Route path='unauthorized' element={<div>Unauthorized Access</div>} />
             </Route>
 
           </Routes>

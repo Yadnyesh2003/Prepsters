@@ -13,7 +13,7 @@ const StudentRoute = ({ element }) => {
     const { user } = useAuth();
     return user && user.role === 'student' ? element : <Navigate to="/" replace />;
 };
-const AdminRoute = ({ element }) => {
-    const { user } = useAuth();
-    return user && user.role === 'admin' ? element : <Navigate to="/" replace />;
-}; 
+// const AdminRoute = ({ element }) => {
+//     const { user } = useAuth();
+//     return user && user.role === 'admin' ? element : <Navigate to="/" replace />;
+// }; 
