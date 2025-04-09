@@ -1,5 +1,7 @@
 import React from 'react'
 import { useAuth } from '../../context/AuthContext'
+import Navbar from '../../components/student/NavbarHome'
+
 
 const Home = () => {
   const { logoutUser } = useAuth()
