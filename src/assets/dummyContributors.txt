@@ -1,0 +1,92 @@
+[
+    {
+        "contributorName": "Ravi Sharma",
+        "contributorContributions": "Created high-quality and engaging content that improved user engagement. Developed a content strategy that led to an increase in traffic by 30%.",
+        "contributorRole": "Content Creator",
+        "contributorSocial": "https://www.linkedin.com/in/ravi-sharma-9b45b7b1/"
+    },
+    {
+        "contributorName": "Priya Singh",
+        "contributorContributions": "Designed and optimized the website's content layout, improving user experience. Collaborated with designers and developers to ensure seamless content integration.",
+        "contributorRole": "Content Designer",
+        "contributorSocial": "https://www.linkedin.com/in/priya-singh-8a6d6972/"
+    },
+    {
+        "contributorName": "Ankit Verma",
+        "contributorContributions": "Developed and maintained the back-end architecture of the web platform. Optimized database performance and ensured seamless integration with third-party services.",
+        "contributorRole": "Developer",
+        "contributorSocial": "https://www.linkedin.com/in/ankit-verma-b4a5b799/"
+    },
+    {
+        "contributorName": "Neha Gupta",
+        "contributorContributions": "Created innovative features for the platform's front-end, focusing on responsive design. Played a crucial role in making the website mobile-friendly and improving page load speed.",
+        "contributorRole": "Developer",
+        "contributorSocial": "https://www.linkedin.com/in/neha-gupta-543a8961/"
+    },
+    {
+        "contributorName": "Arvind Patel",
+        "contributorContributions": "Spearheaded strategic thinking for scaling the platform, helping design the long-term product roadmap. Contributed innovative ideas that led to a 25% increase in user retention.",
+        "contributorRole": "Thinker",
+        "contributorSocial": "https://www.linkedin.com/in/arvind-patel-91b9a431/"
+    },
+    {
+        "contributorName": "Sanya Mehta",
+        "contributorContributions": "Contributed extensively to content marketing strategies that grew the platform's audience. Developed SEO strategies that led to a 40% increase in organic search traffic.",
+        "contributorRole": "Content Creator",
+        "contributorSocial": "https://www.linkedin.com/in/sanya-mehta-1a2d3418/"
+    },
+    {
+        "contributorName": "Rahul Joshi",
+        "contributorContributions": "Innovated key product features, improving user interaction and satisfaction. His input was vital in the successful launch of new platform features.",
+        "contributorRole": "Innovator",
+        "contributorSocial": "https://www.linkedin.com/in/rahul-joshi-34b7a91b/"
+    },
+    {
+        "contributorName": "Simran Kaur",
+        "contributorContributions": "Developed interactive content experiences for users. Worked closely with the development team to implement dynamic features such as quizzes and interactive posts.",
+        "contributorRole": "Content Designer",
+        "contributorSocial": "https://www.linkedin.com/in/simran-kaur-72a39d48/"
+    },
+    {
+        "contributorName": "Vikas Agarwal",
+        "contributorContributions": "Built robust backend services to support the growing user base. Focused on API development and ensuring system scalability during peak usage.",
+        "contributorRole": "Developer",
+        "contributorSocial": "https://www.linkedin.com/in/vikas-agarwal-451a9311/"
+    },
+    {
+        "contributorName": "Pooja Sharma",
+        "contributorContributions": "Conducted extensive market research and user testing, providing insights that shaped product features. Played a key role in refining the platform's UI/UX design.",
+        "contributorRole": "Thinker",
+        "contributorSocial": "https://www.linkedin.com/in/pooja-sharma-91a75a15/"
+    },
+    {
+        "contributorName": "Ajay Kumar",
+        "contributorContributions": "Collaborated on the development of security protocols, ensuring that user data was protected. Played a significant role in enhancing the platform's cybersecurity.",
+        "contributorRole": "Developer",
+        "contributorSocial": "https://www.linkedin.com/in/ajay-kumar-b5639272/"
+    },
+    {
+        "contributorName": "Meenal Desai",
+        "contributorContributions": "Developed and optimized content workflows, improving efficiency for the team. Contributed ideas for content structure that improved overall readability and user engagement.",
+        "contributorRole": "Content Creator",
+        "contributorSocial": "https://www.linkedin.com/in/meenal-desai-4428b7a7/"
+    },
+    {
+        "contributorName": "Ravi Dubey",
+        "contributorContributions": "Led the redesign of the web platform's homepage, increasing conversion rates by 20%. Collaborated with marketing to ensure brand consistency across all digital assets.",
+        "contributorRole": "Content Designer",
+        "contributorSocial": "https://www.linkedin.com/in/ravi-dubey-6d3b491b/"
+    },
+    {
+        "contributorName": "Kriti Patel",
+        "contributorContributions": "Developed innovative interactive tools that enhanced the user's overall platform experience. Played a critical role in implementing advanced functionalities that improved engagement.",
+        "contributorRole": "Innovator",
+        "contributorSocial": "https://www.linkedin.com/in/kriti-patel-8f5a3c77/"
+    },
+    {
+        "contributorName": "Suresh Bansal",
+        "contributorContributions": "Handled full-stack development tasks and was integral in the launch of new features such as chat support and live notifications. Played a key role in bug fixing and feature deployment.",
+        "contributorRole": "Developer",
+        "contributorSocial": "https://www.linkedin.com/in/suresh-bansal-5471b922/"
+    }
+]
