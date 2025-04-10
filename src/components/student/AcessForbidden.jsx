@@ -1,10 +1,20 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom'; // For navigation
+import React, { useContext } from 'react';
+import { useNavigate } from 'react-router-dom'; 
 import { assets } from '../../assets/assets'
+import { useAuth } from '../../context/AuthContext';
 
 const AccessForbidden = () => {
-  const navigate = useNavigate() // Using useHistory hook to navigate
-  const goBack = () => navigate(-1); // Navigate back to the previous page
+  const { role } = useAuth()
+  const navigate = useNavigate() 
+  const goBack = () => {
+    if(role === "admin") {
+      navigate('/ghost')
+    } else if (role === "student"){
+      navigate('/Home')
+    } else {
+      navigate('/')
+    }
+  };
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-900">

@@ -1,10 +1,10 @@
 import React, { useContext } from 'react'
-import { AppContext } from '../../context/AppContext';
+import { useAuth } from '../../context/AuthContext';
 import { NavLink } from 'react-router-dom';
 import { assets } from '../../assets/assets';
 
 const AdminSidebar = ({ activeSidebarType }) => {
-  const { isGhost} = useContext(AppContext);
+  const { isGhost } = useAuth();
 
   const addContentItems = [
     { name: 'Dashboard', path: '/ghost', icon: assets.home_icon },
@@ -32,7 +32,7 @@ const AdminSidebar = ({ activeSidebarType }) => {
 
   
 
-  return isGhost && (
+  return isGhost ? (
     <div className='bg-white md:w-55 w-16 border-r min-h-screen text-base border-gray-500 py-2 flex flex-col'>
       {menuItems.map((item) => (
         <NavLink 
@@ -47,7 +47,7 @@ const AdminSidebar = ({ activeSidebarType }) => {
         </NavLink>
       ))}
     </div>
-  );
+  ) : null;
 };
 
 export default AdminSidebar;

@@ -16,8 +16,8 @@ const Navbar = () => {
 
   const navItems = [
     { id: 1, text: 'Home', path: '/' },
-    { id: 4, text: 'About', path: '/about' },
-    { id: 5, text: 'Contributors', path: '/contact' },
+    { id: 2, text: 'About', path: '/about-us' },
+    { id: 3, text: 'Contributors', path: '/contributors' },
   ];
 
   // bg - gradient - to - br from - [#1F2937] to - [#3B4864]

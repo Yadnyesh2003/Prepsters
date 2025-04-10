@@ -17,6 +17,7 @@ export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [isAuth, setIsAuth] = useState(false);
     const [role, setRole] = useState(null);
+    const [isGhost, setIsGhost] = useState(false);
     const navigate = useNavigate();
     const [loading, setLoading] = useState(true); // Add this
 
@@ -32,6 +33,7 @@ export const AuthProvider = ({ children }) => {
                 const userData = querySnapshot.docs[0].data();
                 setRole(userData.role);
                 // redirectUser(userData.role);
+                setIsGhost(userData.role === "admin"); // ← Add this line
                 return userData.role; // User already exists
             }
             return null; // User does not exist
@@ -55,6 +57,7 @@ export const AuthProvider = ({ children }) => {
                     role: "student", // Default role
                 });
                 setRole("student"); // Set default role
+                setIsGhost(false); // Default to non-admin
                 redirectUser("student"); // Redirect as a new student
             } else {
                 redirectUser(userExists); // Redirect based on existing role
@@ -126,7 +129,7 @@ export const AuthProvider = ({ children }) => {
     };
 
     return (
-        <AuthContext.Provider value={{ user, isAuth, role, loading, signInWithGoogle, logoutUser }}>
+        <AuthContext.Provider value={{ user, isAuth, role, isGhost, loading, signInWithGoogle, logoutUser }}>
             {children}
         </AuthContext.Provider>
     );

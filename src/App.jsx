@@ -43,6 +43,7 @@ import { useAuth } from "./context/AuthContext";
 import { AuthProvider } from "./context/AuthContext";
 import ProtectedRoute from "./middleware/ProtectedRoute";
 import ProtectedRouteStudent from "./middleware/ProtectedRouteStudent";
+import AccessForbidden from './components/student/AcessForbidden';
 
 
 
@@ -119,7 +120,7 @@ function App() {
               <Route path="player/:courseId" element={<Player />} />
               <Route path="loading/:path" element={<Loading />} />
               <Route path="notes" element={<Notes />} />
-              <Route path="unauthorized" element={<div>Unauthorized</div>} />
+              <Route path="unauthorized" element={<AccessForbidden/>} />
             </Route>
 
 
@@ -145,8 +146,10 @@ function App() {
               <Route path='add-pyqs' element={<AddPYQs />} />
               <Route path='add-faqs' element={<AddFAQs />} />
               <Route path='add-notes' element={<AddNotes />} />
-              <Route path='unauthorized' element={<div>Unauthorized Access</div>} />
+              <Route path='unauthorized' element={<AccessForbidden/>} />
             </Route>
+            <Route path='unauthorized' element={<AccessForbidden/>} />
+
 
           </Routes>
 
