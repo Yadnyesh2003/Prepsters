@@ -5,7 +5,7 @@ import { useAuth } from "../../context/AuthContext";
 import img from '../../assets/tte_transparent_logo.png';
 import defaultAvatar from '../../assets/react.svg'; // use a fallback if no photoURL
 
-const Navbar = () => {
+const NavbarHome = () => {
     const { logoutUser, user } = useAuth();
     const [navOpen, setNavOpen] = useState(false);
     const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -17,8 +17,8 @@ const Navbar = () => {
     const navItems = [
         { id: 1, text: 'Exam Prep', path: '/exam-prep' },
         { id: 2, text: 'Resources', path: '/resources' },
-        { id: 3, text: 'About', path: '/about' },
-        { id: 4, text: 'Contributors', path: '/contact' },
+        { id: 3, text: 'About Us', path: '/about-us' },
+        { id: 4, text: 'Contributors', path: '/contributors' },
     ];
 
     const formatDate = (dateString) => {
@@ -41,7 +41,7 @@ const Navbar = () => {
         <nav className="bg-black text-white z-50 relative shadow-lg">
             <div className="container mx-auto flex justify-between items-center py-3 px-6">
                 {/* Logo */}
-                <Link to="/" className="flex items-center space-x-2">
+                <Link to="/Home" className="flex items-center space-x-2">
                     <div className="bg-white rounded-full p-1 shadow-md">
                         <img src={img} alt="TTE Logo" className="h-10 w-10 object-contain" />
                     </div>
@@ -140,4 +140,4 @@ const Navbar = () => {
     );
 };
 
-export default Navbar;
+export default NavbarHome;

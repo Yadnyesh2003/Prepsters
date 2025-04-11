@@ -1,12 +1,11 @@
 import React, { useState } from "react";
 import { Link, Navigate } from "react-router-dom";
 // import { createUserWithEmailAndPassword, signInWithPopup, signOut } from 'firebase/auth'
-import { auth, googleProvider } from '../config/firebase'
-import { toast } from "react-toastify";
-import Home from "./student/Home";
+import { auth, googleProvider } from '../../config/firebase'
+import Home from "../../pages/student/Home";
 
 // import { Link } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../../context/AuthContext";
 
 const Signup = () => {
     const { registerUser, signInWithGoogle } = useAuth();

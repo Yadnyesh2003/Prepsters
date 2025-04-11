@@ -4,15 +4,17 @@ import { AppContext } from '../../context/AppContext';
 import Loading from '../../components/student/Loading';
 import PdfViewer from '../student/PdfViewer';
 import { assets } from '../../assets/assets';
+import { useAuth } from '../../context/AuthContext';
 
 import FilterComponent from './FilterComponent';
+import AccessForbidden from '../student/AccessForbidden';
 
 
 const MyNotes = () => {
+  const { isGhost } = useAuth();
   const [noteData, setNoteData] = useState([]);
   const [filteredData, setFilteredData] = useState([]); // New state to hold the filtered syllabus data
   const [loading, setLoading] = useState(true);
-  const { isGhost, setIsGhost } = useContext(AppContext);
   const [pdfUrl, setPdfUrl] = useState(null);
 
   const [editingNote, setEditingNote] = useState(null);
@@ -20,12 +22,15 @@ const MyNotes = () => {
     branch: [],
     subjectName: [],   //subjectName can be selected multiple as array element
     pyqsTitle: '',
+    contributorName: '',
   });
 
   const [filter, setFilter] = useState({
     branch: '',
     year: ''
   });
+
+  const { toast } = useContext(AppContext);
 
 //================================================================================================================================================================================================
 
@@ -56,7 +61,7 @@ const MyNotes = () => {
       setFilteredData(notes); // Initially show all data
       setLoading(false);
     } catch (error) {
-      alert('Error fetching Notes:' + error.message);
+      toast.error(`Error fetching Notes: ${error.message}`);
       setLoading(false);
     }
   };
@@ -70,7 +75,11 @@ const MyNotes = () => {
   // Handle Edit - Set the PYQ to be edited
   const handleEdit = (note) => {
     setEditingNote(note.id);
-    setEditedData({ ...note.notesCategory || {}, notesTitle: note.notesTitle });
+    setEditedData({ 
+      ...note.notesCategory || {}, 
+      notesTitle: note.notesTitle ,
+      contributorName: note.contributorName
+    });
   };
 
   // Save edited data back to Firestore
@@ -78,28 +87,37 @@ const MyNotes = () => {
     if (!editingNote) return;
 
     try {
-      const noteRef = doc(db, 'Notes', editingNote);
-      await updateDoc(noteRef, {
-        notesCategory: editedData,
-        notesTitle: editedData.notesTitle,
-        updatedAt: serverTimestamp()
-      });
-      setEditingNote(null);
-      setEditedData({});
-      getNoteData(); // Reload data from Firestore
+      if(isGhost) {
+        const noteRef = doc(db, 'Notes', editingNote);
+        await updateDoc(noteRef, {
+          notesCategory: editedData,
+          notesTitle: editedData.notesTitle,
+          contributorName: editedData.contributorName,
+          updatedAt: serverTimestamp()
+        });
+        setEditingNote(null);
+        setEditedData({});
+        getNoteData(); // Reload data from Firestore
+        toast.success('Changes Saved!')
+      }
     } catch (error) {
-      alert('Error saving Note:', error);
+      toast('Unauthorized Access!', {icon: '🚫'})
     }
   };
 
   // Handle Delete - Delete the PYQ from Firestore
   const handleDelete = async (noteId) => {
     try {
-      const noteRef = doc(db, 'Notes', noteId);
-      await deleteDoc(noteRef);
-      getNoteData(); // Reload data from Firestore after deletion
+      if(isGhost) {
+        const noteRef = doc(db, 'Notes', noteId);
+        await deleteDoc(noteRef);
+        getNoteData(); // Reload data from Firestore after deletion
+        toast.success('Deleted data!')
+      } else {
+        toast('Unauthorized Access!', {icon: '🚫'})
+      }
     } catch (error) {
-      alert('Error deleting Note:', error);
+      toast.error(`Error deleting data: ${error.message}`);
     }
   };
 
@@ -162,7 +180,7 @@ const MyNotes = () => {
     return <Loading />;
   }
 
-  return isGhost && (
+  return isGhost ? (
     <div className="max-w-6xl mx-auto p-4">
     <h6 className='text-xs text-black text-center bg-amber-200 border rounded-4xl mb-2'>Institution Filter Is Inactive on This Page!</h6>
     {/* Filter Component */}
@@ -189,6 +207,18 @@ const MyNotes = () => {
                       type="text"
                       value={editedData.notesTitle}
                       onChange={(e) => setEditedData({ ...editedData, notesTitle: e.target.value })}
+                      className="border p-2 w-full md:w-3/4 mt-2 md:mt-0"
+                      required
+                    />
+                  </div>
+
+                  {/* Contributor Name */}
+                  <div className="mt-2 flex flex-col md:flex-row md:items-center justify-between gap-2">
+                    <label className="block text-sm font-semibold text-black w-full md:w-1/4">Contributor Name</label>
+                    <input
+                      type="text"
+                      value={editedData.contributorName}
+                      onChange={(e) => setEditedData({ ...editedData, contributorName: e.target.value })}
                       className="border p-2 w-full md:w-3/4 mt-2 md:mt-0"
                       required
                     />
@@ -273,6 +303,7 @@ const MyNotes = () => {
               ) : (
                 <div className="flex flex-col items-start">
                   <h2 className="text-xl font-semibold">{doc.notesTitle}</h2>
+                  <p className='text-gray-700'>Contributor Name: {doc.contributorName}</p>
                   {notesCategory.subjectName && (
                     <p className="text-gray-700">Subject Name: {Array.isArray(notesCategory.subjectName) ? notesCategory.subjectName.join(', ') : ''}</p>
                   )}
@@ -304,7 +335,7 @@ const MyNotes = () => {
       </div>
       {pdfUrl && <PdfViewer pdfUrl={pdfUrl} onClose={closePdfViewer} />}
     </div>
-  )
+  ) : <AccessForbidden />
 }
 
 export default MyNotes

@@ -1,19 +1,19 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { getDocs, collection, db, doc, updateDoc, deleteDoc, serverTimestamp } from '../../config/firebase'; 
 import { AppContext } from '../../context/AppContext'
-import AccessForbidden from '../student/AcessForbidden'
+import AccessForbidden from '../student/AccessForbidden'
 import Loading from '../../components/student/Loading';
 import FilterComponent from './FilterComponent';
 import PdfViewer from '../student/PdfViewer';
 import { assets } from '../../assets/assets';
+import { useAuth } from '../../context/AuthContext';
 
 
 const MyFAQs = () => {
-
+  const { isGhost } = useAuth();
   const [faqData, setFaqData] = useState([]);
   const [filteredData, setFilteredData] = useState([]); // New state to hold the filtered FAQ data
   const [loading, setLoading] = useState(true);
-  const { isGhost, setIsGhost } = useContext(AppContext);
   const [pdfUrl, setPdfUrl] = useState(null);
 
   const [editingFAQ, setEditingFAQ] = useState(null);
@@ -29,6 +29,8 @@ const MyFAQs = () => {
     institution: '',
     year: ''
   });
+
+  const { toast } = useContext(AppContext);
 
 //================================================================================================================================================================================================
 
@@ -59,7 +61,7 @@ const MyFAQs = () => {
       setFilteredData(faqs); // Initially show all data
       setLoading(false);
     } catch (error) {
-      alert('Error fetching FAQs:', error.message);
+      toast.error(`Error fetching FAQs: ${error.message}`);
       setLoading(false);
     }
   };
@@ -76,7 +78,8 @@ const MyFAQs = () => {
     setEditedData({ 
       ...faq.faqsCategory || {}, 
       faqsTitle: faq.faqsTitle, 
-      contributorName: faq.contributorName });
+      contributorName: faq.contributorName 
+    });
   };
 
   // Save edited data back to Firestore
@@ -84,29 +87,39 @@ const MyFAQs = () => {
     if (!editingFAQ) return;
 
     try {
-      const faqRef = doc(db, 'FAQs', editingFAQ);
-      await updateDoc(faqRef, {
-        faqsCategory: editedData,
-        faqsTitle: editedData.faqsTitle,
-        contributorName: editedData.contributorName,
-        updatedAt: serverTimestamp()
-      });
-      setEditingFAQ(null);
-      setEditedData({});
-      getFAQData(); // Reload data from Firestore
+      if(isGhost) {
+        const faqRef = doc(db, 'FAQs', editingFAQ);
+        await updateDoc(faqRef, {
+          faqsCategory: editedData,
+          faqsTitle: editedData.faqsTitle,
+          contributorName: editedData.contributorName,
+          updatedAt: serverTimestamp()
+        });
+        setEditingFAQ(null);
+        setEditedData({});
+        getFAQData(); // Reload data from Firestore
+        toast.success('Changes Saved!')
+      } else {
+        toast('Unauthorized Access!', {icon: '🚫'})
+      }
     } catch (error) {
-      alert('Error saving FAQ:', error);
+      toast.error(`Error saving data: ${error.message}`);
     }
   };
   
   // Handle Delete - Delete the FAQ from Firestore
   const handleDelete = async (faqId) => {
     try {
-      const faqRef = doc(db, 'FAQs', faqId);
-      await deleteDoc(faqRef);
-      getFAQData(); // Reload data from Firestore after deletion
+      if(isGhost) {
+        const faqRef = doc(db, 'FAQs', faqId);
+        await deleteDoc(faqRef);
+        getFAQData(); // Reload data from Firestore after deletion
+        toast.success('Deleted data!')
+      } else {
+        toast('Unauthorized Access!', {icon: '🚫'})
+      }
     } catch (error) {
-      alert('Error deleting FAQ:', error);
+      toast.error(`Error deleting data: ${error.message}`);
     }
   };
 

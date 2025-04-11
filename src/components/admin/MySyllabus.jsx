@@ -4,14 +4,16 @@ import { AppContext } from '../../context/AppContext';
 import Loading from '../../components/student/Loading';
 import PdfViewer from '../student/PdfViewer';
 import { assets } from '../../assets/assets';
+import { useAuth } from '../../context/AuthContext';
 
 import FilterComponent from './FilterComponent';
+import AccessForbidden from '../student/AccessForbidden';
 
 const MySyllabus = () => {
+  const {isGhost} = useAuth();
   const [syllabusData, setSyllabusData] = useState([]);
   const [filteredData, setFilteredData] = useState([]); // New state to hold the filtered syllabus data
   const [loading, setLoading] = useState(true);
-  const { isGhost, setIsGhost } = useContext(AppContext);
   const [pdfUrl, setPdfUrl] = useState(null);
 
   const [editingSyllabus, setEditingSyllabus] = useState(null);
@@ -22,6 +24,8 @@ const MySyllabus = () => {
     institution: '',
     year: ''
   });
+
+  const { toast } = useContext(AppContext)
 
 //================================================================================================================================================================================================
 
@@ -52,7 +56,7 @@ const MySyllabus = () => {
       setFilteredData(syllabus); // Initially show all data
       setLoading(false);
     } catch (error) {
-      alert.error('Error fetching syllabus:', + error.message);
+      toast.error(`Error fetching Syllabus Data: ${error.message}`);
       setLoading(false);
     }
   };
@@ -74,28 +78,35 @@ const MySyllabus = () => {
     if (!editingSyllabus) return;
 
     try {
-      const syllabusRef = doc(db, 'Syllabus', editingSyllabus);
-      await updateDoc(syllabusRef, {
-        syllabusCategory: editedData,
-        syllabusTitle: editedData.syllabusTitle,
-        updatedAt: serverTimestamp()
-      });
-      setEditingSyllabus(null);
-      setEditedData({});
-      getSyllabusData(); // Reload data from Firestore
+      if(isGhost) {
+        const syllabusRef = doc(db, 'Syllabus', editingSyllabus);
+        await updateDoc(syllabusRef, {
+          syllabusCategory: editedData,
+          syllabusTitle: editedData.syllabusTitle,
+          updatedAt: serverTimestamp()
+        });
+        setEditingSyllabus(null);
+        setEditedData({});
+        getSyllabusData(); // Reload data from Firestore
+      } toast.success('Changes Saved!')
     } catch (error) {
-      alert.error('Error saving syllabus:', error);
+      toast('Unauthorized Access!', {icon: '🚫'})
     }
   };
 
   // Handle Delete - Delete the syllabus from Firestore
   const handleDelete = async (syllabusId) => {
     try {
-      const syllabusRef = doc(db, 'Syllabus', syllabusId);
-      await deleteDoc(syllabusRef);
-      getSyllabusData(); // Reload data from Firestore after deletion
+      if(isGhost) {
+        const syllabusRef = doc(db, 'Syllabus', syllabusId);
+        await deleteDoc(syllabusRef);
+        getSyllabusData(); // Reload data from Firestore after deletion
+        toast.success('Deleted data!')
+      } else {
+      toast('Unauthorized Access!', {icon: '🚫'})
+      }
     } catch (error) {
-      alert.error('Error deleting syllabus:', error);
+      toast.error(`Error deleting data: ${error.message}`);
     }
   };
 
@@ -155,7 +166,7 @@ const MySyllabus = () => {
     return <Loading />;
   }
 
-  return isGhost && (
+  return isGhost ? (
     <div className="max-w-6xl mx-auto p-4">
       {/* Filter Component */}
 
@@ -305,59 +316,7 @@ const MySyllabus = () => {
       </div>
       {pdfUrl && <PdfViewer pdfUrl={pdfUrl} onClose={closePdfViewer} />}
     </div>
-  );
+  ) : <AccessForbidden />
 };
 
 export default MySyllabus;
-
-
-
-{/* <div className="mb-4 p-4 bg-cyan-300 shadow-lg rounded-md">
-<h2 className="text-lg font-semibold">Filter Syllabus Documents</h2>
-<div className="flex flex-col md:flex-row gap-4 mt-4">
-
-  <div>
-    <label className="block text-sm font-semibold text-black">Branch</label>
-    <select
-      name="branch"
-      value={filter.branch}
-      onChange={handleFilterChange}
-      className="border p-2"
-    >
-      <option value="">All Branches</option>
-      {["General Science & Humanities", "Computer Engineering", "Information Technology", "Electronics & Telecommunication", "Artificial Intelligence & Data Science", "Electronics & Computer Science"].map((branch) => (
-        <option key={branch} value={branch}>{branch}</option>
-      ))}
-    </select>
-  </div>
-
-  
-  <div>
-    <label className="block text-sm font-semibold text-black">Institution</label>
-    <input
-      type="text"
-      name="institution"
-      value={filter.institution}
-      onChange={handleFilterChange}
-      className="border p-2"
-      placeholder="Example: Mumbai University"
-    />
-  </div>
-
- 
-  <div>
-    <label className="block text-sm font-semibold text-black">Year</label>
-    <select
-      name="year"
-      value={filter.year}
-      onChange={handleFilterChange}
-      className="border p-2"
-    >
-      <option value="">All Years</option>
-      {["First Year", "Second Year", "Third Year", "Final Year"].map((year) => (
-        <option key={year} value={year}>{year}</option>
-      ))}
-    </select>
-  </div>
-</div>
-</div>  */}

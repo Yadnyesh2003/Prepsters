@@ -1,5 +1,8 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
+import { useAuth } from '../../context/AuthContext';
 import { db, collection, addDoc, serverTimestamp, updateDoc } from "../../config/firebase";
+import { AppContext } from '../../context/AppContext';
+import AccessForbidden from '../student/AccessForbidden';
 
 const AddNotes = () => {
   const [formData, setFormData] = useState({
@@ -10,10 +13,13 @@ const AddNotes = () => {
     },
     notesLink: '',
     notesTitle: '',
+    contributorName: '',
     adminId: ''
   });
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+
+  const { toast } = useContext(AppContext);
+  const { isGhost, user } = useAuth();
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -65,43 +71,43 @@ const AddNotes = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setError("");
 
     try {
-      const notesRef = await addDoc(collection(db, 'Notes'), {
-        ...formData,
-        createdAt: serverTimestamp(),
-        createdBy: 'auth.currentUser.displayName', // Correct this line if you have Firebase Auth setup
-        adminId: 'req.auth.userId'
-      });
-      alert('Data submitted successfully!');
+      if(isGhost){
+        const notesRef = await addDoc(collection(db, 'Notes'), {
+          ...formData,
+          createdAt: serverTimestamp(),
+          createdBy: user.displayName, // Correct this line if you have Firebase Auth setup
+          adminId: user.uid
+        });
+        toast.success('Notes added successfully!');
 
-      await updateDoc(notesRef, {
-        notesId: notesRef.id
-      });
+        await updateDoc(notesRef, {
+          notesId: notesRef.id
+        });
 
-      setFormData({
-        notesCategory: {
-          branch: [],
-          year: '',
-          subjectName: []
-        },
-        notesLink: '',
-        notesTitle: '',
-      })
-
+        setFormData({
+          notesCategory: {
+            branch: [],
+            year: '',
+            subjectName: []
+          },
+          notesLink: '',
+          contributorName: '',
+          notesTitle: '',
+        })
+      } else{
+        toast('Unauthorized Access!', {icon: '🚫'})
+      }
     } catch (error) {
-      setError('Error adding document: ', + error.message);
+      toast.error(`Oops! Couldn't add notes: ${error.message}`);
     } finally {
       setLoading(false);
     }
   };
 
-  return (
+  return isGhost ? (
     <div className="mx-auto mt-7 ml-3 p-6 bg-white overflow-scroll flex flex-col justify-between text-gray-700">
-      
-      {error && <div className="text-red-500 mb-4">{error}</div>}
-
       <form onSubmit={handleSubmit} className="flex flex-col w-3/4 gap-4 text-gray-500">
         {/* Notes Title */}
         <div className="flex flex-col gap-2">
@@ -169,6 +175,19 @@ const AddNotes = () => {
           </div>
         </div>
 
+       {/* Contributor Name */}
+        <div className='flex flex-col gap-2'>
+          <p className="text-lg text-left">Contributor Name</p>
+          <input
+            type="text"
+            name="contributorName"
+            value={formData.contributorName}
+            onChange={handleChange}
+            className="w-full p-2 border border-gray-300 rounded-md"
+            required
+          />
+        </div>
+
         {/* Notes Link */}
         <div className='flex flex-col gap-2'>
           <p className="text-lg text-left">Notes Link</p>
@@ -198,7 +217,7 @@ const AddNotes = () => {
         </button>
       </form>
     </div>
-  );
+  ) : <AccessForbidden/>
 };
 
 export default AddNotes;

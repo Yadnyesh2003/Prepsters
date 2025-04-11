@@ -1,10 +1,10 @@
 import React, { lazy, Suspense, useState } from 'react';
 import { Route, Routes, useMatch } from 'react-router-dom'
 import { Navigate } from 'react-router-dom';
-// import './App.css'
-import Landing from './pages/Landing'
-import Login from './pages/Login'
-import Signup from './pages/Getstarted'
+import { Toaster } from 'react-hot-toast';
+
+
+import Landing from './pages/student/Landing'
 
 // import Home from './pages/student/Home'
 // import ExamPrep from './pages/student/ExamPrep'
@@ -43,7 +43,8 @@ import { useAuth } from "./context/AuthContext";
 import { AuthProvider } from "./context/AuthContext";
 import ProtectedRoute from "./middleware/ProtectedRoute";
 import ProtectedRouteStudent from "./middleware/ProtectedRouteStudent";
-import AccessForbidden from './components/student/AcessForbidden';
+import AccessForbidden from './components/student/AccessForbidden';
+import Navbar from './components/student/NavBar';
 
 
 
@@ -71,18 +72,21 @@ function App() {
   const isAdminRoute = useMatch('/ghost/*')
 
   return (
+    
     <Suspense fallback={<Loader />}>
+      <Toaster
+        position="top-right"
+        reverseOrder={false}
+      />
       <AuthProvider>
         <div className='text-default min-h-screen bg-auto'>
-          {/* {!isAdminRoute && <NavBar/>} */}
+          {/* {!isAdminRoute && <Navbar/>} */}
 
           <Routes>
+            <Route path ='/' element={<Landing />} />
+            <Route path ='/contributors' element={<Contributors />} />
+            <Route path = '/about-us' element = {<AboutUs />} />
 
-            <Route path='/' element={<Landing />} />
-            <Route path='/login' element={<Login />} />
-            <Route path='/signup' element={<Signup />} />
-            <Route path='/contributors' element={<Contributors />} />
-        <Route path = '/about-us' element = {<AboutUs />} />
             <Route
               path="/Home"
               element={
@@ -91,6 +95,7 @@ function App() {
                 </ProtectedRouteStudent>
               }
             />
+
 
             <Route
               path="/exam-prep"
@@ -104,6 +109,7 @@ function App() {
               <Route path="pyqs" element={<PYQs />} />
               <Route path="faqs" element={<FAQs />} />
             </Route>
+
 
             <Route
               path="/resources"
@@ -120,7 +126,6 @@ function App() {
               <Route path="player/:courseId" element={<Player />} />
               <Route path="loading/:path" element={<Loading />} />
               <Route path="notes" element={<Notes />} />
-              <Route path="unauthorized" element={<AccessForbidden/>} />
             </Route>
 
 
@@ -146,10 +151,11 @@ function App() {
               <Route path='add-pyqs' element={<AddPYQs />} />
               <Route path='add-faqs' element={<AddFAQs />} />
               <Route path='add-notes' element={<AddNotes />} />
-              <Route path='unauthorized' element={<AccessForbidden/>} />
+              
             </Route>
-            <Route path='unauthorized' element={<AccessForbidden/>} />
 
+
+            <Route path='unauthorized' element={<AccessForbidden/>} />
 
           </Routes>
 

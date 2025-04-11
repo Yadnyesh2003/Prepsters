@@ -1,9 +1,12 @@
 import React, { useState, useEffect, useRef, useContext } from 'react';
+import { useAuth } from '../../context/AuthContext';
 import Quill from 'quill';
 import uniqid from 'uniqid'
 import 'quill/dist/quill.snow.css';
 import { assets } from '../../assets/assets'
 import { db, collection, addDoc, doc, setDoc, serverTimestamp, updateDoc } from "../../config/firebase"; // import the necessary firestore methods
+import AccessForbidden from '../student/AccessForbidden';
+import { AppContext } from '../../context/AppContext';
 
 export default function AddCourse() {
   const [courseTitle, setCourseTitle] = useState("");
@@ -20,10 +23,12 @@ export default function AddCourse() {
   const [selectedYears, setSelectedYears] = useState([]);
   const [loading, setLoading] = useState(false);
   const [adminId, setAdminId] = useState("");
-    const [error, setError] = useState("");
 
   const quillRef = useRef(null);
   const editorRef = useRef(null);
+
+  const { toast } = useContext(AppContext);
+  const { isGhost, user } = useAuth();
   
   useEffect(() => {
     if (!quillRef.current && editorRef.current) {
@@ -137,52 +142,52 @@ export default function AddCourse() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setError("");
     const courseDescription = quillRef.current.root.innerHTML;
     try {
-      const courseRef = await addDoc(collection(db, "courses"), {
-        courseTitle,
-        courseDescription,
-        courseThumbnail,
-        isPublished: true,
-        createdAt: serverTimestamp(),
-        updatedAt: null,
-        courseRatings: [],
-        adminId: 'req.auth.id',
-        createdBy:'req.auth.userName',
-        category: {
-          branch: selectedBranches,
-          year: selectedYears,
-        },
-        chapters
-      });
-      alert("Course added successfully!");
+      if(isGhost) {
+        const courseRef = await addDoc(collection(db, "courses"), {
+          courseTitle,
+          courseDescription,
+          courseThumbnail,
+          isPublished: true,
+          createdAt: serverTimestamp(),
+          updatedAt: null,
+          courseRatings: [],
+          adminId: user.uid,
+          createdBy: user.displayName,
+          category: {
+            branch: selectedBranches,
+            year: selectedYears,
+          },
+          chapters
+        });
+        toast.success("Course added successfully!");
 
-      await updateDoc(courseRef, {
-        courseId: courseRef.id
-      });
+        await updateDoc(courseRef, {
+          courseId: courseRef.id
+        });
 
-      setCourseTitle("");
-      setCourseThumbnail("");
-      quillRef.current.root.innerHTML = "";
-      setSelectedBranches([]);
-      setSelectedYears([]);
-      setLectureDetails([]);
-      setCurrentChapterId("");
-      setAdminId("")
-      setChapters([]);
+        setCourseTitle("");
+        setCourseThumbnail("");
+        quillRef.current.root.innerHTML = "";
+        setSelectedBranches([]);
+        setSelectedYears([]);
+        setLectureDetails([]);
+        setCurrentChapterId("");
+        setAdminId("")
+        setChapters([]);
+      } else {
+        toast('Unauthorized Access!', {icon: '🚫'})
+      }
     } catch (error) {
-      setError("Error adding course:", + error.message);
+      toast.error(`Oops! Couldn't add the Course: ${error.message}`);
     } finally {
       setLoading(false);
     }
   };
 
-  return (
+  return isGhost ? (
     <div className="overflow-scroll flex flex-col items-start justify-between p-8  text-gray-700">
-
-      {error && <div className="text-red-500 mb-4">{error}</div>}
-
       <form onSubmit={handleSubmit} className="flex flex-col gap-4 mx-w-md w-3/4 text-gray-500">
         <div className="flex flex-col gap-2">
           <label className="text-lg text-left">Course Title</label>
@@ -380,5 +385,5 @@ export default function AddCourse() {
         </button>
       </form>
     </div>
-  );
+  ) : <AccessForbidden />
 }

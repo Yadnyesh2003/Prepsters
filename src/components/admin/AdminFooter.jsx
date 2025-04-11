@@ -1,8 +1,10 @@
 import React from 'react'
 import { assets } from '../../assets/assets'
+import { useAuth } from '../../context/AuthContext';
 
 const AdminFooter = () => {
-  return (
+  const { isGhost } = useAuth()
+  return isGhost ? (
     <div>
       <footer className='flex md:flex-row flex-col-reverse items-center justify-between text-left w-full px-8 border border-t-black'>
         <div className='py-4 flex items-center gap-4'>
@@ -27,7 +29,7 @@ const AdminFooter = () => {
         </div>
       </footer>
     </div>
-  )
+  ) : null
 }
 
 export default AdminFooter
