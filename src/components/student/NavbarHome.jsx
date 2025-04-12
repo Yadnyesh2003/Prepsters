@@ -12,7 +12,10 @@ const NavbarHome = () => {
     const dropdownRef = useRef(null);
 
     const toggleNav = () => setNavOpen(!navOpen);
-    const toggleDropdown = () => setDropdownOpen(prev => !prev);
+    const toggleDropdown = () => {
+        setDropdownOpen(prev => !prev);
+        console.log(user);
+    }
 
     const navItems = [
         { id: 1, text: 'Exam Prep', path: '/exam-prep' },
@@ -61,7 +64,7 @@ const NavbarHome = () => {
                 {/* User Avatar & Dropdown */}
                 <div className="hidden md:block relative ml-6" ref={dropdownRef}>
                     <img
-                        src={user?.photoURL || defaultAvatar}
+                        src={user.photoURL || defaultAvatar}
                         alt="User"
                         className="w-10 h-10 rounded-full cursor-pointer border-2 border-white"
                         onClick={toggleDropdown}
