@@ -44,7 +44,7 @@ import { AuthProvider } from "./context/AuthContext";
 import ProtectedRoute from "./middleware/ProtectedRoute";
 import ProtectedRouteStudent from "./middleware/ProtectedRouteStudent";
 import AccessForbidden from './components/student/AcessForbidden';
-import AccessForbidden from './components/student/AccessForbidden';
+// import AccessForbidden from './components/student/AccessForbidden';
 import Navbar from './components/student/NavBar';
 
 
@@ -84,13 +84,10 @@ function App() {
           {/* {!isAdminRoute && <Navbar/>} */}
 
           <Routes>
-            <Route path='/' element={<Landing />} />
-            <Route path='/contributors' element={<Contributors />} />
-            <Route path='/about-us' element={<AboutUs />} />
 
             <Route path='/' element={<Landing />} />
-            <Route path='/login' element={<Login />} />
-            <Route path='/signup' element={<Signup />} />
+            {/* <Route path='/login' element={<Login />} /> */}
+            {/* <Route path='/signup' element={<Signup />} /> */}
             <Route path='/contributors' element={<Contributors />} />
             <Route path='/about-us' element={<AboutUs />} />
             <Route
