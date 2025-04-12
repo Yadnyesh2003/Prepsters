@@ -9,6 +9,7 @@ import Signup from './pages/Getstarted'
 // import Home from './pages/student/Home'
 // import ExamPrep from './pages/student/ExamPrep'
 import Contributors from './pages/student/Contributors'
+import AboutUs from './pages/student/AboutUs'
 import Syllabus from './pages/student/Syllabus'
 import PYQs from './pages/student/PYQs'
 import FAQs from './pages/student/FAQs'
@@ -23,18 +24,18 @@ import Notes from './pages/student/Notes'
 import Admin from './pages/admin/Admin'
 import Dashboard from './pages/admin/Dashboard'
 import StudentsEnrolled from './pages/admin/StudentsEnrolled'
-import MyContributors from './pages/admin/MyContributors'
-import MyCourses from './pages/admin/MyCourses'
-import MySyllabus from './pages/admin/MySyllabus'
-import MyPYQs from './pages/admin/MyPYQs'
-import MyFAQs from './pages/admin/MyFAQs'
-import MyNotes from './pages/admin/MyNotes'
-import AddContributors from './pages/admin/AddContributors'
-import AddCourse from './pages/admin/AddCourse'
-import AddSyllabus from './pages/admin/AddSyllabus'
-import AddPYQs from './pages/admin/AddPYQs'
-import AddFAQs from './pages/admin/AddFAQs'
-import AddNotes from './pages/admin/AddNotes'
+import MyContributors from './components/admin/MyContributors'
+import MyCourses from './components/admin/MyCourses'
+import MySyllabus from './components/admin/MySyllabus'
+import MyPYQs from './components/admin/MyPYQs'
+import MyFAQs from './components/admin/MyFAQs'
+import MyNotes from './components/admin/MyNotes'
+import AddContributors from './components/admin/AddContributors'
+import AddCourse from './components/admin/AddCourse'
+import AddSyllabus from './components/admin/AddSyllabus'
+import AddPYQs from './components/admin/AddPYQs'
+import AddFAQs from './components/admin/AddFAQs'
+import AddNotes from './components/admin/AddNotes'
 import Loader from './components/student/Loading'
 
 import { useAuth } from "./context/AuthContext";
@@ -42,6 +43,7 @@ import { useAuth } from "./context/AuthContext";
 import { AuthProvider } from "./context/AuthContext";
 import ProtectedRoute from "./middleware/ProtectedRoute";
 import ProtectedRouteStudent from "./middleware/ProtectedRouteStudent";
+import AccessForbidden from './components/student/AcessForbidden';
 
 
 
@@ -80,6 +82,7 @@ function App() {
             <Route path='/login' element={<Login />} />
             <Route path='/signup' element={<Signup />} />
             <Route path='/contributors' element={<Contributors />} />
+        <Route path = '/about-us' element = {<AboutUs />} />
             <Route
               path="/Home"
               element={
@@ -117,7 +120,7 @@ function App() {
               <Route path="player/:courseId" element={<Player />} />
               <Route path="loading/:path" element={<Loading />} />
               <Route path="notes" element={<Notes />} />
-              <Route path="unauthorized" element={<div>Unauthorized</div>} />
+              <Route path="unauthorized" element={<AccessForbidden/>} />
             </Route>
 
 
@@ -143,8 +146,10 @@ function App() {
               <Route path='add-pyqs' element={<AddPYQs />} />
               <Route path='add-faqs' element={<AddFAQs />} />
               <Route path='add-notes' element={<AddNotes />} />
-              <Route path='unauthorized' element={<div>Unauthorized Access</div>} />
+              <Route path='unauthorized' element={<AccessForbidden/>} />
             </Route>
+            <Route path='unauthorized' element={<AccessForbidden/>} />
+
 
           </Routes>
 
