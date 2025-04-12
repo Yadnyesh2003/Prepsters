@@ -3,16 +3,19 @@ import { AppContext } from '../../context/AppContext';
 import { db, collection, updateDoc, doc, getDocs, deleteDoc, serverTimestamp } from "../../config/firebase";
 import Loading from '../../components/student/Loading'
 import { assets } from '../../assets/assets';
+import { useAuth } from '../../context/AuthContext';
+import AccessForbidden from '../student/AccessForbidden';
 
 const MyContributors = () => {
-  const { isGhost } = useContext(AppContext); // Fetch user data/context
+  const { isGhost } = useAuth();
   const [contributorData, setContributorData] = useState([]); // Store contributors data
   const [loading, setLoading] = useState(true); // Manage loading state
-  const [error, setError] = useState(null); // Manage errors
 
   // Track which contributor is being edited
   const [editingContributor, setEditingContributor] = useState(null);
   const [editedData, setEditedData] = useState({});
+
+  const { toast } = useContext(AppContext)
 
   // Function to fetch contributor data from Firestore
   const getContributorData = async () => {
@@ -29,8 +32,8 @@ const MyContributors = () => {
 
       setContributorData(contributors); // Set the fetched data to state
       setLoading(false); // Set loading state to false after data is fetched
-    } catch (err) {
-      setError(err.message); // Set error state in case of failure
+    } catch (error) {
+      toast.error(`Oops! Couldn't fetch Contributors. ${error.message}`); // Set error state in case of failure
       setLoading(false); // Stop loading state if there's an error
     }
   };
@@ -53,14 +56,21 @@ const MyContributors = () => {
     });
   };
 
-  const handleDelete = async(id) => {
+  const handleDelete = async (id) => {
     try {
-      await deleteDoc(doc(db, 'Contributors', id));
-      setContributorData(prevData =>
-        prevData.filter(contributor => contributor.id !== id)
-      );
+      if (isGhost) {
+        const contributorToDelete = contributorData.find(contributor => contributor.id === id);
+        const contributorName = contributorToDelete?.contributorName || 'Contributor';
+        await deleteDoc(doc(db, 'Contributors', id));
+        setContributorData(prevData =>
+          prevData.filter(contributor => contributor.id !== id)
+        );
+        toast.success(`Deleted contributions of ${contributorName}`);
+      } else {
+        toast('Unauthorized Access!', { icon: '🚫' })
+      }
     } catch (error) {
-      setError('Error deleting contributor: ' + error.message);
+      toast.error(`Oops! Couldn't delete. ${error.message}`);
     }
   };
 
@@ -76,26 +86,31 @@ const MyContributors = () => {
   // Save edited data to Firestore
   const handleSave = async (id) => {
     try {
-      const contributorRef = doc(db, 'Contributors', id);
+      if (isGhost) {
+        const contributorRef = doc(db, 'Contributors', id);
 
-      // Update contributor data in Firestore
-      await updateDoc(contributorRef, {
-        contributorName: editedData.contributorName,
-        contributorRole: editedData.contributorRole,
-        contributorContributions: editedData.contributorContributions,
-        contributorSocial: editedData.contributorSocial,
-        updatedAt: serverTimestamp()
-      });
+        // Update contributor data in Firestore
+        await updateDoc(contributorRef, {
+          contributorName: editedData.contributorName,
+          contributorRole: editedData.contributorRole,
+          contributorContributions: editedData.contributorContributions,
+          contributorSocial: editedData.contributorSocial,
+          updatedAt: serverTimestamp()
+        });
 
-      // Update the local state after saving
-      setContributorData(prevData =>
-        prevData.map((contributor) =>
-          contributor.id === id ? { ...contributor, ...editedData } : contributor
-        )
-      );
-      setEditingContributor(null); // Reset editing state
-    } catch (err) {
-      setError('Error saving data: ' + err.message);
+        // Update the local state after saving
+        setContributorData(prevData =>
+          prevData.map((contributor) =>
+            contributor.id === id ? { ...contributor, ...editedData } : contributor
+          )
+        );
+        setEditingContributor(null); // Reset editing state
+        toast.success('Changes Saved!')
+      } else {
+        toast('Unauthorized Access!', { icon: '🚫' })
+      }
+    } catch (error) {
+      toast.error(`Error saving data: ${error.message}`);
     }
   };
 
@@ -103,11 +118,7 @@ const MyContributors = () => {
     return <Loading />; // Show loading indicator while fetching
   }
 
-  if (error) {
-    return <div>Error: {error}</div>; // Show error message if any error occurs
-  }
-
-  return (
+  return isGhost ? (
     <div className="container mx-auto py-2 px-2">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 space-x-0.5">
         {contributorData.map((contributor) => (
@@ -170,8 +181,8 @@ const MyContributors = () => {
                   <span className="hidden md:inline">Edit Contributor</span>
                 </button>
                 <button onClick={() => handleDelete(contributor.id)} className="mt-4 flex bg-red-500 text-white px-4 py-2 rounded-md hover:text-black">
-                <img src={assets.delete_data} alt='delete' className='md:justify-center w-6 h-6 mr-2' />
-                <span className="hidden md:inline">Delete Contributor</span>
+                  <img src={assets.delete_data} alt='delete' className='md:justify-center w-6 h-6 mr-2' />
+                  <span className="hidden md:inline">Delete Contributor</span>
                 </button>
               </div>
             )}
@@ -179,7 +190,7 @@ const MyContributors = () => {
         ))}
       </div>
     </div>
-  )
+  ) : <AccessForbidden />
 };
 
 export default MyContributors;

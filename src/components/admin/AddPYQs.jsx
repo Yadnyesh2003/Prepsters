@@ -1,5 +1,8 @@
-  import React, { useState } from 'react';
-  import { db, collection, addDoc, serverTimestamp, updateDoc } from "../../config/firebase";
+import React, { useContext, useState } from 'react';
+import { AppContext } from '../../context/AppContext';
+import { db, collection, addDoc, serverTimestamp, updateDoc } from "../../config/firebase";
+import { useAuth } from '../../context/AuthContext';
+import AccessForbidden from '../student/AccessForbidden';
 
   const AddPYQs = () => {
     const [formData, setFormData] = useState({
@@ -15,7 +18,9 @@
       adminId: ''
     });
     const [loading, setLoading] = useState(false);
-    const [error, setError] = useState("");
+
+    const { toast } = useContext(AppContext);
+    const { isGhost, user } = useAuth();
 
     const handleChange = (e) => {
       const { name, value, type, checked } = e.target;
@@ -68,45 +73,44 @@
     const handleSubmit = async (e) => {
       e.preventDefault();
       setLoading(true);
-      setError("");
 
       try {
-        const pyqsRef = await addDoc(collection(db, 'PYQs'), {
-          ...formData,
-          createdAt: serverTimestamp(),
-          createdBy: 'auth.currentUser.displayName', // Correct this line if you have Firebase Auth setup
-          adminId: 'req.auth.userId'
-        });
-        alert('Data submitted successfully!');
+        if(isGhost) {
+          const pyqsRef = await addDoc(collection(db, 'PYQs'), {
+            ...formData,
+            createdAt: serverTimestamp(),
+            createdBy: user.displayName, // Correct this line if you have Firebase Auth setup
+            adminId: user.uid
+          });
+          toast.success('PYQs added successfully!');
 
-        await updateDoc(pyqsRef, {
-          pyqsId: pyqsRef.id
-        });
+          await updateDoc(pyqsRef, {
+            pyqsId: pyqsRef.id
+          });
 
-        setFormData({
-          pyqsCategory: {
-            academicYear: '',
-            branch: [],
-            institution: '',
-            subjectName: [],
-            year: '',
-          },
-          pyqsLink: '',
-          pyqsTitle: '',
-        })
-
+          setFormData({
+            pyqsCategory: {
+              academicYear: '',
+              branch: [],
+              institution: '',
+              subjectName: [],
+              year: '',
+            },
+            pyqsLink: '',
+            pyqsTitle: '',
+          })
+        } else{
+          toast('Unauthorized Access!', {icon: '🚫'})
+        }
       } catch (error) {
-        setError('Error adding document: ', + error.message);
+        toast.error(`Oops! Couldn't add PYQs:  ${error.message}`);
       } finally {
         setLoading(false);
       }
     };
 
-    return (
+    return isGhost ? (
       <div className="mx-auto mt-7 ml-3 p-6 bg-white overflow-scroll flex flex-col justify-between text-gray-700">
-        
-        {error && <div className="text-red-500 mb-4">{error}</div>}
-
         <form onSubmit={handleSubmit} className="flex flex-col w-3/4 gap-4 text-gray-500">
           {/* PYQS Title */}
           <div className="flex flex-col gap-2">
@@ -263,7 +267,7 @@
           </button>
         </form>
       </div>
-    );
+    ) : <AccessForbidden />
   };
 
   export default AddPYQs;

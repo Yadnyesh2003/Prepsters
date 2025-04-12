@@ -1,19 +1,19 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { getDocs, collection, db, doc, updateDoc, deleteDoc, serverTimestamp } from '../../config/firebase'; 
+import { getDocs, collection, db, doc, updateDoc, deleteDoc, serverTimestamp } from '../../config/firebase';
 import { AppContext } from '../../context/AppContext'
-import AccessForbidden from '../student/AcessForbidden'
+import AccessForbidden from '../student/AccessForbidden'
 import Loading from '../../components/student/Loading';
 import FilterComponent from './FilterComponent';
 import PdfViewer from '../student/PdfViewer';
 import { assets } from '../../assets/assets';
+import { useAuth } from '../../context/AuthContext';
 
 
 const MyFAQs = () => {
-
+  const { isGhost } = useAuth();
   const [faqData, setFaqData] = useState([]);
   const [filteredData, setFilteredData] = useState([]); // New state to hold the filtered FAQ data
   const [loading, setLoading] = useState(true);
-  const { isGhost, setIsGhost } = useContext(AppContext);
   const [pdfUrl, setPdfUrl] = useState(null);
 
   const [editingFAQ, setEditingFAQ] = useState(null);
@@ -21,7 +21,7 @@ const MyFAQs = () => {
     branch: [],
     faqsTitle: '',
     contributorName: '',
-    subjectName: '', 
+    subjectName: '',
   });
 
   const [filter, setFilter] = useState({
@@ -30,22 +30,24 @@ const MyFAQs = () => {
     year: ''
   });
 
-//================================================================================================================================================================================================
+  const { toast } = useContext(AppContext);
+
+  //================================================================================================================================================================================================
 
   //For FilterComponent.jsx 
   const filterOptions = {
     branches: [
-      "General Science & Humanities", 
-      "Computer Engineering", 
-      "Information Technology", 
-      "Electronics & Telecommunication", 
-      "Artificial Intelligence & Data Science", 
+      "General Science & Humanities",
+      "Computer Engineering",
+      "Information Technology",
+      "Electronics & Telecommunication",
+      "Artificial Intelligence & Data Science",
       "Electronics & Computer Science"
     ],
     years: ["First Year", "Second Year", "Third Year", "Final Year"]
   };
 
-//===============================================================================================================================================================================================
+  //===============================================================================================================================================================================================
 
   // Fetch FAQ data from Firestore
   const getFAQData = async () => {
@@ -59,7 +61,7 @@ const MyFAQs = () => {
       setFilteredData(faqs); // Initially show all data
       setLoading(false);
     } catch (error) {
-      alert('Error fetching FAQs:', error.message);
+      toast.error(`Error fetching FAQs: ${error.message}`);
       setLoading(false);
     }
   };
@@ -73,10 +75,11 @@ const MyFAQs = () => {
   // Handle Edit - Set the FAQ to be edited
   const handleEdit = (faq) => {
     setEditingFAQ(faq.id);
-    setEditedData({ 
-      ...faq.faqsCategory || {}, 
-      faqsTitle: faq.faqsTitle, 
-      contributorName: faq.contributorName });
+    setEditedData({
+      ...faq.faqsCategory || {},
+      faqsTitle: faq.faqsTitle,
+      contributorName: faq.contributorName
+    });
   };
 
   // Save edited data back to Firestore
@@ -84,29 +87,39 @@ const MyFAQs = () => {
     if (!editingFAQ) return;
 
     try {
-      const faqRef = doc(db, 'FAQs', editingFAQ);
-      await updateDoc(faqRef, {
-        faqsCategory: editedData,
-        faqsTitle: editedData.faqsTitle,
-        contributorName: editedData.contributorName,
-        updatedAt: serverTimestamp()
-      });
-      setEditingFAQ(null);
-      setEditedData({});
-      getFAQData(); // Reload data from Firestore
+      if (isGhost) {
+        const faqRef = doc(db, 'FAQs', editingFAQ);
+        await updateDoc(faqRef, {
+          faqsCategory: editedData,
+          faqsTitle: editedData.faqsTitle,
+          contributorName: editedData.contributorName,
+          updatedAt: serverTimestamp()
+        });
+        setEditingFAQ(null);
+        setEditedData({});
+        getFAQData(); // Reload data from Firestore
+        toast.success('Changes Saved!')
+      } else {
+        toast('Unauthorized Access!', { icon: '🚫' })
+      }
     } catch (error) {
-      alert('Error saving FAQ:', error);
+      toast.error(`Error saving data: ${error.message}`);
     }
   };
-  
+
   // Handle Delete - Delete the FAQ from Firestore
   const handleDelete = async (faqId) => {
     try {
-      const faqRef = doc(db, 'FAQs', faqId);
-      await deleteDoc(faqRef);
-      getFAQData(); // Reload data from Firestore after deletion
+      if (isGhost) {
+        const faqRef = doc(db, 'FAQs', faqId);
+        await deleteDoc(faqRef);
+        getFAQData(); // Reload data from Firestore after deletion
+        toast.success('Deleted data!')
+      } else {
+        toast('Unauthorized Access!', { icon: '🚫' })
+      }
     } catch (error) {
-      alert('Error deleting FAQ:', error);
+      toast.error(`Error deleting data: ${error.message}`);
     }
   };
 
@@ -114,16 +127,16 @@ const MyFAQs = () => {
   const filterFAQData = (filterValues) => {
     const filtered = faqData.filter((doc) => {
       const { branch, institution, year } = doc.faqsCategory || {};
-  
+
       const institutionMatch = filterValues.institution
         ? institution && institution.toLowerCase().includes(filterValues.institution.toLowerCase())
         : true;
-  
+
       // Check if the branch filter matches any of the branches in the array
       const branchMatch = filterValues.branch
         ? branch && branch.includes(filterValues.branch) // Check if the selected branch is in the array
         : true;
-  
+
       return (
         branchMatch &&
         institutionMatch &&
@@ -132,7 +145,7 @@ const MyFAQs = () => {
     });
     setFilteredData(filtered); // Update the filtered data
   };
-  
+
   // Handle Year Radio Selection
   const handleYearChange = (e) => {
     setEditedData({
@@ -146,13 +159,13 @@ const MyFAQs = () => {
     const updatedBranches = e.target.checked
       ? [...editedData.branch, branch]  // Add branch if checked
       : editedData.branch.filter((b) => b !== branch);  // Remove branch if unchecked
-  
+
     setEditedData({
       ...editedData,
       branch: updatedBranches,  // Update branch as an array
     });
   };
-  
+
 
   const openPdfViewer = (url) => {
     setPdfUrl(url); // Set the PDF URL to be displayed in the viewer
@@ -169,7 +182,7 @@ const MyFAQs = () => {
   return isGhost ? (
     <div className='max-w-6xl mx-auto p-4'>
       {/* Filter Component */}
-      <FilterComponent 
+      <FilterComponent
         filter={filter}
         setFilter={setFilter}
         filterOptions={filterOptions}
@@ -328,7 +341,7 @@ const MyFAQs = () => {
       </div>
       {pdfUrl && <PdfViewer pdfUrl={pdfUrl} onClose={closePdfViewer} />}
     </div>
-  ) : (<AccessForbidden/>)
+  ) : (<AccessForbidden />)
 }
 
 export default MyFAQs

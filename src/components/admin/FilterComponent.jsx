@@ -1,4 +1,7 @@
-import React from 'react';
+import React, { useContext } from 'react';
+import { useAuth } from '../../context/AuthContext'
+import AccessForbidden from '../student/AccessForbidden';
+
 
 const FilterComponent = ({ filter, setFilter, filterOptions, onFilterChange }) => {
   const handleFilterChange = (e) => {
@@ -8,7 +11,10 @@ const FilterComponent = ({ filter, setFilter, filterOptions, onFilterChange }) =
     onFilterChange(updatedFilter);  // Apply the filter on data immediately
   };
 
-  return (
+
+  const { isGhost } = useAuth();
+
+  return isGhost ? (
     <div className="mb-4 p-4 bg-cyan-300 shadow-lg rounded-md">
       <h2 className="text-lg font-semibold">Filter Documents</h2>
       <div className="flex flex-col md:flex-row gap-4 mt-4">
@@ -59,7 +65,7 @@ const FilterComponent = ({ filter, setFilter, filterOptions, onFilterChange }) =
         </div>
       </div>
     </div>
-  );
+  ) : null
 };
 
 export default FilterComponent;

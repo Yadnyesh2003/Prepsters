@@ -1,5 +1,8 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
+import { AppContext } from '../../context/AppContext';
+import { useAuth } from '../../context/AuthContext';
 import { db, collection, addDoc, serverTimestamp, updateDoc } from "../../config/firebase";
+import AccessForbidden from '../student/AccessForbidden';
 
 const AddSyllabus = () => {
   const [formData, setFormData] = useState({
@@ -14,7 +17,9 @@ const AddSyllabus = () => {
     adminId: ''
   });
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+
+  const { toast } = useContext(AppContext);
+  const { isGhost, user } = useAuth();
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -22,10 +27,10 @@ const AddSyllabus = () => {
     if (name.startsWith('syllabusCategory')) {
       const path = name.split('.'); // Split name into parts
       const field = path.pop(); // Get the last part (e.g., 'academicYear')
-      
+
       setFormData(prevData => {
         const updatedCategory = { ...prevData.syllabusCategory };
-        
+
         if (type === 'checkbox') {
           // Handling checkbox for branch
           if (name === 'syllabusCategory.branch') {
@@ -38,7 +43,7 @@ const AddSyllabus = () => {
         } else {
           updatedCategory[field] = value;
         }
-        
+
         return { ...prevData, syllabusCategory: updatedCategory };
       });
     } else {
@@ -63,44 +68,43 @@ const AddSyllabus = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setError("");
 
     try {
-      const syllabusRef = await addDoc(collection(db, 'Syllabus'), {
-        ...formData,
-        createdAt: serverTimestamp(),
-        createdBy: 'auth.currentUser.displayName', // Correct this line if you have Firebase Auth setup
-        adminId: 'req.auth.userId'
-      });
-      alert('Data submitted successfully!');
+      if (isGhost) {
+        const syllabusRef = await addDoc(collection(db, 'Syllabus'), {
+          ...formData,
+          createdAt: serverTimestamp(),
+          createdBy: user.displayName, // Correct this line if you have Firebase Auth setup
+          adminId: user.uid
+        });
+        toast.success('Syllabus added successfully!');
 
-      await updateDoc(syllabusRef, {
-        syllabusId: syllabusRef.id
-      });
+        await updateDoc(syllabusRef, {
+          syllabusId: syllabusRef.id
+        });
 
-      setFormData({
-        syllabusCategory: {
-          academicYear: '',
-          branch: [],
-          institution: '',
-          year: '',
-        },
-        syllabusLink: '',
-        syllabusTitle: '',
-      })
-
+        setFormData({
+          syllabusCategory: {
+            academicYear: '',
+            branch: [],
+            institution: '',
+            year: '',
+          },
+          syllabusLink: '',
+          syllabusTitle: '',
+        })
+      } else {
+        toast('Unauthorized Access!', { icon: '🚫' })
+      }
     } catch (error) {
-      setError('Error adding document: ', + error.message);
+      toast.error(`Oops! Couldn't add Syllabus: ${error.message}`);
     } finally {
       setLoading(false);
     }
   };
 
-  return (
+  return isGhost ? (
     <div className="mx-auto mt-7 ml-3 p-6 bg-white overflow-scroll flex flex-col justify-between text-gray-700">
-      
-      {error && <div className="text-red-500 mb-4">{error}</div>}
-
       <form onSubmit={handleSubmit} className="flex flex-col w-3/4 gap-4 text-gray-500">
         {/* Syllabus Title */}
         <div className="flex flex-col gap-2">
@@ -133,20 +137,20 @@ const AddSyllabus = () => {
         <div className='space-y-2 '>
           <p className="text-lg text-left">Branch</p>
           <div className="flex flex-col gap-2 text-left">
-            {[  
-                "General Science & Humanities",
-                "Computer Engineering",
-                "Information Technology",
-                "Electronics & Telecommunication",
-                "Artificial Intelligence & Data Science",
-                "Electronics & Computer Science",
-              ].map((branch) => (
+            {[
+              "General Science & Humanities",
+              "Computer Engineering",
+              "Information Technology",
+              "Electronics & Telecommunication",
+              "Artificial Intelligence & Data Science",
+              "Electronics & Computer Science",
+            ].map((branch) => (
               <label key={branch} className='flex items-center gap-2 hover:text-amber-400'>
                 <input
                   type="radio"
                   name="syllabusCategory.branch"
                   value={branch}
-                  checked={formData.syllabusCategory.branch===branch}
+                  checked={formData.syllabusCategory.branch === branch}
                   onChange={handleChange}
                   className="mr-2  hover:text-amber-400"
                 />
@@ -219,7 +223,7 @@ const AddSyllabus = () => {
         </button>
       </form>
     </div>
-  );
+  ) : <AccessForbidden />
 };
 
 export default AddSyllabus;
