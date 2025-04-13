@@ -341,14 +341,15 @@ export default function AddCourse() {
                                 />
                             </div>
                             <div className="mb-4">
-                                {/* // const cleanUrl = inputUrl.split("?")[0]; */}
+
                                 <label className="text-lg ">Lecture URL</label>
                                 <input
                                     type="text"
                                     value={lectureDetails.lectureUrl}
                                     onChange={(e) => {
                                         const inputUrl = e.target.value;
-                                        setLectureDetails({ ...lectureDetails, lectureUrl: inputUrl });
+                                        const cleanUrl = inputUrl.split("?")[0];
+                                        setLectureDetails({ ...lectureDetails, lectureUrl: cleanUrl });
                                     }}
                                     className="w-full p-3 text-gray-700 rounded-lg border-1 border-gray-700 focus:outline-none focus:ring-1 focus:ring-blue-500"
                                 />
