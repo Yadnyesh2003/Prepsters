@@ -51,7 +51,7 @@ import delete_data from './delete_data.png'
 import view_data from './view_data.png'
 import close_button from './close_button.png'
 import access_forbidden from './access_forbidden.png'
-
+import default_student_avatar from './default_student_avatar.png'
 
 export const assets = {
     logo,
@@ -106,7 +106,8 @@ export const assets = {
     delete_data,
     view_data,
     close_button,
-    access_forbidden
+    access_forbidden,
+    default_student_avatar
 }
 
 export const dummyEducatorData = {

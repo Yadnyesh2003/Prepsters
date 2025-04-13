@@ -19,7 +19,7 @@ function Landing() {
         );
     }
     return (
-        <div><Navbar />
+        <div>
             <Hero />
             <Features />
             <HowItWorks />

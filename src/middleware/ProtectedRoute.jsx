@@ -2,11 +2,20 @@
 import React from "react";
 import { Navigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import Loader from "../components/student/Loading";
+import Loader from "../components/student/Loading"; // Import your loading spinner component
 
-const ProtectedRoute = ({ children, allowedRole }) => {
+// const Loader = () => (
+//     <div style={{ display: 'flex', justifyContent: 'center', paddingTop: '4rem' }}>
+//         <div className="loader"></div>
+//     </div>
+// );
+
+const ProtectedRouteStudent = ({ children, allowedRole }) => {
     const { isAuth, role, loading } = useAuth();
-    if (loading) return <Loader />;
+
+    if (loading) {
+        return <Loader />; // Show spinner while checking auth
+    }
 
     if (!isAuth) {
         return <Navigate to="/" replace />;
@@ -19,4 +28,4 @@ const ProtectedRoute = ({ children, allowedRole }) => {
     return children;
 };
 
-export default ProtectedRoute;
+export default ProtectedRouteStudent;

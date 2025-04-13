@@ -1,113 +1,198 @@
-import React, { useState } from 'react';
-import { AiOutlineClose, AiOutlineMenu } from 'react-icons/ai';
+import React, { useState, useEffect, useRef } from 'react';
+import { AiOutlineClose, AiOutlineMenu, AiOutlineLogout, AiOutlineLogin } from 'react-icons/ai';
 import { Link } from 'react-router-dom';
 import { useAuth } from "../../context/AuthContext";
-import img from '../../assets/tte_transparent_logo.png'
+import { assets } from '../../assets/assets';
 
-const Navbar = () => {
-  const { signInWithGoogle } = useAuth();
-  const { demofunction } = useAuth()
-  const [navOpen, setNavOpen] = useState(false);
+const NavbarHome = () => {
+    const { logoutUser, user, signInWithGoogle } = useAuth();
+    const [navOpen, setNavOpen] = useState(false);
+    const [dropdownOpen, setDropdownOpen] = useState(false);
+    const dropdownRef = useRef(null);
 
-  // Toggle mobile menu
-  const toggleNav = () => {
-    setNavOpen(!navOpen);
-  };
+    const toggleNav = () => setNavOpen(!navOpen);
+    const toggleDropdown = () => setDropdownOpen(prev => !prev);
 
-  const navItems = [
-    { id: 1, text: 'Home', path: '/' },
-    { id: 2, text: 'About Us', path: '/about-us' },
-    { id: 3, text: 'Contributors', path: '/contributors' },
-  ];
+    const authNavItems = [
+        { id: 1, text: 'Exam Prep', path: '/exam-prep' },
+        { id: 2, text: 'Resources', path: '/resources' },
+        { id: 3, text: 'About Us', path: '/about-us' },
+        { id: 4, text: 'Contributors', path: '/contributors' },
+    ];
 
-  // bg - gradient - to - br from - [#1F2937] to - [#3B4864]
+    const navItems = [
+        { id: 1, text: 'About Us', path: '/about-us' },
+        { id: 2, text: 'Contributors', path: '/contributors' },
+    ];
 
-  return (
-    <nav className="bg-black text-white z-50 relative shadow-lg">
-      <div className="container mx-auto flex justify-between items-center py-3 px-6">
-        {/* Logo */}
-        <Link to="/" className="flex items-center space-x-2">
-          <div className="bg-white rounded-full p-1 shadow-md">
-            <img src={img} alt="TTE Logo" className="h-10 w-10 object-contain" />
-          </div>
-        </Link>
+    const itemsToDisplay = user ? authNavItems : navItems;
 
-        {/* Desktop Navigation */}
-        <ul className="hidden md:flex space-x-6 ml-auto">
-          {navItems.map(item => (
-            <li key={item.id}>
-              <Link
-                to={item.path}
-                className="text-lg font-medium hover:text-[#c1c1c1] transition duration-300"
-              >
-                {item.text}
-              </Link>
-            </li>
-          ))}
-        </ul>
+    const formatDate = (dateString) => {
+        const date = new Date(dateString);
+        return date.toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' });
+    };
 
-        {/* Login Button (Desktop) */}
-        {/* <Link
-          to="/login"
-          className="hidden md:block px-5 py-2 bg-[#ffffff] text-gray-900 font-semibold rounded-lg hover:bg-[#c1c1c1] transition duration-300"
-          onClick={signInWithGoogle} // Call demo function on click
-        >
-          Login
-        </Link> */}
+    // Close dropdown if clicked outside
+    useEffect(() => {
+        const handleClickOutside = (e) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+                setDropdownOpen(false);
+            }
+        };
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
 
-        <button className="hidden md:block ml-10 px-5 py-2 bg-[#ffffff] text-gray-900 font-semibold rounded-lg hover:bg-[#c1c1c1] transition duration-300"
-          onClick={signInWithGoogle}>Get Started</button>
+    useEffect(() => {
+        console.log("Current User:", user);
+    }, [user]);
+    
 
-        {/* Mobile Menu Toggle Button */}
-        <button onClick={toggleNav} className="md:hidden">
-          {navOpen ? <AiOutlineClose size={24} /> : <AiOutlineMenu size={24} />}
-        </button>
-      </div>
+    return (
+        <nav className="bg-black text-white z-50 relative shadow-lg">
+            <div className="container mx-auto flex justify-between items-center py-3 px-6">
+                {/* Logo */}
+                <Link to="/" className="flex items-center space-x-2">
+                    <div className="bg-white rounded-full p-1 shadow-md">
+                        <img src={assets.tte_transparent_logo} alt="TTE Logo" className="h-10 w-10 object-contain" />
+                    </div>
+                </Link>
 
-      {/* Mobile Navigation Menu */}
-      <div
-        className={`fixed md:hidden top-0 left-0 w-[70%] h-full bg-[#1F2937] shadow-lg transform ${navOpen ? 'translate-x-0' : '-translate-x-full'
-          } transition-transform duration-300`}
-      >
+                {/* Desktop Nav Items */}
+                <ul className="hidden md:flex space-x-6 ml-auto">
+                {itemsToDisplay.map(item => (
+                        <li key={item.id}>
+                            <Link to={item.path} className="text-lg font-medium hover:text-[#c1c1c1] transition">
+                                {item.text}
+                            </Link>
+                        </li>
+                    ))}
+                </ul>
 
-        {/* text-[#00DF9A] */}
-        {/* Mobile Logo & Close Button */}
-        <div className="flex justify-between items-center p-6 border-b border-gray-700">
-          <h1 className="text-3xl font-bold text-[#00DF9A]">TTE</h1>
-          <button onClick={toggleNav}>
-            <AiOutlineClose size={24} />
-          </button>
-        </div>
+                {/* User Avatar & Dropdown */}
+                <div className="hidden md:block ml-6">
+                {user ?
+                    (<div className="relative" ref={dropdownRef}>
+                        <img
+                            src={user?.photoURL}
+                            onError={(e) => {
+                                e.currentTarget.src = assets.default_student_avatar;
+                            }}
+                            alt="User"
+                            className="w-10 h-10 rounded-full cursor-pointer border-2 border-white"
+                            onClick={toggleDropdown}
+                        />
 
-        {/* Mobile Navigation Links */}
-        <ul className="flex flex-col space-y-4 p-6">
-          {navItems.map(item => (
-            <li key={item.id}>
-              <Link
-                to={item.path}
-                className="block text-lg font-medium hover:text-[#c1c1c1] transition duration-300"
-                onClick={toggleNav} // Close menu on item click
-              >
-                {item.text}
-              </Link>
-            </li>
-          ))}
-          <li>
-            {/* <Link
-              to="/login"
-              className="block w-full text-center bg-[#ffffff] text-gray-900 py-2 rounded-lg font-semibold hover:bg-[#c1c1c1] transition duration-300"
-              onClick={signInWithGoogle}
-            >
-              Login
-            </Link> */}
 
-            <button className="block w-full text-center bg-[#ffffff] text-gray-900 py-2 rounded-lg font-semibold hover:bg-[#c1c1c1] transition duration-300"
-              onClick={signInWithGoogle}>Get Started</button>
-          </li>
-        </ul>
-      </div>
-    </nav>
-  );
+                        {dropdownOpen && (
+                            <div className="absolute right-0 mt-2 w-64 bg-white text-black rounded-lg shadow-xl z-50">
+                                <div className="p-4 border-b">
+                                    <p className="font-semibold text-lg">{user?.displayName || "User"}</p>
+                                    <p className="text-sm text-gray-600">{user?.email}</p>
+                                    <p className="text-sm text-gray-500 mt-2">Joined: {formatDate(user?.metadata?.creationTime)}</p>
+                                    <p className="text-sm text-gray-500">Last Seen: {formatDate(user?.metadata?.lastSignInTime)}</p>
+                                </div>
+                                <button
+                                    onClick={logoutUser}
+                                    className="w-full py-2 text-red-600 font-semibold hover:bg-red-100 flex items-center justify-center gap-2"
+                                >
+                                    <AiOutlineLogout /> Logout
+                                </button>
+                            </div>
+                            )}
+                    </div>) 
+                    : (<button className="hidden md:block ml-10 px-5 py-2 bg-[#ffffff] text-gray-900 font-semibold rounded-lg hover:bg-[#c1c1c1] transition duration-300"
+                        onClick={signInWithGoogle}>Get Started</button>)}
+                    
+                </div>
+
+                {/* Mobile Menu Toggle */}
+                <button onClick={toggleNav} className="md:hidden">
+                    {navOpen ? <AiOutlineClose size={24} /> : <AiOutlineMenu size={24} />}
+                </button>
+            </div>
+
+            {/* Mobile Sidebar */}
+            {user ? (
+                <div className={`fixed md:hidden top-0 left-0 w-[75%] h-full bg-[#1F2937] shadow-lg transform ${navOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300`}>
+                {/* Header */}
+                <div className="flex justify-between items-center p-6 border-b border-gray-700">
+                    <h1 className="text-lg font-bold text-[#00DF9A]">Hello, {user?.displayName} </h1>
+                    <button onClick={toggleNav}>
+                        <AiOutlineClose size={24} />
+                    </button>
+                </div>
+
+                {/* User Info (Small font) */}
+                <div className="px-6 py-2 text-xs text-gray-300 border-b border-gray-700">
+                    <p>Email: {user?.email}</p>
+                    <p>Joined: {formatDate(user?.metadata?.creationTime)}</p>
+                    <p>Last Seen: {formatDate(user?.metadata?.lastSignInTime)}</p>
+                </div>
+
+                {/* Mobile Nav Items */}
+                <ul className="flex flex-col space-y-4 p-6">
+                    {itemsToDisplay.map(item => (
+                        <li key={item.id}>
+                            <Link
+                                to={item.path}
+                                className="block text-lg font-medium hover:text-[#c1c1c1] transition"
+                                onClick={toggleNav}
+                            >
+                                {item.text}
+                            </Link>
+                        </li>
+                    ))}
+
+
+                    {/* Logout Button in Mobile */}
+                    <li>
+                        <button
+                            className="flex items-center justify-center gap-2 w-full text-center bg-red-600 text-white py-2 rounded-lg font-semibold hover:bg-red-700 transition"
+                            onClick={() => {
+                                logoutUser();
+                                toggleNav();
+                            }}
+                        >
+                            <AiOutlineLogout /> Logout
+                        </button>
+                    </li>
+                </ul>
+            </div>
+            ) : (
+                <div className={`fixed md:hidden top-0 left-0 w-[75%] h-full bg-[#1F2937] shadow-lg transform ${navOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300`}>
+                    {/* Header */}
+                    <div className="flex justify-between items-center p-6 border-b border-gray-700">
+                        <h1 className="text-2xl font-bold text-[#00DF9A]">TTE</h1>
+                        <button onClick={toggleNav}>
+                            <AiOutlineClose size={24} />
+                        </button>
+                    </div>
+                    <ul className="flex flex-col space-y-4 p-6">
+                    {itemsToDisplay.map(item => (
+                        <li key={item.id}>
+                            <Link
+                                to={item.path}
+                                className="block text-lg font-medium hover:text-[#c1c1c1] transition"
+                                onClick={toggleNav}
+                            >
+                                {item.text}
+                            </Link>
+                        </li>
+                    ))}
+                    </ul>
+                    <button
+                        onClick={logoutUser}
+                        className="w-3/4 py-2 ml-8 text-lime-500 bg-white rounded-full font-bold hover:bg-red-100 flex items-center justify-center gap-2"
+                    >
+                        Get Started
+                    </button>
+                </div>
+                
+            )}
+            
+        </nav>
+    );
 };
 
-export default Navbar;
+export default NavbarHome;
