@@ -87,7 +87,7 @@ const NavbarHome = () => {
                         {dropdownOpen && (
                             <div className="absolute right-0 mt-2 w-64 bg-white text-black rounded-lg shadow-xl z-50">
                                 <div className="p-4 border-b">
-                                    <p className="font-semibold text-lg">{user?.displayName || "User"}</p>
+                                    <p className="font-semibold text-lg">Hello, {user?.displayName || "User"}!!</p>
                                     <p className="text-sm text-gray-600">{user?.email}</p>
                                     <p className="text-sm text-gray-500 mt-2">Joined: {formatDate(user?.metadata?.creationTime)}</p>
                                     <p className="text-sm text-gray-500">Last Seen: {formatDate(user?.metadata?.lastSignInTime)}</p>
