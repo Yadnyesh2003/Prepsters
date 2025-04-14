@@ -3,6 +3,8 @@ import { AppContext } from '../../context/AppContext';
 import PdfViewer from './PdfViewer';
 import { assets } from '../../assets/assets';
 import { useAuth } from '../../context/AuthContext';
+import { motion } from 'framer-motion';
+
 
 const LatestContent = () => {
 
@@ -22,7 +24,11 @@ const LatestContent = () => {
             const contributor = item.contributorName;
             const category = item[`${type.toLowerCase()}Category`] || {};
             return (
-                <div
+                <motion.div
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: idx * 0.1 }}
+                viewport={{ once: true }}
                 key={idx}
                 className="bg-white border border-gray-300 shadow-md rounded-lg p-4 w-full sm:w-[48%] md:w-[32%] lg:w-[31%] xl:w-[30%] flex flex-col justify-between"
                 >
@@ -49,7 +55,7 @@ const LatestContent = () => {
                     <img src={assets.view_data} alt="view" className="w-5 h-5 mr-2" />
                     View
                 </button>
-                </div>
+                </motion.div>
             );
             });
         };
@@ -61,7 +67,14 @@ const LatestContent = () => {
 
             {/* NOTES */}
             <div className="mt-8">
-            <h3 className="text-xl font-semibold mb-4">Recently added Notes</h3>
+            <motion.h3
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4 }}
+                viewport={{ once: true }} 
+                className="text-xl font-semibold mb-4">
+                    Recently added Notes
+            </motion.h3>
             <div className="flex flex-wrap gap-5">
                 {renderCards(notesDataLatest, 'Notes')}
             </div>
@@ -69,7 +82,14 @@ const LatestContent = () => {
 
             {/* FAQS */}
             <div className="mt-8">
-            <h3 className="text-xl font-semibold mb-4">Recently added FAQs</h3>
+            <motion.h3
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4 }}
+                viewport={{ once: true }} 
+                className="text-xl font-semibold mb-4">
+                    Recently added FAQs
+            </motion.h3>
             <div className="flex flex-wrap gap-5">
                 {renderCards(faqDataLatest, 'Faqs')}
             </div>
@@ -77,7 +97,14 @@ const LatestContent = () => {
 
             {/* PYQS */}
             <div className="mt-8">
-            <h3 className="text-xl font-semibold mb-4">Recently added PYQs</h3>
+            <motion.h3
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4 }}
+                viewport={{ once: true }} 
+                className="text-xl font-semibold mb-4">
+                    Recently added PYQs
+            </motion.h3>
             <div className="flex flex-wrap gap-5">
                 {renderCards(pyqDataLatest, 'Pyqs')}
             </div>

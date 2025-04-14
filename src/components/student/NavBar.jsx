@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { AiOutlineClose, AiOutlineMenu, AiOutlineLogout, AiOutlineLogin } from 'react-icons/ai';
+import { AiOutlineClose, AiOutlineMenu, AiOutlineLogout, AiOutlineDown, AiOutlineUp } from 'react-icons/ai';
 import { Link } from 'react-router-dom';
 import { useAuth } from "../../context/AuthContext";
 import { assets } from '../../assets/assets';
@@ -8,6 +8,10 @@ const NavbarHome = () => {
     const { logoutUser, user, signInWithGoogle } = useAuth();
     const [navOpen, setNavOpen] = useState(false);
     const [dropdownOpen, setDropdownOpen] = useState(false);
+
+    const [examPrepOpen, setExamPrepOpen] = useState(false);
+    const [resourcesOpen, setResourcesOpen] = useState(false);
+
     const dropdownRef = useRef(null);
 
     const toggleNav = () => setNavOpen(!navOpen);
@@ -132,31 +136,92 @@ const NavbarHome = () => {
 
                 {/* Mobile Nav Items */}
                 <ul className="flex flex-col space-y-4 p-6">
-                    {itemsToDisplay.map(item => (
-                        <li key={item.id}>
-                            <Link
-                                to={item.path}
-                                className="block text-lg font-medium hover:text-[#c1c1c1] transition"
-                                onClick={toggleNav}
-                            >
-                                {item.text}
-                            </Link>
-                        </li>
-                    ))}
-
-
-                    {/* Logout Button in Mobile */}
+                    {/* Exam Prep with Dropdown */}
                     <li>
                         <button
-                            className="flex items-center justify-center gap-2 w-full text-center bg-red-600 text-white py-2 rounded-lg font-semibold hover:bg-red-700 transition"
-                            onClick={() => {
-                                logoutUser();
-                                toggleNav();
-                            }}
+                            onClick={() => setExamPrepOpen(prev => !prev)}
+                            className="w-full flex items-center justify-between text-left text-lg font-medium hover:text-[#c1c1c1] transition"
                         >
-                            <AiOutlineLogout /> Logout
+                            Exam Prep
+                            {examPrepOpen ? <AiOutlineUp className="ml-2" /> : <AiOutlineDown className="ml-2" />}
                         </button>
+                        {examPrepOpen && (
+                            <ul className="ml-4 mt-2 space-y-2 text-sm text-gray-300">
+                                <li>
+                                    <Link to="/exam-prep/syllabus" onClick={toggleNav}>Syllabus</Link>
+                                </li>
+                                <li>
+                                    <Link to="/exam-prep/pyqs" onClick={toggleNav}>PYQs</Link>
+                                </li>
+                                <li>
+                                    <Link to="/exam-prep/faqs" onClick={toggleNav}>FAQs</Link>
+                                </li>
+                            </ul>
+                        )}
                     </li>
+
+                    {/* Resources with Dropdown */}
+                    <li>
+                        <button
+                            onClick={() => setResourcesOpen(prev => !prev)}
+                            className="w-full flex items-center justify-between text-left text-lg font-medium hover:text-[#c1c1c1] transition"
+                        >
+                            Resources
+                            {resourcesOpen ? <AiOutlineUp className="ml-2" /> : <AiOutlineDown className="ml-2" />}
+                        </button>
+                        {resourcesOpen && (
+                            <ul className="ml-4 mt-2 space-y-2 text-sm text-gray-300">
+                                <li>
+                                    <Link to="/resources/notes" onClick={toggleNav}>Notes</Link>
+                                </li>
+                                <li>
+                                    <Link to="/resources/course-list" onClick={toggleNav}>Courses</Link>
+                                </li>
+                            </ul>
+                        )}
+                    </li>
+
+                    {/* Other Nav Items */}
+                    <li>
+                        <Link
+                            to="/about-us"
+                            className="block text-lg font-medium hover:text-[#c1c1c1] transition"
+                            onClick={toggleNav}
+                        >
+                            About Us
+                        </Link>
+                    </li>
+                    <li>
+                        <Link
+                            to="/contributors"
+                            className="block text-lg font-medium hover:text-[#c1c1c1] transition"
+                            onClick={toggleNav}
+                        >
+                            Contributors
+                        </Link>
+                    </li>
+
+                    {/* Logout / Login */}
+                    {user ? (
+                        <li>
+                            <button
+                                className="flex items-center justify-center gap-2 w-full text-center bg-red-600 text-white py-2 rounded-lg font-semibold hover:bg-red-700 transition"
+                                onClick={() => {
+                                    logoutUser();
+                                    toggleNav();
+                                }}
+                            >
+                                <AiOutlineLogout /> Logout
+                            </button>
+                        </li>
+                    ) : (
+                        <button
+                            onClick={signInWithGoogle}
+                            className="w-3/4 py-2 ml-8 text-lime-500 bg-white rounded-full font-bold hover:bg-red-100 flex items-center justify-center gap-2"
+                        >
+                            Get Started
+                        </button>
+                    )}
                 </ul>
             </div>
             ) : (
