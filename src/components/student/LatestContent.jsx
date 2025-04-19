@@ -36,12 +36,12 @@ const LatestContent = () => {
                     <h4 className="text-lg font-medium mb-1 text-gray-800">{title}</h4>
                     <p className="text-xs text-gray-600">Contributed By: {contributor}</p>
                     {category.branch && ( 
-                        <p className="text-xs text-gray-500">
+                        <p className="text-xs text-gray-500 truncate overflow-hidden whitespace-nowrap sm:whitespace-normal">
                             Branch: {Array.isArray(category.branch) ? category.branch.join(', ') : category.branch}
                         </p>
                     )}
                     {category.subjectName && (
-                        <p className="text-xs text-gray-500">
+                        <p className="text-xs text-gray-500 truncate overflow-hidden whitespace-nowrap sm:whitespace-normal">
                             Subject: {Array.isArray(category.subjectName) ? category.subjectName.join(', ') : category.subjectName}
                         </p>
                     )}
@@ -75,7 +75,7 @@ const LatestContent = () => {
                 className="text-xl font-semibold mb-4">
                     Recently added Notes
             </motion.h3>
-            <div className="flex flex-wrap gap-5">
+            <div className="grid gap-5 grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
                 {renderCards(notesDataLatest, 'Notes')}
             </div>
             </div>
@@ -90,7 +90,7 @@ const LatestContent = () => {
                 className="text-xl font-semibold mb-4">
                     Recently added FAQs
             </motion.h3>
-            <div className="flex flex-wrap gap-5">
+            <div className="grid gap-5 grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
                 {renderCards(faqDataLatest, 'Faqs')}
             </div>
             </div>
@@ -105,7 +105,7 @@ const LatestContent = () => {
                 className="text-xl font-semibold mb-4">
                     Recently added PYQs
             </motion.h3>
-            <div className="flex flex-wrap gap-5">
+            <div className="grid gap-5 grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
                 {renderCards(pyqDataLatest, 'Pyqs')}
             </div>
             </div>

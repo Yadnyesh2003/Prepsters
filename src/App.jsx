@@ -44,6 +44,7 @@ import { AuthProvider } from "./context/AuthContext";
 import ProtectedRoute from "./middleware/ProtectedRoute";
 import AccessForbidden from './components/student/AccessForbidden';
 import Navbar from './components/student/NavBar';
+import Profile from './pages/student/Profile';
 
 
 
@@ -94,6 +95,14 @@ function App() {
                   <Home />
                 </ProtectedRoute>
               }
+            />
+
+            <Route 
+              path='/profile' element={
+                <ProtectedRoute allowedRole="student">
+                  <Profile />
+                </ProtectedRoute>
+              } 
             />
 
 

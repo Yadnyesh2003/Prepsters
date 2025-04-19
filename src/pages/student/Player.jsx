@@ -1,8 +1,9 @@
 import React from 'react'
+import ComingSoon from '../../components/student/ComingSoon'
 
 const Player = () => {
   return (
-    <h1>Player Page - Used to Play the lectures in the courses.</h1>
+    <ComingSoon />
   )
 }
 

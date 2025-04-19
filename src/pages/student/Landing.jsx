@@ -22,9 +22,9 @@ function Landing() {
     return (
         <div>
             <Hero />
+            <LatestContent/>
             <Features />
             <HowItWorks />
-            <LatestContent/>
             <ImpactSection />
             <Footer />
         </div>

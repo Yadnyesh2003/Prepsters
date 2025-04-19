@@ -13,6 +13,9 @@ const NavbarHome = () => {
     const [resourcesOpen, setResourcesOpen] = useState(false);
 
     const dropdownRef = useRef(null);
+    const examPrepRef = useRef(null);
+    const resourcesRef = useRef(null);
+
 
     const toggleNav = () => setNavOpen(!navOpen);
     const toggleDropdown = () => setDropdownOpen(prev => !prev);
@@ -42,6 +45,12 @@ const NavbarHome = () => {
             if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
                 setDropdownOpen(false);
             }
+            if (examPrepRef.current && !examPrepRef.current.contains(e.target)) {
+                setExamPrepOpen(false);
+            }
+            if (resourcesRef.current && !resourcesRef.current.contains(e.target)) {
+                setResourcesOpen(false);
+            }
         };
         document.addEventListener("mousedown", handleClickOutside);
         return () => document.removeEventListener("mousedown", handleClickOutside);
@@ -63,16 +72,61 @@ const NavbarHome = () => {
                 </Link>
 
                 {/* Desktop Nav Items */}
-                <ul className="hidden md:flex space-x-6 ml-auto">
-                {itemsToDisplay.map(item => (
-                        <li key={item.id}>
-                            <Link to={item.path} className="text-lg font-medium hover:text-[#c1c1c1] transition">
-                                {item.text}
-                            </Link>
+                <ul className="hidden md:flex space-x-6 ml-auto items-center">
+                    {user && (
+                        <>
+                        {/* Exam Prep Dropdown */}
+                        <li className="relative group" ref={examPrepRef}>
+                            <button
+                            onClick={() => setExamPrepOpen(prev => !prev)}
+                            className="flex items-center text-lg font-medium hover:text-[#c1c1c1]"
+                            >
+                            Exam Prep 
+                            </button>
+                            {examPrepOpen && (
+                            <ul className="absolute left-0 top-full mt-2 w-40 bg-white text-black rounded-md shadow-md z-50">
+                                <li>
+                                <Link to="/exam-prep/syllabus" className="block px-4 py-2 hover:bg-gray-100">Syllabus</Link>
+                                </li>
+                                <li>
+                                <Link to="/exam-prep/pyqs" className="block px-4 py-2 hover:bg-gray-100">PYQs</Link>
+                                </li>
+                                <li>
+                                <Link to="/exam-prep/faqs" className="block px-4 py-2 hover:bg-gray-100">FAQs</Link>
+                                </li>
+                            </ul>
+                            )}
                         </li>
-                    ))}
-                </ul>
 
+                        {/* Resources Dropdown */}
+                        <li className="relative group" ref={resourcesRef}>
+                            <button
+                            onClick={() => setResourcesOpen(prev => !prev)}
+                            className="flex items-center text-lg font-medium hover:text-[#c1c1c1]"
+                            >
+                            Resources 
+                            </button>
+                            {resourcesOpen && (
+                            <ul className="absolute left-0 top-full mt-2 w-40 bg-white text-black rounded-md shadow-md z-50">
+                                <li>
+                                <Link to="/resources/notes" className="block px-4 py-2 hover:bg-gray-100">Notes</Link>
+                                </li>
+                                <li>
+                                <Link to="/resources/course-list" className="block px-4 py-2 hover:bg-gray-100">Courses</Link>
+                                </li>
+                            </ul>
+                            )}
+                        </li>
+                        </>
+                    )}
+                {/* Static Links (About, Contributors) */}
+                    <li>
+                        <Link to="/about-us" className="text-lg font-medium hover:text-[#c1c1c1] transition">About Us</Link>
+                    </li>
+                    <li>
+                        <Link to="/contributors" className="text-lg font-medium hover:text-[#c1c1c1] transition">Contributors</Link>
+                    </li>
+                </ul>
                 {/* User Avatar & Dropdown */}
                 <div className="hidden md:block ml-6">
                 {user ?
@@ -120,7 +174,7 @@ const NavbarHome = () => {
             {user ? (
                 <div className={`fixed md:hidden top-0 left-0 w-[75%] h-full bg-[#1F2937] shadow-lg transform ${navOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300`}>
                 {/* Header */}
-                <div className="flex justify-between items-center p-6 border-b border-gray-700">
+                <div className="flex justify-between items-center p-6 border-b  border-gray-700">
                     <h1 className="text-lg font-bold text-[#00DF9A]">Hello, {user?.displayName} </h1>
                     <button onClick={toggleNav}>
                         <AiOutlineClose size={24} />
@@ -143,7 +197,6 @@ const NavbarHome = () => {
                             className="w-full flex items-center justify-between text-left text-lg font-medium hover:text-[#c1c1c1] transition"
                         >
                             Exam Prep
-                            {examPrepOpen ? <AiOutlineUp className="ml-2" /> : <AiOutlineDown className="ml-2" />}
                         </button>
                         {examPrepOpen && (
                             <ul className="ml-4 mt-2 space-y-2 text-sm text-gray-300">
@@ -167,7 +220,6 @@ const NavbarHome = () => {
                             className="w-full flex items-center justify-between text-left text-lg font-medium hover:text-[#c1c1c1] transition"
                         >
                             Resources
-                            {resourcesOpen ? <AiOutlineUp className="ml-2" /> : <AiOutlineDown className="ml-2" />}
                         </button>
                         {resourcesOpen && (
                             <ul className="ml-4 mt-2 space-y-2 text-sm text-gray-300">
@@ -182,6 +234,15 @@ const NavbarHome = () => {
                     </li>
 
                     {/* Other Nav Items */}
+                    <li>
+                        <Link
+                            to="/profile"
+                            className="block text-lg font-medium hover:text-[#c1c1c1] transition"
+                            onClick={toggleNav}
+                        >
+                            My Profile
+                        </Link>
+                    </li>
                     <li>
                         <Link
                             to="/about-us"
@@ -247,7 +308,7 @@ const NavbarHome = () => {
                     ))}
                     </ul>
                     <button
-                        onClick={logoutUser}
+                        onClick={signInWithGoogle}
                         className="w-3/4 py-2 ml-8 text-lime-500 bg-white rounded-full font-bold hover:bg-red-100 flex items-center justify-center gap-2"
                     >
                         Get Started
