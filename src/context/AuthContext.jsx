@@ -21,6 +21,8 @@ export const AuthProvider = ({ children }) => {
     const navigate = useNavigate();
     const [loading, setLoading] = useState(true); // Add this
 
+    
+
 
     // Function to fetch user role from Firestore based on email
     const fetchUserRoleByEmail = async (email) => {
@@ -151,7 +153,7 @@ export const AuthProvider = ({ children }) => {
         if (userRole === "admin") {
             navigate("/ghost");
         } else {
-            navigate("/Home");
+            navigate("/home");
         }
     };
 

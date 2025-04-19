@@ -91,7 +91,7 @@ function App() {
             <Route path='/contributors' element={<Contributors />} />
             <Route path='/about-us' element={<AboutUs />} />
             <Route
-              path="/Home"
+              path="/home"
               element={
                 <ProtectedRouteStudent allowedRole="student">
                   <Home />
