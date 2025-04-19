@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext"
 
 const Hero = () => {
-    const { signInWithGoogle } = useAuth();
+    const { user, signInWithGoogle } = useAuth();
     return (
         <section className="relative w-full">
             {/* Background Image for mobile */}
@@ -28,11 +28,11 @@ const Hero = () => {
                         Navigate your B.Tech journey with confidence. Access personalized learning analytics,
                         comprehensive study materials, and FAQs — all in one place.
                     </p>
-
-                    <button className="px-6 py-3 bg-[#000000] text-white font-semibold rounded-lg shadow-lg hover:bg-[#727272] transition duration-300"
+                    {user ? (null) : 
+                    (<button className="px-6 py-3 bg-[#000000] text-white font-semibold rounded-lg shadow-lg hover:bg-[#727272] transition duration-300"
                         onClick={signInWithGoogle} >
                         Get Started
-                    </button>
+                    </button>)}
 
                 </div>
 

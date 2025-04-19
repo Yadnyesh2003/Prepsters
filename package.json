@@ -21,6 +21,7 @@
     "react-hot-toast": "^2.5.2",
     "react-icons": "^5.5.0",
     "react-router-dom": "^7.4.0",
+    "react-select": "^5.10.1",
     "styled-components": "^6.1.17",
     "tailwindcss": "^4.0.17",
     "uniqid": "^5.4.0"

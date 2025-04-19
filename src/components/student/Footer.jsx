@@ -2,6 +2,15 @@ import React from 'react'
 import img from '../../assets/tte_transparent_logo.png'
 
 const Footer = () => {
+
+    const today = new Date();
+    const formattedDate = today.toLocaleDateString('en-IN', {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+    });
+
+
     return (
         <footer className='bg-gray-900 md:px-36 text-left w-full mt-10'>
 
@@ -17,17 +26,8 @@ const Footer = () => {
                         <span className="font-bold text-lg sm:text-xl md:text-1xl text-white/60">The Third Tier Engineers</span>
                     </div>
                     <p className='mt-6 text-center md:text-left text-sm text-white/80'>TheThirdTierEngineers made its online presence on 22nd October,2023.
-                        Today is 14th February,2025. Look how far we have reached!</p>
+                        Today is {formattedDate}. Look how far we have reached!</p>
                 </div>
-                {/* <div className='flex flex-col md:items-start items-left w-full'>
-          <h2 className='font-semibold  text-white/80 mb-5'>Company</h2>
-          <ul className='flex md:flex-col w-full justify-between text-sm text-white/80 md:space-y-2'>
-            <li> <a href='#'>Home</a></li>
-            <li> <a href='#'>About Us</a></li>
-            <li> <a href='#'>Contact Us</a></li>
-            <li> <a href='#'>Privacy Policy</a></li>
-          </ul>
-        </div> */}
                 <div className='hidden md:flex flex-col items-start w-full'>
                     <h2 className='font-semibold text-white mb-5'>Subscribe to our News Letter</h2>
                     <p className='text-sm text-white/80'>The latest news, articles and resoources sent to your inbox weekly

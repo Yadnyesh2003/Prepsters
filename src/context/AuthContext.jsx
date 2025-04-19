@@ -153,7 +153,7 @@ export const AuthProvider = ({ children }) => {
         if (userRole === "admin") {
             navigate("/ghost");
         } else {
-            navigate("/home");
+            navigate("/");
         }
     };
 

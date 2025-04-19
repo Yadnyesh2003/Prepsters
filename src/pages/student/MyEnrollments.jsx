@@ -1,8 +1,9 @@
 import React from 'react'
+import ComingSoon from '../../components/student/ComingSoon'
 
 const MyEnrollments = () => {
   return (
-    <h1>MyEnrollments Page</h1>
+    <ComingSoon />
   )
 }
 

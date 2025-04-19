@@ -90,3 +90,61 @@
         "contributorSocial": "https://www.linkedin.com/in/suresh-bansal-5471b922/"
     }
 ]
+
+
+1. Add syllabusLink to editedData in handleEdit
+Find this code in your handleEdit():
+
+js
+Copy
+Edit
+setEditedData({ ...syllabus.syllabusCategory || {}, syllabusTitle: syllabus.syllabusTitle });
+👉 Replace it with:
+
+js
+Copy
+Edit
+setEditedData({ 
+  ...syllabus.syllabusCategory || {}, 
+  syllabusTitle: syllabus.syllabusTitle,
+  syllabusLink: syllabus.syllabusLink
+});
+✅ 2. Add an input field for editing syllabusLink in the JSX
+Inside your edit form (where other inputs like syllabusTitle, academicYear etc. are), add this:
+
+js
+Copy
+Edit
+{/* Syllabus Link */}
+<div className="mt-2 flex flex-col md:flex-row md:items-center justify-between gap-2">
+  <label className="block text-sm font-semibold text-black w-full md:w-1/4">Syllabus Link (PDF URL)</label>
+  <input
+    type="text"
+    value={editedData.syllabusLink || ''}
+    onChange={(e) => setEditedData({ ...editedData, syllabusLink: e.target.value })}
+    className="border p-2 w-full md:w-3/4 mt-2 md:mt-0"
+    required
+  />
+</div>
+✅ 3. Update handleSaveEdit() to include syllabusLink
+Find this part in handleSaveEdit():
+
+js
+Copy
+Edit
+await updateDoc(syllabusRef, {
+  syllabusCategory: editedData,
+  syllabusTitle: editedData.syllabusTitle,
+  updatedAt: serverTimestamp()
+});
+👉 Update it to:
+
+js
+Copy
+Edit
+await updateDoc(syllabusRef, {
+  syllabusCategory: editedData,
+  syllabusTitle: editedData.syllabusTitle,
+  syllabusLink: editedData.syllabusLink,
+  updatedAt: serverTimestamp()
+});
