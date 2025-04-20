@@ -11,6 +11,11 @@ const Syllabus = () => {
   const [showFilter, setShowFilter] = useState(true);
   const [loading, setLoading] = useState(false); 
 
+  //LazyLoad
+  const [visibleCount, setVisibleCount] = useState(3); // Initial number of cards
+  const [isFetchingMore, setIsFetchingMore] = useState(false);
+
+
   const { toast } = useContext(AppContext);
 
   const openPdfViewer = (url) => {
@@ -26,6 +31,25 @@ const Syllabus = () => {
       toast("Apply filter to get data!");
     }
   }, [showFilter]);
+
+  //LazyLoad
+  useEffect(() => {
+    const handleScroll = () => {
+      const bottom =
+        window.innerHeight + window.scrollY >= document.body.offsetHeight - 100;
+      if (bottom && !isFetchingMore && visibleCount < syllabusData.length) {
+        setIsFetchingMore(true);
+        setTimeout(() => {
+          setVisibleCount((prev) => prev + 10); // Load 10 more cards
+          setIsFetchingMore(false);
+        }, 500); // simulate slight delay
+      }
+    };
+  
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [visibleCount, isFetchingMore, syllabusData]);
+  
 
   return (
     <div className="min-h-screen p-6 bg-gradient-to-b from-purple-500 to-transparent">
@@ -53,7 +77,7 @@ const Syllabus = () => {
         ) : (
           <div className="space-y-4">
           {syllabusData.length > 0 && (
-          syllabusData.map((item) => (
+          syllabusData.slice(0, visibleCount).map((item) => (
             <div key={item.id} className="p-4 bg-gray-100 mb-2 flex flex-col items-start border-2 rounded-2xl border-indigo-600 hover:bg-cyan-100">
             <h2 className="text-base sm:text-lg md:text-xl font-medium mb-1 text-indigo-800">{item.syllabusTitle}</h2>
             {item.syllabusCategory.academicYear && (
@@ -77,6 +101,14 @@ const Syllabus = () => {
               {pdfUrl && <PdfViewer pdfUrl={pdfUrl} onClose={closePdfViewer} />}
             </div>
           )))}
+            {isFetchingMore && (
+              <div className="text-center py-4 text-indigo-700 text-lg font-medium">
+                Fetching more
+                <span className="inline-block animate-bounce [animation-delay:0s]">.</span>
+                <span className="inline-block animate-bounce [animation-delay:0.1s]">.</span>
+                <span className="inline-block animate-bounce [animation-delay:0.2s]">.</span>
+              </div>
+            )}
         </div>
         )}
       </div>

@@ -11,6 +11,10 @@ const FAQs = () => {
   const [showFilter, setShowFilter] = useState(true);
   const [loading, setLoading] = useState(false);
 
+  const [visibleCount, setVisibleCount] = useState(3); // To track how many items are visible
+  const [isFetchingMore, setIsFetchingMore] = useState(false); // To track if we're fetching more items
+
+
   const { toast } = useContext(AppContext);
 
   const openPdfViewer = (url) => {
@@ -26,6 +30,23 @@ const FAQs = () => {
       toast("Apply filter to get data!");
     }
   }, [showFilter]);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const bottom = window.innerHeight + window.scrollY >= document.body.offsetHeight - 100;
+      if (bottom && !isFetchingMore && visibleCount < faqsData.length) {
+        setIsFetchingMore(true);
+        setTimeout(() => {
+          setVisibleCount((prev) => prev + 10); // Increase the number of visible FAQs by 10
+          setIsFetchingMore(false);
+        }, 500); // Simulate delay
+      }
+    };
+  
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [visibleCount, isFetchingMore, faqsData]);
+  
 
   return (
     <div className="min-h-screen p-6 bg-gradient-to-b from-purple-500 to-transparent">
@@ -59,7 +80,7 @@ const FAQs = () => {
         ) : (
           <div className="space-y-4">
             {faqsData.length > 0 &&
-              faqsData.map((item) => (
+              faqsData.slice(0, visibleCount).map((item) => (
                 <div
                   key={item.id}
                   className="p-4 bg-gray-100 mb-2 flex flex-col items-start border-2 rounded-2xl border-indigo-600 hover:bg-cyan-100"
@@ -111,6 +132,14 @@ const FAQs = () => {
                   {pdfUrl && <PdfViewer pdfUrl={pdfUrl} onClose={closePdfViewer} />}
                 </div>
               ))}
+              {isFetchingMore && (
+                <div className="text-center py-4 text-indigo-700 text-lg font-medium">
+                  Fetching more
+                  <span className="inline-block animate-bounce [animation-delay:0s]">.</span>
+                  <span className="inline-block animate-bounce [animation-delay:0.1s]">.</span>
+                  <span className="inline-block animate-bounce [animation-delay:0.2s]">.</span>
+                </div>
+              )}
           </div>
         )}
       </div>

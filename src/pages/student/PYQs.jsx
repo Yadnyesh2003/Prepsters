@@ -10,6 +10,10 @@ const PYQs = () => {
   const [pdfUrl, setPdfUrl] = useState(null);
   const [showFilter, setShowFilter] = useState(true);
   const [loading, setLoading] = useState(false);
+  
+  // Lazy loading state  
+  const [visibleCount, setVisibleCount] = useState(3); // Initial cards  
+  const [isFetchingMore, setIsFetchingMore] = useState(false);
 
   const { toast } = useContext(AppContext);
 
@@ -26,6 +30,22 @@ const PYQs = () => {
       toast("Apply filter to get data!");
     }
   }, [showFilter]);
+
+  // Lazy load scroll effect
+  useEffect(() => {
+    const handleScroll = () => {
+    const bottom = window.innerHeight + window.scrollY >= document.body.offsetHeight - 100; 
+      if (bottom && !isFetchingMore && visibleCount < pyqsData.length) {
+        setIsFetchingMore(true);
+        setTimeout(() => {
+          setVisibleCount((prev) => prev + 10); // Load 10 more
+          setIsFetchingMore(false);
+        }, 500);
+      }
+    };  
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [visibleCount, isFetchingMore, pyqsData]);
 
   return (
     <div className="min-h-screen p-6 bg-gradient-to-b from-purple-500 to-transparent">
@@ -59,7 +79,7 @@ const PYQs = () => {
         ) : (
           <div className="space-y-4">
             {pyqsData.length > 0 &&
-              pyqsData.map((item) => (
+              pyqsData.slice(0, visibleCount).map((item) => (
                 <div
                   key={item.id}
                   className="p-4 bg-gray-100 mb-2 flex flex-col items-start border-2 rounded-2xl border-indigo-600 hover:bg-cyan-100"
@@ -119,6 +139,14 @@ const PYQs = () => {
                   {pdfUrl && <PdfViewer pdfUrl={pdfUrl} onClose={closePdfViewer} />}
                 </div>
               ))}
+              {isFetchingMore && (
+              <div className="text-center py-4 text-indigo-700 text-lg font-medium">
+                Fetching more
+                <span className="inline-block animate-bounce [animation-delay:0s]">.</span>
+                <span className="inline-block animate-bounce [animation-delay:0.1s]">.</span>
+                <span className="inline-block animate-bounce [animation-delay:0.2s]">.</span>
+              </div>
+            )}
           </div>
         )}
       </div>
