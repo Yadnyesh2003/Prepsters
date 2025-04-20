@@ -102,6 +102,7 @@ const FAQsFilter = ({ onResults }) => {
           <label className="block mb-1 font-medium">Contributor</label>
           <Select
             name="contributorName"
+            isClearable={true}
             components={animatedComponents}
             options={contributors}
             placeholder="Select Contributor"
@@ -116,6 +117,7 @@ const FAQsFilter = ({ onResults }) => {
           <label className="block mb-1 font-medium">Institution</label>
           <Select
             name="institution"
+            isClearable={true}
             components={animatedComponents}
             options={institutions}
             placeholder="Select Institution"
@@ -130,6 +132,7 @@ const FAQsFilter = ({ onResults }) => {
           <label className="block mb-1 font-medium">Subject</label>
           <Select
             name="subjectName"
+            isClearable={true}
             components={animatedComponents}
             options={subjects}
             placeholder="Select Subject"
@@ -144,6 +147,7 @@ const FAQsFilter = ({ onResults }) => {
           <label className="block mb-1 font-medium">Year</label>
           <Select
             name="year"
+            isClearable={true}
             components={animatedComponents}
             options={years}
             placeholder="Select Year"

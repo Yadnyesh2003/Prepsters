@@ -157,3 +157,8 @@ export const branches = [
     { value: "Yadnyesh Firke", label: "Yadnyesh Firke" },
     { value: "Part Narkhede", label: "Parth Narkhede" },
   ];
+
+  export const academicYears = [
+    { value: "May 23", label: "May 23" },
+    { value: "Dec 22", label: "Dec 22" },
+  ];

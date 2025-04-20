@@ -54,23 +54,23 @@ const Syllabus = () => {
           <div className="space-y-4">
           {syllabusData.length > 0 && (
           syllabusData.map((item) => (
-            <div key={item.id} className="p-4 bg-gray-100 rounded mb-2 flex flex-col items-start">
-            <h2 className="text-xs font-semibold">Syllabus Title: {item.syllabusTitle}</h2>
+            <div key={item.id} className="p-4 bg-gray-100 mb-2 flex flex-col items-start border-2 rounded-2xl border-indigo-600 hover:bg-cyan-100">
+            <h2 className="text-base sm:text-lg md:text-xl font-medium mb-1 text-indigo-800">{item.syllabusTitle}</h2>
             {item.syllabusCategory.academicYear && (
-              <p className="text-gray-700">Academic Year: {item.syllabusCategory.academicYear}</p>
+              <p className="text-xs sm:text-sm md:text-base text-gray-700">Academic Year: {item.syllabusCategory.academicYear}</p>
             )}
             {item.syllabusCategory.branch && (
-              <p className="text-gray-700">Branch: {item.syllabusCategory.branch}</p>
+              <p className="text-xs sm:text-sm md:text-base text-gray-700">Branch: {item.syllabusCategory.branch}</p>
             )}
             {item.syllabusCategory.institution && (
-              <p className="text-gray-700">Institution: {item.syllabusCategory.institution}</p>
+              <p className="text-xs sm:text-sm md:text-base text-gray-700">Institution: {item.syllabusCategory.institution}</p>
             )}
             {item.syllabusCategory.year && (
-              <p className="text-gray-700">Year: {item.syllabusCategory.year}</p>
+              <p className="text-xs sm:text-sm md:text-base text-gray-700">Year: {item.syllabusCategory.year}</p>
             )}
-            <div className="flex space-x-4 mt-2">
-              <button onClick={() => openPdfViewer(item.syllabusLink)} className="flex bg-indigo-500 text-white px-4 py-2 rounded-md hover:text-black">
-                <img src={assets.view_data} alt="view" className="w-6 h-6 mr-2" />
+            <div className="mt-2 mb-1 flex justify-center">
+              <button onClick={() => openPdfViewer(item.syllabusLink)} className="flex items-center bg-indigo-500 text-white px-4 py-2 rounded-md hover:bg-indigo-600 transition">
+                <img src={assets.view_data} alt="view" className="w-5 h-5 mr-2" />
                   <span className="hidden md:inline">View Syllabus</span>
               </button>
             </div>
