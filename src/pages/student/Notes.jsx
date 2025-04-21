@@ -1,7 +1,8 @@
-import React, { useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { assets } from '../../assets/assets';
 import PdfViewer from '../../components/student/PdfViewer';
 import NotesFilter from '../../components/student/NotesFilter';
+import { AppContext } from '../../context/AppContext';
 
 const Notes = () => {
   const [notesData, setNotesData] = useState([]);
@@ -12,6 +13,7 @@ const Notes = () => {
   const [visibleCount, setVisibleCount] = useState(3);
   const [isFetchingMore, setIsFetchingMore] = useState(false);
 
+  const { toast } = useContext(AppContext)
   
   const openPdfViewer = (url) => {
     setPdfUrl(url); // Set the PDF URL to be displayed in the viewer
