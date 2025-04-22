@@ -1,19 +1,19 @@
 import React, { useContext, useEffect, useState } from "react";
-import PYQsFilter from "../../components/student/PYQsFilter";
+import FAQsFilter from "../../components/student/FAQsFilter";
 import PdfViewer from "../../components/student/PdfViewer";
 import { assets } from "../../assets/assets";
 import Loader from "../../components/student/Loading";
 import { AppContext } from "../../context/AppContext";
 
-const PYQs = () => {
-  const [pyqsData, setPyqsData] = useState([]);
+const FAQs = () => {
+  const [faqsData, setFaqsData] = useState([]);
   const [pdfUrl, setPdfUrl] = useState(null);
   const [showFilter, setShowFilter] = useState(true);
   const [loading, setLoading] = useState(false);
-  
-  // Lazy loading state  
-  const [visibleCount, setVisibleCount] = useState(3); // Initial cards  
-  const [isFetchingMore, setIsFetchingMore] = useState(false);
+
+  const [visibleCount, setVisibleCount] = useState(3); // To track how many items are visible
+  const [isFetchingMore, setIsFetchingMore] = useState(false); // To track if we're fetching more items
+
 
   const { toast } = useContext(AppContext);
 
@@ -31,28 +31,29 @@ const PYQs = () => {
     }
   }, [showFilter]);
 
-  // Lazy load scroll effect
   useEffect(() => {
     const handleScroll = () => {
-    const bottom = window.innerHeight + window.scrollY >= document.body.offsetHeight - 100; 
-      if (bottom && !isFetchingMore && visibleCount < pyqsData.length) {
+      const bottom = window.innerHeight + window.scrollY >= document.body.offsetHeight - 100;
+      if (bottom && !isFetchingMore && visibleCount < faqsData.length) {
         setIsFetchingMore(true);
         setTimeout(() => {
-          setVisibleCount((prev) => prev + 10); // Load 10 more
+          setVisibleCount((prev) => prev + 10); // Increase the number of visible FAQs by 10
           setIsFetchingMore(false);
-        }, 500);
+        }, 500); // Simulate delay
       }
-    };  
+    };
+  
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
-  }, [visibleCount, isFetchingMore, pyqsData]);
+  }, [visibleCount, isFetchingMore, faqsData]);
+  
 
   return (
     <div className="min-h-screen p-6 bg-gradient-to-b from-purple-500 to-transparent">
       {showFilter && (
-        <PYQsFilter
+        <FAQsFilter
           onResults={(data) => {
-            setPyqsData(data);
+            setFaqsData(data);
             setShowFilter(false);
             setLoading(false);
           }}
@@ -64,7 +65,7 @@ const PYQs = () => {
           <button
             onClick={() => {
               setShowFilter(true);
-              setPyqsData([]);
+              setFaqsData([]);
             }}
             className="text-white px-4 py-2 rounded border-white border-2 bg-yellow-500 hover:bg-purple-700"
           >
@@ -78,53 +79,45 @@ const PYQs = () => {
           <Loader />
         ) : (
           <div className="space-y-4">
-            {pyqsData.length > 0 &&
-              pyqsData.slice(0, visibleCount).map((item) => (
+            {faqsData.length > 0 &&
+              faqsData.slice(0, visibleCount).map((item) => (
                 <div
                   key={item.id}
                   className="p-4 bg-gray-100 mb-2 flex flex-col items-start border-2 rounded-2xl border-indigo-600 hover:bg-cyan-100"
                 >
-                  <h2 className="text-base sm:text-lg md:text-xl font-medium mb-1 text-indigo-800">
-                    {item.pyqsTitle || "PYQ Document"}
-                  </h2>
+                  <h2 className="text-base sm:text-lg md:text-xl font-medium mb-1 text-indigo-800">{item.faqsTitle}</h2>
 
-                  {item.pyqsCategory?.branch && (
+                  {item.faqsCategory?.contributorName && (
                     <p className="text-xs sm:text-sm md:text-base text-gray-700">
-                      Branch: {Array.isArray(item.pyqsCategory.branch)
-                        ? item.pyqsCategory.branch.join(", ")
-                        : item.pyqsCategory.branch}
+                      Contributor: {item.faqsCategory.contributorName}
                     </p>
                   )}
-
-                  {item.pyqsCategory?.institution && (
+                  {item.faqsCategory?.branch && (
                     <p className="text-xs sm:text-sm md:text-base text-gray-700">
-                      Institution: {item.pyqsCategory.institution}
+                      Branch: {Array.isArray(item.faqsCategory.branch)
+                        ? item.faqsCategory.branch.join(", ")
+                        : item.faqsCategory.branch}
                     </p>
                   )}
-
-                  {item.pyqsCategory?.subjectName && (
+                  {item.faqsCategory?.institution && (
                     <p className="text-xs sm:text-sm md:text-base text-gray-700">
-                      Subject: {Array.isArray(item.pyqsCategory.subjectName)
-                        ? item.pyqsCategory.subjectName.join(", ")
-                        : item.pyqsCategory.subjectName}
+                      Institution: {item.faqsCategory.institution}
                     </p>
                   )}
-
-                  {item.pyqsCategory?.academicYear && (
+                  {item.faqsCategory?.subjectName && (
                     <p className="text-xs sm:text-sm md:text-base text-gray-700">
-                      Academic Year: {item.pyqsCategory.academicYear}
+                      Subject: {item.faqsCategory.subjectName}
                     </p>
                   )}
-
-                  {item.pyqsCategory?.year && (
+                  {item.faqsCategory?.year && (
                     <p className="text-xs sm:text-sm md:text-base text-gray-700">
-                      Exam Year: {item.pyqsCategory.year}
+                      Year: {item.faqsCategory.year}
                     </p>
                   )}
 
                   <div className="mt-2 mb-1 flex justify-center">
                     <button
-                      onClick={() => openPdfViewer(item.pyqsLink)}
+                      onClick={() => openPdfViewer(item.faqsLink)}
                       className="flex items-center bg-indigo-500 text-white px-4 py-2 rounded-md hover:bg-indigo-600 transition"
                     >
                       <img
@@ -132,7 +125,7 @@ const PYQs = () => {
                         alt="view"
                         className="w-5 h-5 mr-2"
                       />
-                      <span className="hidden md:inline">View PYQ</span>
+                      <span className="hidden md:inline">View FAQs</span>
                     </button>
                   </div>
 
@@ -140,14 +133,14 @@ const PYQs = () => {
                 </div>
               ))}
               {/* {isFetchingMore && (
-              <div className="text-center py-4 text-indigo-700 text-lg font-medium">
-                Fetching more
-                <span className="inline-block animate-bounce [animation-delay:0s]">.</span>
-                <span className="inline-block animate-bounce [animation-delay:0.1s]">.</span>
-                <span className="inline-block animate-bounce [animation-delay:0.2s]">.</span>
-              </div>
-            )} */}
-            {isFetchingMore && (
+                <div className="text-center py-4 text-indigo-700 text-lg font-medium">
+                  Fetching more
+                  <span className="inline-block animate-bounce [animation-delay:0s]">.</span>
+                  <span className="inline-block animate-bounce [animation-delay:0.1s]">.</span>
+                  <span className="inline-block animate-bounce [animation-delay:0.2s]">.</span>
+                </div>
+              )} */}
+              {isFetchingMore && (
               <div className="flex justify-center py-4">
                 <div className="w-16 sm:w-20 aspect-square border-4 border-gray-300 border-t-4 border-t-blue-400 rounded-full animate-spin"></div>
               </div>
@@ -159,4 +152,4 @@ const PYQs = () => {
   );
 };
 
-export default PYQs;
+export default FAQs;

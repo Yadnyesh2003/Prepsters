@@ -155,7 +155,7 @@ export const branches = [
 
   export const contributors = [
     { value: "Yadnyesh Firke", label: "Yadnyesh Firke" },
-    { value: "Part Narkhede", label: "Parth Narkhede" },
+    { value: "Parth Narkhede", label: "Parth Narkhede" },
   ];
 
   export const academicYears = [

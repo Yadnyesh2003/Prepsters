@@ -49,7 +49,7 @@ import Profile from './pages/student/Profile';
 
 
 
-const Home = lazy(() => import('./pages/student/Home'));
+
 const ExamPrep = lazy(() => import('./pages/student/ExamPrep'));
 const Resources = lazy(() => import('./pages/student/Resourses'));
 
@@ -87,15 +87,6 @@ function App() {
             <Route path ='/' element={<Landing />} />
             <Route path ='/contributors' element={<Contributors />} />
             <Route path = '/about-us' element = {<AboutUs />} />
-
-            <Route
-              path="/Home"
-              element={
-                <ProtectedRoute allowedRole="student">
-                  <Home />
-                </ProtectedRoute>
-              }
-            />
 
             <Route 
               path='/profile' element={

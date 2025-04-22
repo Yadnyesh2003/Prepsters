@@ -4,12 +4,17 @@ import PdfViewer from "../../components/student/PdfViewer";
 import { assets } from "../../assets/assets";
 import Loader from "../../components/student/Loading";
 import { AppContext } from "../../context/AppContext";
+import { useAuth } from '../../context/AuthContext';
+import { db, doc, getDoc, updateDoc } from "../../config/firebase";
+import Rating from "../../components/student/Rating";
 
 const FAQs = () => {
   const [faqsData, setFaqsData] = useState([]);
   const [pdfUrl, setPdfUrl] = useState(null);
   const [showFilter, setShowFilter] = useState(true);
   const [loading, setLoading] = useState(false);
+
+  const { user } = useAuth();
 
   const [visibleCount, setVisibleCount] = useState(3); // To track how many items are visible
   const [isFetchingMore, setIsFetchingMore] = useState(false); // To track if we're fetching more items
@@ -24,6 +29,43 @@ const FAQs = () => {
   const closePdfViewer = () => {
     setPdfUrl(null);
   };
+
+  const handleFaqRating = async (faqId, newRating) => {
+    try {
+      const userId = user?.uid;
+      if (!userId) return toast.error("You must be logged in to rate");
+  
+      const faqRef = doc(db, "FAQs", faqId);
+      const faqSnap = await getDoc(faqRef);
+      if (!faqSnap.exists()) return toast.error("FAQ not found");
+  
+      const faqData = faqSnap.data();
+      const existingRatings = faqData.faqsRatings || [];
+  
+      const alreadyRated = existingRatings.find(r => r.userId === userId);
+  
+      let updatedRatings;
+      if (alreadyRated) {
+        updatedRatings = existingRatings.map(r =>
+          r.userId === userId ? { ...r, rating: newRating } : r
+        );
+      } else {
+        updatedRatings = [...existingRatings, { userId, rating: newRating }];
+      }
+  
+      await updateDoc(faqRef, { faqsRatings: updatedRatings });
+      toast.success("Thank you for rating!");
+  
+      setFaqsData(prev =>
+        prev.map(faq =>
+          faq.id === faqId ? { ...faq, faqsRatings: updatedRatings } : faq
+        )
+      );
+    } catch (error) {
+      toast(error.message);
+    }
+  };
+  
 
   useEffect(() => {
     if (showFilter) {
@@ -67,7 +109,7 @@ const FAQs = () => {
               setShowFilter(true);
               setFaqsData([]);
             }}
-            className="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600"
+            className="text-white px-4 py-2 rounded border-white border-2 bg-yellow-500 hover:bg-purple-700"
           >
             Change Filters
           </button>
@@ -115,6 +157,26 @@ const FAQs = () => {
                     </p>
                   )}
 
+                  {item.faqsRatings?.length > 0 && (
+                    <p className="text-xs sm:text-sm md:text-base text-indigo-700 font-bold">
+                      Avg. Rating: {(
+                        item.faqsRatings.reduce((acc, r) => acc + r.rating, 0) / item.faqsRatings.length
+                      ).toFixed(1)} / 5
+                    </p>
+                  )}
+
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs sm:text-sm md:text-base text-gray-700">Rate this FAQ:</span>
+                    <Rating
+                      initialRating={
+                        item.faqsRatings?.find(r => r.userId === user?.uid)?.rating || 0
+                      }
+                      onRate={(rating) => handleFaqRating(item.id, rating)}
+                      size={20}
+                    />
+                  </div>
+
+
                   <div className="mt-2 mb-1 flex justify-center">
                     <button
                       onClick={() => openPdfViewer(item.faqsLink)}
@@ -132,14 +194,19 @@ const FAQs = () => {
                   {pdfUrl && <PdfViewer pdfUrl={pdfUrl} onClose={closePdfViewer} />}
                 </div>
               ))}
-              {isFetchingMore && (
+              {/* {isFetchingMore && (
                 <div className="text-center py-4 text-indigo-700 text-lg font-medium">
                   Fetching more
                   <span className="inline-block animate-bounce [animation-delay:0s]">.</span>
                   <span className="inline-block animate-bounce [animation-delay:0.1s]">.</span>
                   <span className="inline-block animate-bounce [animation-delay:0.2s]">.</span>
                 </div>
-              )}
+              )} */}
+              {isFetchingMore && (
+              <div className="flex justify-center py-4">
+                <div className="w-16 sm:w-20 aspect-square border-4 border-gray-300 border-t-4 border-t-blue-400 rounded-full animate-spin"></div>
+              </div>
+            )}
           </div>
         )}
       </div>

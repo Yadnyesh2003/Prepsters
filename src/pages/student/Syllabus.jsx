@@ -65,7 +65,7 @@ const Syllabus = () => {
                 setShowFilter(true);
                 setSyllabusData([]);
               }}
-              className="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600"
+              className="text-white px-4 py-2 rounded border-white border-2 bg-yellow-500 hover:bg-purple-700"
             >
               Change Filters
             </button>
@@ -101,12 +101,17 @@ const Syllabus = () => {
               {pdfUrl && <PdfViewer pdfUrl={pdfUrl} onClose={closePdfViewer} />}
             </div>
           )))}
-            {isFetchingMore && (
+            {/* {isFetchingMore && (
               <div className="text-center py-4 text-indigo-700 text-lg font-medium">
                 Fetching more
                 <span className="inline-block animate-bounce [animation-delay:0s]">.</span>
                 <span className="inline-block animate-bounce [animation-delay:0.1s]">.</span>
                 <span className="inline-block animate-bounce [animation-delay:0.2s]">.</span>
+              </div>
+            )} */}
+            {isFetchingMore && (
+              <div className="flex justify-center py-4">
+                <div className="w-16 sm:w-20 aspect-square border-4 border-gray-300 border-t-4 border-t-blue-400 rounded-full animate-spin"></div>
               </div>
             )}
         </div>

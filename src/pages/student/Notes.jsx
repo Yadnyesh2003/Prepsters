@@ -3,6 +3,9 @@ import { assets } from '../../assets/assets';
 import PdfViewer from '../../components/student/PdfViewer';
 import NotesFilter from '../../components/student/NotesFilter';
 import { AppContext } from '../../context/AppContext';
+import Rating from '../../components/student/Rating';
+import { db, doc, getDoc, updateDoc } from "../../config/firebase";
+import { useAuth } from '../../context/AuthContext';
 
 const Notes = () => {
   const [notesData, setNotesData] = useState([]);
@@ -14,6 +17,7 @@ const Notes = () => {
   const [isFetchingMore, setIsFetchingMore] = useState(false);
 
   const { toast } = useContext(AppContext)
+  const { isGhost, user } = useAuth();
   
   const openPdfViewer = (url) => {
     setPdfUrl(url); // Set the PDF URL to be displayed in the viewer
@@ -22,6 +26,47 @@ const Notes = () => {
   const closePdfViewer = () => {
     setPdfUrl(null); // Close the viewer by setting PDF URL to null
   };
+
+  const handleNoteRating = async (noteId, newRating) => {
+    try {
+      const userId = user?.uid
+      if (!userId) return toast.error("You must be logged in to rate");
+  
+      const noteRef = doc(db, "Notes", noteId)
+      const noteSnap = await getDoc(noteRef)
+      if (!noteSnap.exists()) return toast.error("Note not found")
+  
+      const noteData = noteSnap.data()
+      // const existingRatings = noteData.ratings || []
+      const existingRatings = noteData.notesRatings || []
+  
+      const alreadyRated = existingRatings.find(r => r.userId === userId)
+  
+      let updatedRatings
+      if (alreadyRated) {
+        // Remove old rating and add new one
+        updatedRatings = existingRatings.map(r =>
+          r.userId === userId ? { ...r, rating: newRating } : r
+        )
+      } else {
+        updatedRatings = [...existingRatings, { userId, rating: newRating }]
+      }
+  
+      await updateDoc(noteRef, { notesRatings: updatedRatings })
+      toast.success("Thank You for Rating!")
+  
+      // To update UI with latest rating.
+      setNotesData(prev =>
+        prev.map(note =>
+          note.id === noteId ? { ...note, notesRatings: updatedRatings } : note
+        )
+      )
+  
+    } catch (error) {
+      toast(error.message)
+    }
+  }
+  
 
 
   useEffect(() => {
@@ -60,7 +105,7 @@ const Notes = () => {
                 setShowFilter(true);
                 setNotesData([]);
               }}
-              className="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600"
+              className="text-white px-4 py-2 rounded border-white border-2 bg-yellow-500 hover:bg-purple-700"
             >
               Change Filters
             </button>
@@ -81,7 +126,26 @@ const Notes = () => {
               {note.notesCategory.year && (
                 <p className="text-xs sm:text-sm md:text-base text-gray-700">Year: {note.notesCategory.year}</p>
               )}
-                <div className="mt-2 mb-1 flex justify-center">
+              {note.notesRatings?.length > 0 && (
+                <p className="text-xs sm:text-sm md:text-base text-indigo-700 font-bold">
+                  Avg. Rating: {(
+                    note.notesRatings.reduce((acc, r) => acc + r.rating, 0) / note.notesRatings.length
+                  ).toFixed(1)} / 5
+                </p>
+              )}
+      
+                <div className="flex items-center gap-2">
+                  <span className="text-xs sm:text-sm md:text-base text-gray-700">Leave stars if it helped!</span>
+                  <Rating
+                    initialRating={
+                      note.notesRatings?.find(r => r.userId === user?.uid)?.rating || 0
+                    }
+                    onRate={(rating) => handleNoteRating(note.id, rating)}
+                    size={20}
+                  />
+                </div>
+
+                <div className="mb-1 flex justify-center">
                   <button onClick={() => openPdfViewer(note .notesLink)} className="flex items-center bg-indigo-500 text-white px-4 py-2 rounded-md hover:bg-indigo-600 transition">
                       <img src={assets.view_data} alt="view" className="w-5 h-5 mr-2" />
                         <span className="hidden md:inline">View Notes</span>
@@ -90,14 +154,19 @@ const Notes = () => {
                 {pdfUrl && <PdfViewer pdfUrl={pdfUrl} onClose={closePdfViewer} />}
             </div>
           ))}
-          {isFetchingMore && (
+          {/* {isFetchingMore && (
             <div className="text-center py-4 text-indigo-700 text-lg font-medium">
               Fetching more
               <span className="inline-block animate-bounce [animation-delay:0s]">.</span>
               <span className="inline-block animate-bounce [animation-delay:0.1s]">.</span>
               <span className="inline-block animate-bounce [animation-delay:0.2s]">.</span>
             </div>
-          )}
+          )} */}
+            {isFetchingMore && (
+              <div className="flex justify-center py-4">
+                <div className="w-16 sm:w-20 aspect-square border-4 border-gray-300 border-t-4 border-t-blue-400 rounded-full animate-spin"></div>
+              </div>
+            )}
         </div>
       </div>
     </div>
