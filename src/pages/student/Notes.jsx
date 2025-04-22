@@ -111,64 +111,101 @@ const Notes = () => {
             </button>
           </div>
         )}
+
       <div className="max-w-6xl mx-auto p-4">
         <div className="space-y-4">
           {notesData.length > 0 && notesData.slice(0, visibleCount).map((note) => (
-            <div key={note.id} className="p-4 bg-gray-100 mb-2 flex flex-col items-start border-2 rounded-2xl border-indigo-600 hover:bg-cyan-100">
-              <h2 className="text-base sm:text-lg md:text-xl font-medium mb-1 text-indigo-800">{note.notesTitle}</h2>
-              <p className='text-xs sm:text-sm md:text-base text-gray-700'>Contributor Name: {note.contributorName}</p>
-              {note.notesCategory.subjectName && (
-                <p className="text-xs sm:text-sm md:text-base text-gray-700">Subject Name: {Array.isArray(note.notesCategory.subjectName) ? note.notesCategory.subjectName.join(', ') : ''}</p>
-              )}
-              {note.notesCategory.branch && (
-                <p className="text-xs sm:text-sm md:text-base text-gray-700">Branch: {Array.isArray(note.notesCategory.branch) ? note.notesCategory.branch.join(', '): ''}</p>
-              )}
-              {note.notesCategory.year && (
-                <p className="text-xs sm:text-sm md:text-base text-gray-700">Year: {note.notesCategory.year}</p>
-              )}
-              {note.notesRatings?.length > 0 && (
-                <p className="text-xs sm:text-sm md:text-base text-indigo-700 font-bold">
-                  Avg. Rating: {(
-                    note.notesRatings.reduce((acc, r) => acc + r.rating, 0) / note.notesRatings.length
-                  ).toFixed(1)} / 5
-                </p>
-              )}
-      
-                <div className="flex items-center gap-2">
-                  <span className="text-xs sm:text-sm md:text-base text-gray-700">Leave stars if it helped!</span>
+            <div
+              key={note.id}
+              className="p-4 bg-gray-100 mb-2 flex flex-col border-2 rounded-2xl border-indigo-600 hover:bg-cyan-100"
+            >
+              {/* Title + Rating stars (desktop only) */}
+              <div className="flex flex-col md:flex-row md:items-center md:justify-between w-full">
+                <h2 className="text-base sm:text-lg md:text-xl font-medium mb-1 text-indigo-800">
+                  {note.notesTitle}
+                </h2>
+
+                {/* Desktop only: Rating stars */}
+                <div className="hidden md:flex items-center gap-2">
                   <Rating
-                    initialRating={
-                      note.notesRatings?.find(r => r.userId === user?.uid)?.rating || 0
-                    }
+                    initialRating={note.notesRatings?.find(r => r.userId === user?.uid)?.rating || 0}
                     onRate={(rating) => handleNoteRating(note.id, rating)}
                     size={20}
                   />
                 </div>
+              </div>
 
-                <div className="mb-1 flex justify-center">
-                  <button onClick={() => openPdfViewer(note .notesLink)} className="flex items-center bg-indigo-500 text-white px-4 py-2 rounded-md hover:bg-indigo-600 transition">
-                      <img src={assets.view_data} alt="view" className="w-5 h-5 mr-2" />
-                        <span className="hidden md:inline">View Notes</span>
+              {/* Other Info */}
+              <p className="text-xs sm:text-sm md:text-base text-gray-700">
+                Contributor Name: {note.contributorName}
+              </p>
+              {note.notesCategory.subjectName && (
+                <p className="text-xs sm:text-sm md:text-base text-gray-700">
+                  Subject Name: {Array.isArray(note.notesCategory.subjectName) ? note.notesCategory.subjectName.join(', ') : ''}
+                </p>
+              )}
+              {note.notesCategory.branch && (
+                <p className="text-xs sm:text-sm md:text-base text-gray-700">
+                  Branch: {Array.isArray(note.notesCategory.branch) ? note.notesCategory.branch.join(', ') : ''}
+                </p>
+              )}
+              {note.notesCategory.year && (
+                <p className="text-xs sm:text-sm md:text-base text-gray-700">
+                  Year: {note.notesCategory.year}
+                </p>
+              )}
+
+              {/* Mobile only: Avg Rating + Stars */}
+              <div className="block md:hidden mt-2">
+                {note.notesRatings?.length > 0 && (
+                  <p className="text-xs sm:text-sm text-indigo-700 font-bold">
+                    Avg. Rating: {(
+                      note.notesRatings.reduce((acc, r) => acc + r.rating, 0) / note.notesRatings.length
+                    ).toFixed(1)} / 5
+                  </p>
+                )}
+                <div className="flex items-center gap-2 mt-1">
+                  <Rating
+                    initialRating={note.notesRatings?.find(r => r.userId === user?.uid)?.rating || 0}
+                    onRate={(rating) => handleNoteRating(note.id, rating)}
+                    size={20}
+                  />
+                </div>
+              </div>
+
+              {/* Bottom Row: View button + Avg Rating (desktop only) */}
+              <div className="flex flex-col md:flex-row md:items-center md:justify-between mt-2 gap-2">
+                <div className="flex justify-center">
+                  <button
+                    onClick={() => openPdfViewer(note.notesLink)}
+                    className="flex items-center bg-indigo-500 text-white px-4 py-2 rounded-md hover:bg-indigo-600 transition"
+                  >
+                    <img src={assets.view_data} alt="view" className="w-5 h-5 mr-2" />
+                    View Notes
                   </button>
                 </div>
-                {pdfUrl && <PdfViewer pdfUrl={pdfUrl} onClose={closePdfViewer} />}
+
+                {/* Desktop only: Avg Rating */}
+                {note.notesRatings?.length > 0 && (
+                  <p className="hidden md:block text-xs sm:text-sm md:text-base text-indigo-700 font-bold mt-1 md:mt-0">
+                    Avg. Rating: {(
+                      note.notesRatings.reduce((acc, r) => acc + r.rating, 0) / note.notesRatings.length
+                    ).toFixed(1)} / 5
+                  </p>
+                )}
+              </div>
+
+              {pdfUrl && <PdfViewer pdfUrl={pdfUrl} onClose={closePdfViewer} />}
             </div>
           ))}
-          {/* {isFetchingMore && (
-            <div className="text-center py-4 text-indigo-700 text-lg font-medium">
-              Fetching more
-              <span className="inline-block animate-bounce [animation-delay:0s]">.</span>
-              <span className="inline-block animate-bounce [animation-delay:0.1s]">.</span>
-              <span className="inline-block animate-bounce [animation-delay:0.2s]">.</span>
+
+          {isFetchingMore && (
+            <div className="flex justify-center py-4">
+              <div className="w-16 sm:w-20 aspect-square border-4 border-gray-300 border-t-4 border-t-blue-400 rounded-full animate-spin"></div>
             </div>
-          )} */}
-            {isFetchingMore && (
-              <div className="flex justify-center py-4">
-                <div className="w-16 sm:w-20 aspect-square border-4 border-gray-300 border-t-4 border-t-blue-400 rounded-full animate-spin"></div>
-              </div>
-            )}
+          )}
         </div>
-      </div>
+      </div>    
     </div>
   );
 };

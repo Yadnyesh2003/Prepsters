@@ -1,36 +1,36 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react';
+import { assets } from '../../assets/assets';
 
-const Rating = ({ initialRating = 0, onRate }) => {
-  const [rating, setRating] = useState(initialRating || 0)
+const Rating = ({ initialRating = 0, onRate, size = 24 }) => {
+  const [rating, setRating] = useState(initialRating || 0);
 
   const handleClick = (value) => {
-    setRating(value)
-    onRate?.(value)
-  }
+    setRating(value);
+    onRate?.(value);
+  };
 
   useEffect(() => {
-    if(initialRating)
-      setRating(initialRating)
-  }, [initialRating])
+    setRating(initialRating || 0);
+  }, [initialRating]);
 
   return (
-    <div>
+    <div className="flex items-center gap-1">
       {Array.from({ length: 5 }, (_, i) => {
-        const starValue = i + 1
+        const starValue = i + 1;
+        const isFilled = starValue <= rating;
         return (
-          <span
-            key={i}
-            className={`text-xl sm:text-2xl cursor-pointer transition-colors ${
-              starValue <= rating ? 'text-yellow-500' : 'text-gray-400'
-            }`}
-            onClick={() => handleClick(starValue)}
-          >
-            &#9733;
-          </span>
-        )
+        <img
+          key={i}
+          src={isFilled ? assets.star_yellow : assets.star_white}
+          alt={`star-${starValue}`}
+          className="cursor-pointer transition duration-200 transform hover:scale-110"
+          style={{ width: size, height: size }}
+          onClick={() => handleClick(starValue)}
+        />
+        );
       })}
     </div>
-  )
-}
+  );
+};
 
-export default Rating
+export default Rating;
