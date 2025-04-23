@@ -4,7 +4,6 @@ import arrow_icon from './arrow_icon.svg'
 import down_arrow_icon from './down_arrow_icon.svg'
 import time_left_clock_icon from './time_left_clock_icon.svg'
 import time_clock_icon from './time_clock_icon.svg'
-import user_icon from './user_icon.svg'
 import home_icon from './home_icon.svg'
 import add_icon from './add_icon.svg'
 import my_course_icon from './my_course_icon.svg'
@@ -32,7 +31,6 @@ export const assets = {
     arrow_icon,
     dropdown_icon,
     cross_icon,
-    upload_area,
     down_arrow_icon,
     time_left_clock_icon,
     time_clock_icon,
