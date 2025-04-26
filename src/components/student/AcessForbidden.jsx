@@ -1,16 +1,17 @@
 import React, { useContext } from 'react';
-import { useNavigate } from 'react-router-dom'; 
+import { useNavigate } from 'react-router-dom';
 import { assets } from '../../assets/assets'
 import { useAuth } from '../../context/AuthContext';
 
 const AccessForbidden = () => {
-  const { role } = useAuth()
-  const navigate = useNavigate() 
+  const { role, logoutUser } = useAuth()
+  const navigate = useNavigate()
   const goBack = () => {
-    if(role === "admin") {
+    if (role === "admin") {
       navigate('/ghost')
-    } else if (role === "student"){
-      navigate('/Home')
+    } else if (role === "student") {
+      logoutUser(),
+        navigate('/')
     } else {
       navigate('/')
     }
@@ -23,7 +24,7 @@ const AccessForbidden = () => {
           <img
             className="w-16 h-16 text-yellow-400 mx-auto"
             src={assets.access_forbidden}
-            alt = 'Access Denied Icon'
+            alt='Access Denied Icon'
           />
         </div>
         <h1 className="text-4xl font-bold text-white mb-6 animate__animated animate__fadeIn animate__delay-1s">Access Forbidden</h1>
