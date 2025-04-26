@@ -56,16 +56,6 @@ export const assets = {
     star_yellow
 }
 
-export const dummyEducatorData = {
-    "_id": "675ac1512100b91a6d9b8b24",
-    "name": "GreatStack",
-    "email": "user.greatstack@gmail.com",
-    "imageUrl": "https://img.clerk.com/eyJ0eXBlIjoicHJveHkiLCJzcmMiOiJodHRwczovL2ltYWdlcy5jbGVyay5kZXYvb2F1dGhfZ29vZ2xlL2ltZ18yclFkaDBOMmFqWnBoTTRBOXZUanZxVlo0aXYifQ",
-    "createdAt": "2024-12-12T10:56:17.930Z",
-    "updatedAt": "2024-12-12T10:56:17.930Z",
-    "__v": 0
-}
-
 export const branches = [
     { value: "General Science & Humanities", label: "General Science & Humanities" },
     { value: "Computer Engineering", label: "Computer Engineering" },
@@ -73,30 +63,88 @@ export const branches = [
     { value: "Electronics & Telecommunication", label: "Electronics & Telecommunication" },
     { value: "Artificial Intelligence & Data Science", label: "Artificial Intelligence & Data Science" },
     { value: "Electronics & Computer Science", label: "Electronics & Computer Science" },
+    { value: "Cyber Security", label: "Cyber Security" },
+    // { value: "Electrical Engineering", label: "Electrical Engineering" },
+    // { value: "Mechanical Engineering", label: "Mechanical Engineering" },
   ];
   
   export const years = [
     { value: "First Year", label: "First Year" },
     { value: "Second Year", label: "Second Year" },
     { value: "Third Year", label: "Third Year" },
-    { value: "Final Year", label: "Final Year" },
+    // { value: "Final Year", label: "Final Year" },
   ];
   
   export const subjects = [
-    { value: "Cryptography & Network Security", label: "Cryptography & Network Security" },
+
+    //FIRST YEAR SUBJECTS (SEM 1)
     { value: "Engineering Mathematics 1", label: "Engineering Mathematics 1" },
+    { value: "Engineering Physics 1", label: "Engineering Physics 1" },
+    { value: "Engineering Chemistry 1", label: "Engineering Chemistry 1" },
+    { value: "Engineering Mechanics", label: "Engineering Mechanics" },
+    { value: "Basic Electrical & Electronics Engineering", label: "Basic Electrical & Electronics Engineering" },
+    { value: "C Programming", label: "C Programming" },
+
+    //FIRST YEAR SUBJECTS (SEM 2)
     { value: "Engineering Mathematics 2", label: "Engineering Mathematics 2" },
+    { value: "Engineering Physics 2", label: "Engineering Physics 2" },
+    { value: "Engineering Chemistry 2", label: "Engineering Chemistry 2" },
+    { value: "Engineering Graphics", label: "Engineering Graphics" },
+    { value: "Python Programming", label: "Python Programming" },
+
+    //COMPUTER & IT THEORY EXAM SUBJECTS (SEM 3 TO SEM 6)
     { value: "Engineering Mathematics 3", label: "Engineering Mathematics 3" },
     { value: "Engineering Mathematics 4", label: "Engineering Mathematics 4" },
-    { value: "Engineering Physics 1", label: "Engineering Physics 1" },
-    { value: "Automata Theory", label: "Automata Theory" },
-    { value: "Compiler Design", label: "Compiler Design" },
+    { value: "Discrete Structures & Graph Theory", label: "Discrete Structures & Graph Theory" },
+    { value: "Data Structures and Analysis", label: "Data Structures and Analysis" },
+    { value: "Data Structures", label: "Data Structures" },
+    { value: "Analysis Of Algorithm", label: "Analysis Of Algorithm" },
+    { value: "Database Management System", label: "Database Management System" },
+    { value: "Computer Organization & Architecture", label: "Computer Organization & Architecture" },
+    { value: "Digital Logic & Computer Architecture", label: "Digital Logic & Computer Architecture" },
+    { value: "Microprocessor", label: "Microprocessor" },
+    { value: "Computer Graphics", label: "Computer Graphics" },
+    { value: "Principle of Communication", label: "Principle of Communication" },
+    { value: "Paradigms and Computer Programming Fundamentals", label: "Paradigms and Computer Programming Fundamentals" },
+    { value: "Java Programming", label: "Java Programming" },
     { value: "Operating Systems", label: "Operating Systems" },
+    { value: "Computer Network & Network Design", label: "Computer Network & Network Design" },
+    { value: "Computer Network", label: "Computer Network" },
+    { value: "Automata Theory", label: "Automata Theory" },
+    { value: "Theoretical Computer Science", label: "Theoretical Computer Science" },
+    // { value: "Theory Of Computation", label: "Theory Of Computation" },
+    { value: "Internet Programming", label: "Internet Programming" },
+    { value: "Computer Network Security", label: "Computer Network Security" },
+    { value: "Cryptography & Network Security", label: "Cryptography & Network Security" },
+    { value: "Cryptography & System Security", label: "Cryptography & System Security" },
+    { value: "Software Engineering", label: "Software Engineering" },
+    { value: "Entrepreneurship and E-Business", label: "Entrepreneurship and E-Business" },
+    { value: "Microcontroller Embedded Programming", label: "Microcontroller Embedded Programming" },
+    { value: "Advance Data Management Technologies", label: "Advance Data Management Technologies" },
+    { value: "Advanced Data Structures & Analaysis", label: "Advance Data Structures & Analysis" },
+    { value: "Computer Graphics & Multimedia System", label: "Computer Graphics & Multimedia System" },
+    { value: "Probabilistic Graphical Models", label: "Probabilistic Graphical Models" },
+    { value: "Data Warehousing & Mining", label: "Data Warehousing & Mining" },
+    { value: "Systerm Programming & Compiler Construction", label: "System Programming & Compiler Construction" },
+    { value: "Mobile Computing", label: "Mobile Computing" },
+    { value: "Artificial Intelligence", label: "Artificial Intelligence" },
+    { value: "Internet Of Things", label: "Internet Of Things" },
+    { value: "Digital Signal & Image Processing", label: "Digital Signal & Image Processing" },
+    { value: "Quantitative Analysis", label: "Quantitative Analysis" },
+    { value: "Data Mining & Busisness Intelligence", label: "Data Mining & Business Intelligence" },
+    { value: "Web X.0", label: "Web X.0" },
+    { value: "Artificial Intelligence & Data Science 1", label: "Artificial Intelligence & Data Science 1" },
+    { value: "Wireless Technology", label: "Wireless Technology" },
+    { value: "Software Architecture", label: "Software Architecture" },
+    { value: "Green IT", label: "Green IT" },
+    { value: "Image Processing", label: "Image Processing" },
+    { value: "Ethical Hacking & Forensics", label: "Ethical Hacking & Forensics" },
+    
   ];
 
   export const institutions = [
     { value: "Mumbai University", label: "Mumbai University" },
-    { value: "RAIT", label: "RAIT" },
+    { value: "Shah & Anchor Kutchhi College Of Engineering", label: "Shah & Anchor Kutchhi College Of Engineering" },
   ];
 
   export const contributors = [
@@ -105,6 +153,23 @@ export const branches = [
   ];
 
   export const academicYears = [
-    { value: "May 23", label: "May 23" },
+    { value: "May 16", label: "May 16" },
+    { value: "Dec 16", label: "Dec 16" },
+    { value: "May 17", label: "May 17" },
+    { value: "Dec 17", label: "Dec 17" },
+    { value: "May 18", label: "May 18" },
+    { value: "Dec 18", label: "Dec 18" },
+    { value: "May 19", label: "May 19" },
+    { value: "Dec 19", label: "Dec 19" },
+    { value: "May 20", label: "May 20" },
+    { value: "Dec 20", label: "Dec 20" },
+    { value: "May 21", label: "May 21" },
+    { value: "Dec 21", label: "Dec 21" },
+    { value: "May 22", label: "May 22" },
     { value: "Dec 22", label: "Dec 22" },
+    { value: "May 23", label: "May 23" },
+    { value: "Dec 23", label: "Dec 23" },
+    { value: "May 24", label: "May 24" },
+    { value: "Dec 24", label: "Dec 24" },
+
   ];
