@@ -2,7 +2,10 @@ import React from 'react'
 
 const MyCourses = () => {
   return (
-    <h1>MyCourses - Admin can view and edit the courses created so far.</h1>
+    <div className='flex flex-col items-center justify-center h-screen'>
+      <h1 className='text-3xl font-bold'>My Courses</h1>
+      <p className='mt-4 text-lg'>This is the My Courses page for admin.</p>
+    </div>
   )
 }
 

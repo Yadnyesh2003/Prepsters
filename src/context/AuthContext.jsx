@@ -21,6 +21,8 @@ export const AuthProvider = ({ children }) => {
     const navigate = useNavigate();
     const [loading, setLoading] = useState(true); // Add this
 
+    
+
 
     // Function to fetch user role from Firestore based on email
     const fetchUserRoleByEmail = async (email) => {
@@ -86,6 +88,14 @@ export const AuthProvider = ({ children }) => {
         return () => unsubscribe();
     }, []);
 
+
+
+    // const allowedDomains = ["@viit.ac.in", "@sakec.ac.in"];
+
+    // const isEmailAllowed = (email) => {
+    //     return allowedDomains.some((domain) => email.endsWith(domain));
+    // };
+
     // Google Sign-In with 48-hour session
     const signInWithGoogle = async () => {
         try {
@@ -103,6 +113,25 @@ export const AuthProvider = ({ children }) => {
 
             // Check if user exists & save if new
             await saveUserToFirestore(loggedInUser);
+
+            // const existingRole = await fetchUserRoleByEmail(loggedInUser.email);
+
+            // if (!existingRole) {
+            //     // New user, treat as student by default
+            //     if (!isEmailAllowed(loggedInUser.email)) {
+            //         alert("Please login with your official institute email. Personal emails aren't allowed.");
+            //         await logoutUser();
+            //         return;
+            //     }
+            //     await saveUserToFirestore(loggedInUser); // default student path
+            // } else {
+            //     // Existing user: only restrict if role is student
+            //     if (existingRole === "student" && !isEmailAllowed(loggedInUser.email)) {
+            //         alert("Please login with your official institute email. Personal emails aren't allowed.");
+            //         await logoutUser();
+            //         return;
+            //     }
+            // }
             // }
         } catch (error) {
             console.error("Google Sign-in Error:", error.message);

@@ -42,7 +42,8 @@ import { useAuth } from "./context/AuthContext";
 
 import { AuthProvider } from "./context/AuthContext";
 import ProtectedRoute from "./middleware/ProtectedRoute";
-import AccessForbidden from './components/student/AccessForbidden';
+import AccessForbidden from './components/student/AcessForbidden';
+// import AccessForbidden from './components/student/AccessForbidden';
 import Navbar from './components/student/NavBar';
 import Profile from './pages/student/Profile';
 
@@ -73,7 +74,7 @@ function App() {
   const isUnauthorizedRoute = useMatch('/unauthorized');
 
   return (
-    
+
     <Suspense fallback={<Loader />}>
       <Toaster
         position="top-right"
@@ -84,9 +85,13 @@ function App() {
         {!isAdminRoute && !isUnauthorizedRoute && <Navbar />}
 
           <Routes>
-            <Route path ='/' element={<Landing />} />
-            <Route path ='/contributors' element={<Contributors />} />
-            <Route path = '/about-us' element = {<AboutUs />} />
+
+            <Route path='/' element={<Landing />} />
+            {/* <Route path='/login' element={<Login />} /> */}
+            {/* <Route path='/signup' element={<Signup />} /> */}
+            <Route path='/contributors' element={<Contributors />} />
+            <Route path='/about-us' element={<AboutUs />} />
+            
 
             <Route 
               path='/profile' element={
@@ -126,6 +131,7 @@ function App() {
               <Route path="player/:courseId" element={<Player />} />
               <Route path="loading/:path" element={<Loading />} />
               <Route path="notes" element={<Notes />} />
+              <Route path="unauthorized" element={<AccessForbidden />} />
             </Route>
 
 

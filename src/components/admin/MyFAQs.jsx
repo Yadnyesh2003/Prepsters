@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { getDocs, collection, db, doc, updateDoc, deleteDoc, serverTimestamp } from '../../config/firebase'; 
+import { getDocs, collection, db, doc, updateDoc, deleteDoc, serverTimestamp } from '../../config/firebase';
 import { AppContext } from '../../context/AppContext'
 import Select from 'react-select';
 import makeAnimated from 'react-select/animated';
@@ -36,7 +36,7 @@ const MyFAQs = () => {
   const { toast } = useContext(AppContext);
   const animatedComponents = makeAnimated();
 
-//================================================================================================================================================================================================
+  //================================================================================================================================================================================================
 
   //For FilterComponent.jsx 
   const filterOptions = {
@@ -45,7 +45,7 @@ const MyFAQs = () => {
     institutions: institutions.map(i => i.value)
   };
 
-//===============================================================================================================================================================================================
+  //===============================================================================================================================================================================================
 
   // Fetch FAQ data from Firestore
   const getFAQData = async () => {
@@ -73,10 +73,10 @@ const MyFAQs = () => {
   // Handle Edit - Set the FAQ to be edited
   const handleEdit = (faq) => {
     setEditingFAQ(faq.id);
-    setEditedData({ 
-      ...faq.faqsCategory || {}, 
-      faqsTitle: faq.faqsTitle, 
-      contributorName: faq.contributorName 
+    setEditedData({
+      ...faq.faqsCategory || {},
+      faqsTitle: faq.faqsTitle,
+      contributorName: faq.contributorName
     });
   };
 
@@ -85,7 +85,7 @@ const MyFAQs = () => {
     if (!editingFAQ) return;
 
     try {
-      if(isGhost) {
+      if (isGhost) {
         const faqRef = doc(db, 'FAQs', editingFAQ);
         await updateDoc(faqRef, {
           faqsCategory: editedData,
@@ -99,23 +99,23 @@ const MyFAQs = () => {
         getFAQData(); // Reload data from Firestore
         toast.success('Changes Saved!')
       } else {
-        toast('Unauthorized Access!', {icon: '🚫'})
+        toast('Unauthorized Access!', { icon: '🚫' })
       }
     } catch (error) {
       toast.error(`Error saving data: ${error.message}`);
     }
   };
-  
+
   // Handle Delete - Delete the FAQ from Firestore
   const handleDelete = async (faqId) => {
     try {
-      if(isGhost) {
+      if (isGhost) {
         const faqRef = doc(db, 'FAQs', faqId);
         await deleteDoc(faqRef);
         getFAQData(); // Reload data from Firestore after deletion
         toast.success('Deleted data!')
       } else {
-        toast('Unauthorized Access!', {icon: '🚫'})
+        toast('Unauthorized Access!', { icon: '🚫' })
       }
     } catch (error) {
       toast.error(`Error deleting data: ${error.message}`);
@@ -140,7 +140,7 @@ const MyFAQs = () => {
       const branchMatch = filterValues.branch
         ? branch && branch.includes(filterValues.branch) // Check if the selected branch is in the array
         : true;
-  
+
       return (
         branchMatch &&
         institutionMatch &&
@@ -150,7 +150,7 @@ const MyFAQs = () => {
     });
     setFilteredData(filtered); // Update the filtered data
   };
-  
+
   // Handle Year Radio Selection
   const handleYearChange = (e) => {
     setEditedData({
@@ -164,13 +164,13 @@ const MyFAQs = () => {
     const updatedBranches = e.target.checked
       ? [...editedData.branch, branch]  // Add branch if checked
       : editedData.branch.filter((b) => b !== branch);  // Remove branch if unchecked
-  
+
     setEditedData({
       ...editedData,
       branch: updatedBranches,  // Update branch as an array
     });
   };
-  
+
 
   const openPdfViewer = (url) => {
     setPdfUrl(url); // Set the PDF URL to be displayed in the viewer
@@ -187,7 +187,7 @@ const MyFAQs = () => {
   return isGhost ? (
     <div className='max-w-6xl mx-auto p-4'>
       {/* Filter Component */}
-      <FilterComponent 
+      <FilterComponent
         filter={filter}
         setFilter={setFilter}
         filterOptions={filterOptions}
@@ -371,7 +371,7 @@ const MyFAQs = () => {
       </div>
       {pdfUrl && <PdfViewer pdfUrl={pdfUrl} onClose={closePdfViewer} />}
     </div>
-  ) : (<AccessForbidden/>)
+  ) : (<AccessForbidden />)
 }
 
 export default MyFAQs

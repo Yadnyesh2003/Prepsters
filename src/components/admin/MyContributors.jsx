@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { AppContext} from '../../context/AppContext';
+import { AppContext } from '../../context/AppContext';
 import { db, collection, updateDoc, doc, getDocs, deleteDoc, serverTimestamp } from "../../config/firebase";
 import Loading from '../../components/admin/Loading'
 import { assets } from '../../assets/assets';
@@ -56,9 +56,9 @@ const MyContributors = () => {
     });
   };
 
-  const handleDelete = async(id) => {
+  const handleDelete = async (id) => {
     try {
-      if(isGhost) {
+      if (isGhost) {
         const contributorToDelete = contributorData.find(contributor => contributor.id === id);
         const contributorName = contributorToDelete?.contributorName || 'Contributor';
         await deleteDoc(doc(db, 'Contributors', id));
@@ -67,7 +67,7 @@ const MyContributors = () => {
         );
         toast.success(`Deleted contributions of ${contributorName}`);
       } else {
-        toast('Unauthorized Access!', {icon: '🚫'})
+        toast('Unauthorized Access!', { icon: '🚫' })
       }
     } catch (error) {
       toast.error(`Oops! Couldn't delete. ${error.message}`);
@@ -108,7 +108,7 @@ const MyContributors = () => {
         setEditingContributor(null); // Reset editing state
         toast.success('Changes Saved!')
       } else {
-        toast('Unauthorized Access!', {icon: '🚫'})
+        toast('Unauthorized Access!', { icon: '🚫' })
       }
     } catch (error) {
       toast.error(`Error saving data: ${error.message}`);
@@ -182,8 +182,8 @@ const MyContributors = () => {
                   <span className="hidden md:inline">Edit Contributor</span>
                 </button>
                 <button onClick={() => handleDelete(contributor.id)} className="mt-4 flex bg-red-500 text-white px-4 py-2 rounded-md hover:text-black">
-                <img src={assets.delete_data} alt='delete' className='md:justify-center w-6 h-6 mr-2' />
-                <span className="hidden md:inline">Delete Contributor</span>
+                  <img src={assets.delete_data} alt='delete' className='md:justify-center w-6 h-6 mr-2' />
+                  <span className="hidden md:inline">Delete Contributor</span>
                 </button>
               </div>
             )}

@@ -23,7 +23,7 @@ export const AppContextProvider = (props) => {
           const notesQuery = query(
             collection(db, 'Notes'),
             orderBy('createdAt', 'desc'),
-            limit(3)
+            limit(4)
           );
           const querySnapshot = await getDocs(notesQuery);
           const notes = querySnapshot.docs.map((doc) => ({
@@ -41,7 +41,7 @@ export const AppContextProvider = (props) => {
           const faqQuery = query(
             collection(db, 'FAQs'),
             orderBy('createdAt', 'desc'),
-            limit(3)
+            limit(4)
           );
           const querySnapshot = await getDocs(faqQuery);
           const faqs = querySnapshot.docs.map((doc) => ({
@@ -59,7 +59,7 @@ export const AppContextProvider = (props) => {
             const pyqQuery = query(
                 collection(db, 'PYQs'),
                 orderBy('createdAt', 'desc'),
-                limit(3)
+                limit(4)
             );
             const querySnapshot = await getDocs(pyqQuery);
             const pyqs = querySnapshot.docs.map((doc)=>({

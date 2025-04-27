@@ -11,8 +11,9 @@
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.0.17",
+    "canvas-confetti": "^1.9.3",
     "firebase": "^11.5.0",
-    "framer-motion": "^12.6.3",
+    "framer-motion": "^12.9.2",
     "lucide-react": "^0.487.0",
     "quill": "^2.0.3",
     "react": "^19.0.0",

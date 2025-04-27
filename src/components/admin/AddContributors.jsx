@@ -38,8 +38,8 @@ const AddContributors = () => {
         setContributorSocial("");
 
         toast.success('Contributor added successfully!');
-      } else{
-        toast('Unauthorized Access!', {icon: '🚫'})
+      } else {
+        toast('Unauthorized Access!', { icon: '🚫' })
       }
     } catch (error) {
       toast.error(`Oops! Couldn't add the contributor: ${error.message}`);
@@ -52,7 +52,7 @@ const AddContributors = () => {
     <div className="mx-auto mt-7 ml-3 p-6 bg-white overflow-scroll flex flex-col justify-between text-gray-700">
       <form onSubmit={handleSubmit} className="flex flex-col w-3/4 gap-4 text-gray-500">
         <div className="flex flex-col gap-2">
-        {console.log('User Details' , user)}
+          {console.log('User Details', user)}
           <label className="text-lg text-left">Contributor Name</label>
           <input
             type="text"

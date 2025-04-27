@@ -1,70 +1,67 @@
 import React, { useContext, useState } from 'react';
 import { AppContext } from '../../context/AppContext';
-import PdfViewer from './PdfViewer';
+// import { getDocs, collection, db, doc, updateDoc, deleteDoc, serverTimestamp } from '../../config/firebase';
 import { assets } from '../../assets/assets';
 import { useAuth } from '../../context/AuthContext';
 import { motion } from 'framer-motion';
+import PdfViewer from './PdfViewer';
 
 const LatestContent = () => {
     const { notesDataLatest, faqDataLatest, pyqDataLatest } = useContext(AppContext);
-    const [pdfUrl, setPdfUrl] = useState(null);
     const { user } = useAuth();
+    const [pdfUrl, setPdfUrl] = useState(null);
 
-    const openPdfViewer = (url) => setPdfUrl(url);
+    const openPdfViewer = (url) => {
+        setPdfUrl(url);
+        console.log("URL", url);
+    }
     const closePdfViewer = () => setPdfUrl(null);
 
     const renderCards = (data, type) => {
         if (!Array.isArray(data)) return null;
 
         return data.map((item, idx) => {
-            const title = item[`${type.toLowerCase()}Title`];
-            const link = item[`${type.toLowerCase()}Link`];
-            const contributor = item.contributorName;
+            const title = item[`${type.toLowerCase()}Title`] || 'Untitled';
+            const link = item[`${type.toLowerCase()}Link`] || '#';
+            const contributor = item.contributorName || 'Unknown';
             const category = item[`${type.toLowerCase()}Category`] || {};
 
             return (
                 <motion.div
+                    key={item._id || idx}
                     initial={{ opacity: 0, y: 30 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5, delay: idx * 0.1 }}
                     viewport={{ once: true }}
-                    key={idx}
-                    className="bg-white border border-gray-300 shadow-md rounded-lg p-4 w-full hover:shadow-indigo-500 hover:bg-indigo-100 transform transition-transform duration-300 hover:scale-105"
+                    className="bg-white border border-gray-200 shadow-sm rounded-xl p-4 flex flex-col justify-between h-full overflow-hidden"
                 >
-                    <div>
-                        <h4 className="text-base sm:text-lg md:text-xl font-medium mb-1 text-gray-800">{title}</h4>
-                        <p className="text-xs sm:text-sm md:text-base text-gray-700">Contributed By: {contributor}</p>
+                    <div className="flex flex-col gap-1 overflow-hidden">
+                        <h4 className="text-base font-semibold text-gray-800 line-clamp-2">{title}</h4>
+                        <p className="text-xs text-gray-600 truncate">Contributed By: {contributor}</p>
 
                         {category.branch && (
-                            <p className="text-xs sm:text-sm md:text-base text-gray-700 truncate overflow-hidden whitespace-nowrap">
-                            Branch: {Array.isArray(category.branch) ? category.branch.join(', ') : category.branch}
+                            <p className="text-xs text-gray-500 truncate">
+                                Branch: {Array.isArray(category.branch) ? category.branch.join(', ') : category.branch}
                             </p>
                         )}
-
                         {category.subjectName && (
-                            <p className="text-xs sm:text-sm md:text-base text-gray-700 truncate overflow-hidden whitespace-nowrap">
-                            Subject: {Array.isArray(category.subjectName) ? category.subjectName.join(', ') : category.subjectName}
+                            <p className="text-xs text-gray-500 truncate">
+                                Subject: {Array.isArray(category.subjectName) ? category.subjectName.join(', ') : category.subjectName}
                             </p>
                         )}
-
-                        {category.year && (
-                            <p className="text-xs sm:text-sm md:text-base text-gray-700">Year: {category.year}</p>
-                        )}
-
-                        {category.institution && (
-                            <p className="text-xs sm:text-sm md:text-base text-gray-700">Institution: {category.institution}</p>
-                        )}
-                        </div>
-
-                    <div className="mt-2 mb-1 flex justify-center">
-                        <button
-                        onClick={() => openPdfViewer(link)}
-                        className="flex items-center bg-indigo-500 text-white px-4 py-2 rounded-md hover:bg-indigo-600 transition"
-                        >
-                        <img src={assets.view_data} alt="view" className="w-5 h-5 mr-2" />
-                        View
-                        </button>
+                        {category.year && <p className="text-xs text-gray-500 truncate">Year: {category.year}</p>}
+                        {category.institution && <p className="text-xs text-gray-500 truncate">Institution: {category.institution}</p>}
                     </div>
+
+                    <button
+                        type="button"
+                        onClick={() => openPdfViewer(link)}
+                        className="mt-3 inline-flex items-center justify-center bg-indigo-600 text-white px-3 py-1.5 text-sm rounded-md hover:bg-indigo-700 transition"
+                    >
+                        <img src={assets.view_data} alt="view" className="w-4 h-4 mr-2" />
+                        View
+                    </button>
+
                 </motion.div>
             );
         });
@@ -82,47 +79,46 @@ const LatestContent = () => {
                         whileInView={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.4 }}
                         viewport={{ once: true }}
-                        className="text-xl font-semibold mb-4"
+                        className="text-xl font-semibold mb-6 text-gray-800"
                     >
-                        Recently added Notes
+                        Recently Added Notes
                     </motion.h3>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 w-full">
+                    <div className="grid gap-6 grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4">
                         {renderCards(notesDataLatest, 'Notes')}
                     </div>
                 </div>
 
-                {/* FAQS */}
-                <div className="mt-8">
+                {/* FAQs */}
+                <div className="mt-12">
                     <motion.h3
                         initial={{ opacity: 0, y: 20 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.4 }}
                         viewport={{ once: true }}
-                        className="text-xl font-semibold mb-4"
+                        className="text-xl font-semibold mb-6 text-gray-800"
                     >
-                        Recently added FAQs
+                        Recently Added FAQs
                     </motion.h3>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 w-full">
+                    <div className="grid gap-6 grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4">
                         {renderCards(faqDataLatest, 'Faqs')}
                     </div>
                 </div>
 
-                {/* PYQS */}
-                <div className="mt-8">
+                {/* PYQs */}
+                <div className="mt-12">
                     <motion.h3
                         initial={{ opacity: 0, y: 20 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.4 }}
                         viewport={{ once: true }}
-                        className="text-xl font-semibold mb-4"
+                        className="text-xl font-semibold mb-6 text-gray-800"
                     >
-                        Recently added PYQs
+                        Recently Added PYQs
                     </motion.h3>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 w-full">
+                    <div className="grid gap-6 grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4">
                         {renderCards(pyqDataLatest, 'Pyqs')}
                     </div>
                 </div>
-
                 {pdfUrl && <PdfViewer pdfUrl={pdfUrl} onClose={closePdfViewer} />}
             </div>
         </section>
