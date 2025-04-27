@@ -11,6 +11,11 @@ const Syllabus = () => {
   const [showFilter, setShowFilter] = useState(true);
   const [loading, setLoading] = useState(false); 
 
+  //LazyLoad
+  const [visibleCount, setVisibleCount] = useState(3); // Initial number of cards
+  const [isFetchingMore, setIsFetchingMore] = useState(false);
+
+
   const { toast } = useContext(AppContext);
 
   const openPdfViewer = (url) => {
@@ -27,6 +32,25 @@ const Syllabus = () => {
     }
   }, [showFilter]);
 
+  //LazyLoad
+  useEffect(() => {
+    const handleScroll = () => {
+      const bottom =
+        window.innerHeight + window.scrollY >= document.body.offsetHeight - 100;
+      if (bottom && !isFetchingMore && visibleCount < syllabusData.length) {
+        setIsFetchingMore(true);
+        setTimeout(() => {
+          setVisibleCount((prev) => prev + 10); // Load 10 more cards
+          setIsFetchingMore(false);
+        }, 500); // simulate slight delay
+      }
+    };
+  
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [visibleCount, isFetchingMore, syllabusData]);
+  
+
   return (
     <div className="min-h-screen p-6 bg-gradient-to-b from-purple-500 to-transparent">
       {showFilter && <SyllabusFilter onResults={(data) => {
@@ -41,7 +65,7 @@ const Syllabus = () => {
                 setShowFilter(true);
                 setSyllabusData([]);
               }}
-              className="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600"
+              className="text-white px-4 py-2 rounded border-white border-2 bg-yellow-500 hover:bg-purple-700"
             >
               Change Filters
             </button>
@@ -53,30 +77,43 @@ const Syllabus = () => {
         ) : (
           <div className="space-y-4">
           {syllabusData.length > 0 && (
-          syllabusData.map((item) => (
-            <div key={item.id} className="p-4 bg-gray-100 rounded mb-2 flex flex-col items-start">
-            <h2 className="text-xs font-semibold">Syllabus Title: {item.syllabusTitle}</h2>
+          syllabusData.slice(0, visibleCount).map((item) => (
+            <div key={item.id} className="p-4 bg-gray-100 mb-2 flex flex-col items-start border-2 rounded-2xl border-indigo-600 hover:bg-cyan-100">
+            <h2 className="text-base sm:text-lg md:text-xl font-medium mb-1 text-indigo-800">{item.syllabusTitle}</h2>
             {item.syllabusCategory.academicYear && (
-              <p className="text-gray-700">Academic Year: {item.syllabusCategory.academicYear}</p>
+              <p className="text-xs sm:text-sm md:text-base text-gray-700">Academic Year: {item.syllabusCategory.academicYear}</p>
             )}
             {item.syllabusCategory.branch && (
-              <p className="text-gray-700">Branch: {item.syllabusCategory.branch}</p>
+              <p className="text-xs sm:text-sm md:text-base text-gray-700">Branch: {item.syllabusCategory.branch}</p>
             )}
             {item.syllabusCategory.institution && (
-              <p className="text-gray-700">Institution: {item.syllabusCategory.institution}</p>
+              <p className="text-xs sm:text-sm md:text-base text-gray-700">Institution: {item.syllabusCategory.institution}</p>
             )}
             {item.syllabusCategory.year && (
-              <p className="text-gray-700">Year: {item.syllabusCategory.year}</p>
+              <p className="text-xs sm:text-sm md:text-base text-gray-700">Year: {item.syllabusCategory.year}</p>
             )}
-            <div className="flex space-x-4 mt-2">
-              <button onClick={() => openPdfViewer(item.syllabusLink)} className="flex bg-indigo-500 text-white px-4 py-2 rounded-md hover:text-black">
-                <img src={assets.view_data} alt="view" className="w-6 h-6 mr-2" />
+            <div className="mt-2 mb-1 flex justify-center">
+              <button onClick={() => openPdfViewer(item.syllabusLink)} className="flex items-center bg-indigo-500 text-white px-4 py-2 rounded-md hover:bg-indigo-600 transition">
+                <img src={assets.view_data} alt="view" className="w-5 h-5 mr-2" />
                   <span className="hidden md:inline">View Syllabus</span>
               </button>
             </div>
               {pdfUrl && <PdfViewer pdfUrl={pdfUrl} onClose={closePdfViewer} />}
             </div>
           )))}
+            {/* {isFetchingMore && (
+              <div className="text-center py-4 text-indigo-700 text-lg font-medium">
+                Fetching more
+                <span className="inline-block animate-bounce [animation-delay:0s]">.</span>
+                <span className="inline-block animate-bounce [animation-delay:0.1s]">.</span>
+                <span className="inline-block animate-bounce [animation-delay:0.2s]">.</span>
+              </div>
+            )} */}
+            {isFetchingMore && (
+              <div className="flex justify-center py-4">
+                <div className="w-16 sm:w-20 aspect-square border-4 border-gray-300 border-t-4 border-t-blue-400 rounded-full animate-spin"></div>
+              </div>
+            )}
         </div>
         )}
       </div>

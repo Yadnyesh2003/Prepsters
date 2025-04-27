@@ -8,8 +8,12 @@ const LatestContent = () => {
     const { notesDataLatest, faqDataLatest, pyqDataLatest } = useContext(AppContext);
     const { user } = useAuth();
 
+    const openPdfViewer = (url) => setPdfUrl(url);
+    const closePdfViewer = () => setPdfUrl(null);
+
     const renderCards = (data, type) => {
         if (!Array.isArray(data)) return null;
+
         return data.map((item, idx) => {
             const title = item[`${type.toLowerCase()}Title`] || 'Untitled';
             const link = item[`${type.toLowerCase()}Link`] || '#';
@@ -58,14 +62,12 @@ const LatestContent = () => {
     };
 
     return user ? (
-        <section className="w-full bg-gray-50 overflow-hidden">
-            <div className="px-6 py-10 max-w-7xl mx-auto">
-                <h2 className="text-3xl font-bold text-center mb-10 text-gray-900">
-                    Check out our Latest Study Resources!
-                </h2>
+        <section className="relative w-full">
+            <div className="px-4 py-8 w-full">
+                <h2 className="text-2xl font-bold mb-6 text-center">Check out our Latest Study Resources!</h2>
 
-                {/* Notes */}
-                <div className="mt-10">
+                {/* NOTES */}
+                <div className="mt-8">
                     <motion.h3
                         initial={{ opacity: 0, y: 20 }}
                         whileInView={{ opacity: 1, y: 0 }}

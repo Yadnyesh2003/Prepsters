@@ -1,66 +1,56 @@
 import React, { useContext, useState } from 'react';
+import Select from 'react-select';
 import { AppContext } from '../../context/AppContext';
 import { useAuth } from '../../context/AuthContext';
 import { db, collection, addDoc, serverTimestamp, updateDoc } from "../../config/firebase";
 import AccessForbidden from '../student/AccessForbidden';
+import { branches, institutions, years } from '../../assets/assets';
 
 const AddSyllabus = () => {
   const [formData, setFormData] = useState({
     syllabusCategory: {
       academicYear: '',
-      branch: '',
-      institution: '',
-      year: '',
+      branch: null,
+      institution: null,
+      year: null,
     },
     syllabusLink: '',
     syllabusTitle: '',
     adminId: ''
   });
-  const [loading, setLoading] = useState(false);
 
+  const [loading, setLoading] = useState(false);
   const { toast } = useContext(AppContext);
   const { isGhost, user } = useAuth();
 
-  const handleChange = (e) => {
-    const { name, value, type, checked } = e.target;
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
 
     if (name.startsWith('syllabusCategory')) {
-      const path = name.split('.'); // Split name into parts
-      const field = path.pop(); // Get the last part (e.g., 'academicYear')
+      const path = name.split('.');
+      const field = path[1];
 
-      setFormData(prevData => {
-        const updatedCategory = { ...prevData.syllabusCategory };
-
-        if (type === 'checkbox') {
-          // Handling checkbox for branch
-          if (name === 'syllabusCategory.branch') {
-            if (checked) {
-              updatedCategory.branch.push(value);
-            } else {
-              updatedCategory.branch = updatedCategory.branch.filter((item) => item !== value);
-            }
-          }
-        } else {
-          updatedCategory[field] = value;
-        }
-
-        return { ...prevData, syllabusCategory: updatedCategory };
-      });
+      setFormData(prev => ({
+        ...prev,
+        syllabusCategory: {
+          ...prev.syllabusCategory,
+          [field]: value,
+        },
+      }));
     } else {
-      setFormData((prevData) => ({ ...prevData, [name]: value }));
+      setFormData(prev => ({
+        ...prev,
+        [name]: value,
+      }));
     }
   };
 
-  // Handle year checkbox selection
-  const handleYearChange = (e) => {
-    const selectedYear = e.target.value;
-
-    // Only allow one selection
-    setFormData((prevData) => ({
-      ...prevData,
+  const handleSelectChange = (selectedOption, { name }) => {
+    setFormData(prev => ({
+      ...prev,
       syllabusCategory: {
-        ...prevData.syllabusCategory,
-        year: selectedYear,  // Store the selected year as a string
+        ...prev.syllabusCategory,
+        [name]: selectedOption,
       },
     }));
   };
@@ -71,30 +61,42 @@ const AddSyllabus = () => {
 
     try {
       if (isGhost) {
-        const syllabusRef = await addDoc(collection(db, 'Syllabus'), {
+        const formattedData = {
           ...formData,
+          syllabusCategory: {
+            academicYear: formData.syllabusCategory.academicYear,
+            branch: formData.syllabusCategory.branch?.value || '',
+            institution: formData.syllabusCategory.institution?.value || '',
+            year: formData.syllabusCategory.year?.value || '',
+          },
+          adminId: user.uid,
+          createdBy: user.displayName,
           createdAt: serverTimestamp(),
-          createdBy: user.displayName, // Correct this line if you have Firebase Auth setup
-          adminId: user.uid
-        });
+        };
+
+        const syllabusRef = await addDoc(collection(db, 'Syllabus'), formattedData);
+
         toast.success('Syllabus added successfully!');
 
         await updateDoc(syllabusRef, {
           syllabusId: syllabusRef.id
         });
 
+        // Reset form
         setFormData({
           syllabusCategory: {
             academicYear: '',
-            branch: [],
-            institution: '',
-            year: '',
+            branch: null,
+            institution: null,
+            year: null,
           },
           syllabusLink: '',
           syllabusTitle: '',
-        })
+          adminId: ''
+        });
+
       } else {
-        toast('Unauthorized Access!', { icon: '🚫' })
+        toast('Unauthorized Access!', { icon: '🚫' });
       }
     } catch (error) {
       toast.error(`Oops! Couldn't add Syllabus: ${error.message}`);
@@ -113,7 +115,7 @@ const AddSyllabus = () => {
             type="text"
             name="syllabusTitle"
             value={formData.syllabusTitle}
-            onChange={handleChange}
+            onChange={handleInputChange}
             className="w-full p-2 border border-gray-300 rounded-md"
             required
           />
@@ -126,79 +128,64 @@ const AddSyllabus = () => {
             type="text"
             name="syllabusCategory.academicYear"
             value={formData.syllabusCategory.academicYear}
-            onChange={handleChange}
+            onChange={handleInputChange}
             className="w-full p-2 border border-gray-300 rounded-md"
             placeholder="Example: 2022-2023"
             required
           />
         </div>
 
-        {/* Branch */}
-        <div className='space-y-2 '>
+        {/* Branch Dropdown */}
+        <div className="flex flex-col gap-2">
           <p className="text-lg text-left">Branch</p>
-          <div className="flex flex-col gap-2 text-left">
-            {[
-              "General Science & Humanities",
-              "Computer Engineering",
-              "Information Technology",
-              "Electronics & Telecommunication",
-              "Artificial Intelligence & Data Science",
-              "Electronics & Computer Science",
-            ].map((branch) => (
-              <label key={branch} className='flex items-center gap-2 hover:text-amber-400'>
-                <input
-                  type="radio"
-                  name="syllabusCategory.branch"
-                  value={branch}
-                  checked={formData.syllabusCategory.branch === branch}
-                  onChange={handleChange}
-                  className="mr-2  hover:text-amber-400"
-                />
-                <span>{branch}</span>
-              </label>
-            ))}
-          </div>
-        </div>
-
-        {/* Institution */}
-        <div className='flex flex-col gap-2'>
-          <p className="text-lg text-left">Institution</p>
-          <input
-            type="text"
-            name="syllabusCategory.institution"
-            value={formData.syllabusCategory.institution}
-            onChange={handleChange}
-            className="w-full p-2 border border-gray-300 rounded-md"
-            placeholder="Example: Mumbai University"
+          <Select
+            name="branch"
+            isClearable={true}
+            options={branches}
             required
+            value={formData.syllabusCategory.branch}
+            onChange={handleSelectChange}
+            placeholder="Select Branch..."
+            className="text-black"
           />
         </div>
 
-        {/* Year  */}
-        <div className="space-y-2">
-          <p className="text-lg text-left">Year</p>
-          <div className="flex flex-col gap-2">
-            {["First Year", "Second Year", "Third Year", "Final Year"].map((year) => (
-              <label key={year} className="flex items-center gap-2 hover:text-amber-300">
-                <input
-                  type="radio"
-                  value={year}
-                  checked={formData.syllabusCategory.year === year} // Check if the year is selected
-                  onChange={handleYearChange} // Handle year change
-                  className="accent-blue-600"
-                />
-                <span>{year}</span>
-              </label>
-            ))}
-          </div>
+        {/* Institution Dropdown */}
+        <div className="flex flex-col gap-2">
+          <p className="text-lg text-left">Institution</p>
+          <Select
+            name="institution"
+            isClearable={true}
+            options={institutions}
+            required
+            value={formData.syllabusCategory.institution}
+            onChange={handleSelectChange}
+            placeholder="Select Institution..."
+            className="text-black"
+          />
         </div>
 
-        {/* PYQS Link */}
-        <div className='flex flex-col gap-2'>
+        {/* Year Dropdown */}
+        <div className="flex flex-col gap-2">
+          <p className="text-lg text-left">Year</p>
+          <Select
+            name="year"
+            isClearable={true}
+            options={years}
+            required
+            value={formData.syllabusCategory.year}
+            onChange={handleSelectChange}
+            placeholder="Select Year..."
+            className="text-black"
+          />
+        </div>
+
+        {/* Syllabus Link */}
+        <div className="flex flex-col gap-2">
           <p className="text-lg text-left">Syllabus Link</p>
           <input
             type="url"
-            name="pyqsLink"
+            name="syllabusLink"
             value={formData.syllabusLink}
             onChange={(e) => {
               const modifiedLink = e.target.value.replace(/\/view\?usp=drive_link$/, '/preview');
@@ -208,11 +195,10 @@ const AddSyllabus = () => {
               });
             }}
             className="w-full p-2 border border-gray-300 rounded-md"
+            placeholder="Enter GDrive PDF Link..."
             required
-            placeholder='Enter GDrive PDF Link...'
           />
         </div>
-
 
         <button
           type="submit"
@@ -223,7 +209,7 @@ const AddSyllabus = () => {
         </button>
       </form>
     </div>
-  ) : <AccessForbidden />
+  ) : <AccessForbidden />;
 };
 
 export default AddSyllabus;

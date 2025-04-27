@@ -98,11 +98,13 @@ const NotesFilter = ({ onResults }) => {
       onSubmit={handleSubmit}
       className="bg-white p-6 rounded-lg shadow-md space-y-4 max-w-md mx-auto"
     >
+      <h3 className="text-lg font-semibold mb-4">Filter Notes</h3>
       {/* Branch - multi-select */}
       <div>
         <label className="block mb-1 font-medium">Branch</label>
         <Select
           isMulti
+          closeMenuOnSelect={false}
           name="branch"
           components={animatedComponents}
           options={branches}
@@ -110,37 +112,22 @@ const NotesFilter = ({ onResults }) => {
           classNamePrefix="select"
           value={filters.branch.map((val) => ({ value: val, label: val }))}
           onChange={handleBranchChange}
-          closeMenuOnSelect={false}
         />
       </div>
 
       {/* Subject - single select */}
       <div>
         <label className="block mb-1 font-medium">Subject</label>
-        {/* <Select
-          name="subjectName"
-          options={subjects}
-          components={animatedComponents}
-          className="basic-single"
-          classNamePrefix="select"
-          isClearable
-          value={
-            filters.subjectName
-              ? subjects.find((opt) => opt.value === filters.subjectName)
-              : null
-          }
-          onChange={handleSubjectChange}
-        /> */}
         <Select
           isMulti
           name="subjectName"
+          closeMenuOnSelect={false}
           options={subjects}
           components={animatedComponents}
           className="basic-multi-select"
           classNamePrefix="select"
           value={filters.subjectName.map((val) => ({ value: val, label: val }))}
           onChange={handleSubjectChange}
-          closeMenuOnSelect={false}
         />
 
       </div>

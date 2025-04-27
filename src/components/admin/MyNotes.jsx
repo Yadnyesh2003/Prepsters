@@ -1,9 +1,11 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { getDocs, collection, db, doc, updateDoc, deleteDoc, serverTimestamp } from '../../config/firebase'; 
 import { AppContext } from '../../context/AppContext';
-import Loading from '../../components/student/Loading';
+import Select from 'react-select';
+import makeAnimated from 'react-select/animated';
+import Loading from '../../components/admin/Loading';
 import PdfViewer from '../student/PdfViewer';
-import { assets } from '../../assets/assets';
+import { assets, branches, institutions, years, contributors, subjects} from '../../assets/assets';
 import { useAuth } from '../../context/AuthContext';
 
 import FilterComponent from './FilterComponent';
@@ -11,7 +13,7 @@ import AccessForbidden from '../student/AccessForbidden';
 
 
 const MyNotes = () => {
-  const { isGhost } = useAuth();
+  const { isGhost, user } = useAuth();
   const [noteData, setNoteData] = useState([]);
   const [filteredData, setFilteredData] = useState([]); // New state to hold the filtered syllabus data
   const [loading, setLoading] = useState(true);
@@ -27,24 +29,20 @@ const MyNotes = () => {
 
   const [filter, setFilter] = useState({
     branch: '',
-    year: ''
+    year: '',
+    searchQuery: ''
   });
 
   const { toast } = useContext(AppContext);
+  const animatedComponents = makeAnimated();
 
 //================================================================================================================================================================================================
 
   //For FilterComponent.jsx 
   const filterOptions = {
-    branches: [
-      "General Science & Humanities", 
-      "Computer Engineering", 
-      "Information Technology", 
-      "Electronics & Telecommunication", 
-      "Artificial Intelligence & Data Science", 
-      "Electronics & Computer Science"
-    ],
-    years: ["First Year", "Second Year", "Third Year", "Final Year"]
+    branches: branches.map(b => b.value),
+    years: years.map(y => y.value),
+    institutions: institutions.map(i => i.value)
   };
 
 //===============================================================================================================================================================================================
@@ -93,7 +91,8 @@ const MyNotes = () => {
           notesCategory: editedData,
           notesTitle: editedData.notesTitle,
           contributorName: editedData.contributorName,
-          updatedAt: serverTimestamp()
+          updatedBy: user.displayName,
+          updatedAt: serverTimestamp(),
         });
         setEditingNote(null);
         setEditedData({});
@@ -134,15 +133,21 @@ const MyNotes = () => {
   const filterNoteData = (filterValues) => {
     const filtered = noteData.filter((doc) => {
       const { branch, year } = doc.notesCategory || {};
+      const title = doc.notesTitle || '';
   
       // Check if the branch filter matches any of the branches in the array
       const branchMatch = filterValues.branch
         ? branch && branch.includes(filterValues.branch) // Check if the selected branch is in the array
         : true;
+    
+      const searchMatch = filterValues.searchQuery
+        ? title.toLowerCase().includes(filterValues.searchQuery.toLowerCase())
+        : true;
   
       return (
         branchMatch &&
-        (filterValues.year ? year === filterValues.year : true)
+        (filterValues.year ? year === filterValues.year : true) &&
+        searchMatch
       );
     });
     setFilteredData(filtered); // Update the filtered data
@@ -215,73 +220,85 @@ const MyNotes = () => {
                   {/* Contributor Name */}
                   <div className="mt-2 flex flex-col md:flex-row md:items-center justify-between gap-2">
                     <label className="block text-sm font-semibold text-black w-full md:w-1/4">Contributor Name</label>
-                    <input
-                      type="text"
-                      value={editedData.contributorName}
-                      onChange={(e) => setEditedData({ ...editedData, contributorName: e.target.value })}
-                      className="border p-2 w-full md:w-3/4 mt-2 md:mt-0"
-                      required
+                    <Select
+                      name="contributorName"
+                      isClearable
+                      components={animatedComponents}
+                      options={contributors}
+                      value={contributors.find((c) => c.value === editedData.contributorName)}
+                      onChange={(selected) =>
+                        setEditedData((prev) => ({
+                          ...prev,
+                          contributorName: selected ? selected.value : '',
+                        }))
+                      }
+                      className="w-full md:w-3/4 mt-2 md:mt-0 text-black"
+                      placeholder="Select Contributor"
                     />
                   </div>
 
 
-                  {/* Branches Checkboxes */}
-                  <div className="mt-2">
-                    <label className="block text-sm font-semibold text-black">Branch</label>
-                    <div className="flex flex-col md:flex-row gap-4 mt-2">
-                      {["General Science & Humanities", "Computer Engineering", "Information Technology", "Electronics & Telecommunication", "Artificial Intelligence & Data Science", "Electronics & Computer Science"].map((branch) => (
-                        <label key={branch} className="flex items-center hover:text-indigo-700">
-                          <input
-                            type="checkbox"  // Change from radio to checkbox for multiple selections
-                            value={branch}
-                            checked={editedData.branch.includes(branch)}  // Check if branch is selected
-                            onChange={handleBranchChange}
-                            className="mr-2"
-                          />
-                          {branch}
-                        </label>
-                      ))}
-                    </div>
-                  </div>
+                  {/* Branches Drop Down */}
+                  <div className="mt-2 flex flex-col md:flex-row md:items-center justify-between gap-2">
+                  <label className="block text-sm font-semibold text-black w-full md:w-1/4">Branch</label>
+                  <Select
+                    name="branch"
+                    isMulti
+                    closeMenuOnSelect={false}
+                    components={animatedComponents}
+                    options={branches}
+                    value={branches.filter((b) => editedData.branch.includes(b.value))}
+                    onChange={(selected) =>
+                      setEditedData((prev) => ({
+                        ...prev,
+                        branch: selected.map((s) => s.value),
+                      }))
+                    }
+                    className="w-full md:w-3/4 mt-2 md:mt-0 text-black"
+                    placeholder="Select Branch(es)"
+                  />
+                </div>
 
                   {/* Edit Subject Names */}
-                  <div className="mt-2">
-                    <label className="block text-sm font-semibold text-black">Subject Name</label>
-                    <input
-                      type="text"
-                      value={Array.isArray(editedData.subjectName) ? editedData.subjectName.join(', ') : ''} // Display comma-separated subjects
-                      onChange={(e) => {
-                        const subjects = e.target.value.split(',').map(subject => subject.trim());
-                        setEditedData({
-                          ...editedData,
-                          subjectName: subjects ||[]
-                        });
-                      }}
-                      className="border p-2 w-full md:w-3/4 mt-2 md:mt-0"
-                    />
-                    <p className="text-sm text-gray-500">Enter subject names separated by commas.</p>
-                  </div>
+                  <div className="mt-2 flex flex-col md:flex-row md:items-center justify-between gap-2">
+                  <label className="block text-sm font-semibold text-black w-full md:w-1/4">Subject Name</label>
+                  <Select
+                    name="subjectName"
+                    isMulti
+                    closeMenuOnSelect={false}
+                    components={animatedComponents}
+                    options={subjects}
+                    value={subjects.filter((s) => editedData.subjectName.includes(s.value))}
+                    onChange={(selected) =>
+                      setEditedData((prev) => ({
+                        ...prev,
+                        subjectName: selected.map((s) => s.value),
+                      }))
+                    }
+                    className="w-full md:w-3/4 mt-2 md:mt-0 text-black"
+                    placeholder="Select Subject(s)"
+                  />
+                </div>
 
 
-
-                  {/* Year Radio Buttons */}
-                  <div className="mt-2">
-                    <label className="block text-left text-sm font-semibold text-black">Year</label>
-                    <div className="flex flex-col md:flex-row gap-4 mt-2">
-                      {["First Year", "Second Year", "Third Year", "Final Year"].map((year) => (
-                        <label key={year} className="flex items-center gap-2 hover:text-indigo-700">
-                          <input
-                            type="radio"
-                            value={year}
-                            checked={editedData.year === year}
-                            onChange={handleYearChange}
-                            className="mr-2"
-                            required
-                          />
-                          {year}
-                        </label>
-                      ))}
-                    </div>
+                  {/* Year DropDown */}
+                  <div className="mt-2 flex flex-col md:flex-row md:items-center justify-between gap-2">
+                    <label className="block text-sm font-semibold text-black w-full md:w-1/4">Year</label>
+                    <Select
+                      name="year"
+                      isClearable
+                      components={animatedComponents}
+                      options={years}
+                      value={years.find((y) => y.value === editedData.year)}
+                      onChange={(selected) =>
+                        setEditedData((prev) => ({
+                          ...prev,
+                          year: selected ? selected.value : '',
+                        }))
+                      }
+                      className="w-full md:w-3/4 mt-2 md:mt-0 text-black"
+                      placeholder="Select Year"
+                  />
                   </div>
 
                   {/* Save and Cancel Buttons */}

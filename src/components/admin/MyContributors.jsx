@@ -1,13 +1,13 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { AppContext } from '../../context/AppContext';
 import { db, collection, updateDoc, doc, getDocs, deleteDoc, serverTimestamp } from "../../config/firebase";
-import Loading from '../../components/student/Loading'
+import Loading from '../../components/admin/Loading'
 import { assets } from '../../assets/assets';
 import { useAuth } from '../../context/AuthContext';
 import AccessForbidden from '../student/AccessForbidden';
 
 const MyContributors = () => {
-  const { isGhost } = useAuth();
+  const { isGhost, user } = useAuth();
   const [contributorData, setContributorData] = useState([]); // Store contributors data
   const [loading, setLoading] = useState(true); // Manage loading state
 
@@ -95,7 +95,8 @@ const MyContributors = () => {
           contributorRole: editedData.contributorRole,
           contributorContributions: editedData.contributorContributions,
           contributorSocial: editedData.contributorSocial,
-          updatedAt: serverTimestamp()
+          updatedBy: user.displayName,
+          updatedAt: serverTimestamp(),
         });
 
         // Update the local state after saving

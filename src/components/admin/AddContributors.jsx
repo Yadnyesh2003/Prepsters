@@ -20,14 +20,15 @@ const AddContributors = () => {
     setLoading(true);
 
     try {
-      if (isGhost) {
-        const contributorRef = await addDoc(collection(db, "Contributors"), {
-          adminId: user.uid,
+      if(isGhost) {
+        const contributorRef = await addDoc(collection(db, "Contributors"), { 
           contributorName,
           contributorRole,
           contributorContributions,
           contributorSocial,
-          createdAt: serverTimestamp()
+          adminId: user.uid,
+          createdBy: user.displayName,
+          createdAt: serverTimestamp(),
         });
 
         setAdminId("");

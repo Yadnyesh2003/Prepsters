@@ -1,25 +1,30 @@
 import React, { useContext, useState } from 'react';
 import { AppContext } from '../../context/AppContext';
 import { db, collection, addDoc, serverTimestamp, updateDoc } from "../../config/firebase";
+import Select from 'react-select';
+import makeAnimated from "react-select/animated";
 import { useAuth } from '../../context/AuthContext';
 import AccessForbidden from '../student/AccessForbidden';
+import { branches, years, academicYears, contributors, institutions, subjects } from '../../assets/assets';
 
   const AddPYQs = () => {
     const [formData, setFormData] = useState({
       pyqsCategory: {
-        academicYear: '',
+        academicYear: null,
         branch: [],
-        institution: '',
+        institution: null,
         subjectName: [],
-        year: '',
+        year: null,
       },
       pyqsLink: '',
       pyqsTitle: '',
+      contributorName: null,
       adminId: ''
     });
     const [loading, setLoading] = useState(false);
 
     const { toast } = useContext(AppContext);
+    const animatedComponents = makeAnimated();
     const { isGhost, user } = useAuth();
 
     const handleChange = (e) => {
@@ -56,20 +61,6 @@ import AccessForbidden from '../student/AccessForbidden';
       }
     };
 
-    // Handle year checkbox selection
-    const handleYearChange = (e) => {
-      const selectedYear = e.target.value;
-
-      // Only allow one selection
-      setFormData((prevData) => ({
-        ...prevData,
-        pyqsCategory: {
-          ...prevData.pyqsCategory,
-          year: selectedYear,  // Store the selected year as a string
-        },
-      }));
-    };
-
     const handleSubmit = async (e) => {
       e.preventDefault();
       setLoading(true);
@@ -77,11 +68,20 @@ import AccessForbidden from '../student/AccessForbidden';
       try {
         if(isGhost) {
           const pyqsRef = await addDoc(collection(db, 'PYQs'), {
-            ...formData,
+            pyqsCategory: {
+              academicYear: formData.pyqsCategory.academicYear?.value || '',
+              branch: formData.pyqsCategory.branch?.map(b => b.value),
+              institution: formData.pyqsCategory.institution?.value || '',
+              subjectName: formData.pyqsCategory.subjectName?.map(s => s.value),
+              year: formData.pyqsCategory.year?.value || '',
+            },
+            pyqsTitle: formData.pyqsTitle,
+            pyqsLink: formData.pyqsLink,
+            contributorName: formData.contributorName?.value || '',
+            adminId: user.uid,
+            createdBy: user.displayName,
             createdAt: serverTimestamp(),
-            createdBy: user.displayName, // Correct this line if you have Firebase Auth setup
-            adminId: user.uid
-          });
+          });          
           toast.success('PYQs added successfully!');
 
           await updateDoc(pyqsRef, {
@@ -90,15 +90,16 @@ import AccessForbidden from '../student/AccessForbidden';
 
           setFormData({
             pyqsCategory: {
-              academicYear: '',
+              academicYear: null,
               branch: [],
-              institution: '',
+              institution: null,
               subjectName: [],
-              year: '',
+              year: null,
             },
             pyqsLink: '',
             pyqsTitle: '',
-          })
+            contributorName: null,
+          });          
         } else{
           toast('Unauthorized Access!', {icon: '🚫'})
         }
@@ -125,111 +126,141 @@ import AccessForbidden from '../student/AccessForbidden';
             />
           </div>
 
+          {/* Contributor Name */}
+          <div className='flex flex-col gap-2'>
+            <p className="text-lg text-left">Contributor Name</p>
+            <Select
+              options={contributors}
+              isClearable={true}
+              required
+              components={animatedComponents}
+              value={formData.contributorName}
+              onChange={(selected) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  contributorName: selected,
+                }))
+              }
+              className="text-black"
+              placeholder="Select contributor"
+            />
+          </div>
+
           {/* Academic Year */}
           <div className="flex flex-col gap-2">
             <p className="text-lg text-left">Academic Year</p>
-            <input
-              type="text"
-              name="pyqsCategory.academicYear"
-              value={formData.pyqsCategory.academicYear}
-              onChange={handleChange}
-              className="w-full p-2 border border-gray-300 rounded-md"
-              placeholder="Example: Dec 22"
+            <Select
+              options={academicYears}
+              isClearable={true}
               required
+              components={animatedComponents}
+              value={formData.pyqsCategory.academicYear}
+              onChange={(selected) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  pyqsCategory: {
+                    ...prev.pyqsCategory,
+                    academicYear: selected,
+                  },
+                }))
+              }
+              className="text-black"
+              placeholder="Select Academic Year"
             />
-          </div>
+          </div>  
 
           {/* Branch */}
           <div className='space-y-2 '>
             <p className="text-lg text-left">Branch</p>
-            <div className="flex flex-col gap-2 text-left">
-              {[  "Computer Engineering",
-                  "Information Technology",
-                  "Electronics & Telecommunication",
-                  "Artificial Intelligence & Data Science",
-                  "Electronics & Computer Science",
-                ].map((branch) => (
-                <label key={branch} className='flex items-center gap-2 hover:text-amber-400'>
-                  <input
-                    type="checkbox"
-                    name="pyqsCategory.branch"
-                    value={branch}
-                    checked={formData.pyqsCategory.branch.includes(branch)}
-                    onChange={handleChange}
-                    className="mr-2  hover:text-amber-400"
-                  />
-                  <span>{branch}</span>
-                </label>
-              ))}
-            </div>
+            <Select
+              isMulti
+              closeMenuOnSelect={false}
+              required
+              components={animatedComponents}
+              options={branches}
+              value={formData.pyqsCategory.branch}
+              onChange={(selected) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  pyqsCategory: {
+                    ...prev.pyqsCategory,
+                    branch: selected,
+                  },
+                }))
+              }
+              className="text-black"
+              placeholder="Select branches"
+            />
           </div>
 
           {/* Institution */}
           <div className='flex flex-col gap-2'>
             <p className="text-lg text-left">Institution</p>
-            <input
-              type="text"
-              name="pyqsCategory.institution"
-              value={formData.pyqsCategory.institution}
-              onChange={handleChange}
-              className="w-full p-2 border border-gray-300 rounded-md"
-              placeholder="Example: Mumbai University"
+            <Select
+              options={institutions}
+              isClearable={true}
               required
+              components={animatedComponents}
+              value={formData.pyqsCategory.institution}
+              onChange={(selected) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  pyqsCategory: {
+                    ...prev.pyqsCategory,
+                    institution: selected,
+                  },
+                }))
+              }
+              className="text-black"
+              placeholder="Select institution"
             />
           </div>
 
           {/* Subject Name */}
           <div className='flex flex-col gap-2'>
-            <p className="text-lg text-left">Subject Name (Comma Separated)</p>
-            <input
-              type="text"
-              name="pyqsCategory.subjectName"
-              value={formData.pyqsCategory.subjectName.join(', ')}
-              onChange={handleChange}
-              className="w-full p-2 border border-gray-300 rounded-md"
-              placeholder="Example: Operating System, Data Structures"
-              required
+            <p className="text-lg text-left">Subject Name</p>
+            <Select
+              isMulti
+              closeMenuOnSelect={false}
+              components={animatedComponents}
+              options={subjects} // import this from assets
+              value={formData.pyqsCategory.subjectName}
+              onChange={(selected) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  pyqsCategory: {
+                    ...prev.pyqsCategory,
+                    subjectName: selected,
+                  },
+                }))
+              }
+              className="text-black"
+              placeholder="Select subjects"
             />
           </div>
 
           {/* Year  */}
           <div className="space-y-2">
             <p className="text-lg text-left">Year</p>
-            <div className="flex flex-col gap-2">
-              {["First Year", "Second Year", "Third Year", "Final Year"].map((year) => (
-                <label key={year} className="flex items-center gap-2 hover:text-amber-300">
-                  <input
-                    type="radio"
-                    value={year}
-                    checked={formData.pyqsCategory.year === year} // Check if the year is selected
-                    onChange={handleYearChange} // Handle year change
-                    className="accent-blue-600"
-                  />
-                  <span>{year}</span>
-                </label>
-              ))}
-            </div>
-          </div>
-
-          {/* PYQS Link
-          <div className='flex flex-col gap-2'>
-            <p className="text-lg text-left">PYQs Link</p>
-            <input
-              type="url"
-              name="pyqsLink"
-              value={formData.pyqsLink}
-              onChange={(e) => {
-                const modifiedLink = e.target.value.replace(/\/view\?usp=drive_link$/, '/preview');
-                setFormData({
-                  ...formData,
-                  pyqsLink: modifiedLink,
-                });
-              }}
-              className="w-full p-2 border border-gray-300 rounded-md"
+            <Select
+              name="year"
+              isClearable={true}
+              options={years}
               required
-              placeholder='Enter GDrive PDF Link...'
+              value={formData.pyqsCategory.year}
+              onChange={(selected) =>
+                setFormData((prev) => ({
+                  ...prev,
+                  pyqsCategory: {
+                    ...prev.pyqsCategory,
+                    year: selected,
+                  },
+                }))
+              }
+              placeholder="Select Year"
+              className="text-black"
             />
-          </div> */}
+          </div>
 
           
           {/* PYQs Link */}

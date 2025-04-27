@@ -1,17 +1,19 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { getDocs, collection, db, doc, updateDoc, deleteDoc, serverTimestamp } from '../../config/firebase';
 import { AppContext } from '../../context/AppContext';
-import Loading from '../../components/student/Loading';
+import Select from 'react-select';
+import makeAnimated from 'react-select/animated';
+import Loading from '../../components/admin/Loading';
 import PdfViewer from '../student/PdfViewer';
-import { assets } from '../../assets/assets';
+import { assets, branches, institutions, subjects, years, contributors, academicYears } from '../../assets/assets';
 import { useAuth } from '../../context/AuthContext';
 import FilterComponent from './FilterComponent';
 import AccessForbidden from '../student/AccessForbidden';
 
 const MyPYQs = () => {
-  const { isGhost } = useAuth();
+  const { isGhost, user } = useAuth();
   const [pyqData, setPyqData] = useState([]);
-  const [filteredData, setFilteredData] = useState([]); // New state to hold the filtered PYQ data
+  const [filteredData, setFilteredData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [pdfUrl, setPdfUrl] = useState(null);
 
@@ -20,12 +22,14 @@ const MyPYQs = () => {
     branch: [],
     pyqsTitle: '',
     subjectName: [], 
+    contributorName: ''
   });
 
   const [filter, setFilter] = useState({
     branch: '',
     institution: '',
-    year: ''
+    year: '',
+    searchQuery: ''
   });
 
   const {toast} = useContext(AppContext)
@@ -34,15 +38,9 @@ const MyPYQs = () => {
 
   //For FilterComponent.jsx 
   const filterOptions = {
-    branches: [
-      "General Science & Humanities", 
-      "Computer Engineering", 
-      "Information Technology", 
-      "Electronics & Telecommunication", 
-      "Artificial Intelligence & Data Science", 
-      "Electronics & Computer Science"
-    ],
-    years: ["First Year", "Second Year", "Third Year", "Final Year"]
+    branches: branches.map(b => b.value),
+    years: years.map(y => y.value),
+    institutions: institutions.map(i => i.value)
   };
 
 //===============================================================================================================================================================================================
@@ -73,7 +71,11 @@ const MyPYQs = () => {
   // Handle Edit - Set the PYQ to be edited
   const handleEdit = (pyq) => {
     setEditingPYQ(pyq.id);
-    setEditedData({ ...pyq.pyqsCategory || {}, pyqsTitle: pyq.pyqsTitle });
+    setEditedData({ 
+      ...pyq.pyqsCategory || {}, 
+      pyqsTitle: pyq.pyqsTitle,
+      contributorName: pyq.contributorName || ''
+    });
   };
 
   // Save edited data back to Firestore
@@ -86,7 +88,9 @@ const MyPYQs = () => {
         await updateDoc(pyqRef, {
           pyqsCategory: editedData,
           pyqsTitle: editedData.pyqsTitle,
-          updatedAt: serverTimestamp()
+          contributorName: editedData.contributorName,
+          updatedBy: user.displayName,
+          updatedAt: serverTimestamp(),
         });
         setEditingPYQ(null);
         setEditedData({});
@@ -128,6 +132,7 @@ const MyPYQs = () => {
 const filterPYQData = (filterValues) => {
   const filtered = pyqData.filter((doc) => {
     const { branch, institution, year } = doc.pyqsCategory || {};
+    const title = doc.pyqsTitle || '';
 
     const institutionMatch = filterValues.institution
       ? institution && institution.toLowerCase().includes(filterValues.institution.toLowerCase())
@@ -138,10 +143,15 @@ const filterPYQData = (filterValues) => {
       ? branch && branch.includes(filterValues.branch) // Check if the selected branch is in the array
       : true;
 
+    const searchMatch = filterValues.searchQuery
+      ? title.toLowerCase().includes(filterValues.searchQuery.toLowerCase())
+      : true;
+
     return (
       branchMatch &&
       institutionMatch &&
-      (filterValues.year ? year === filterValues.year : true)
+      (filterValues.year ? year === filterValues.year : true) &&
+      searchMatch
     );
   });
   setFilteredData(filtered); // Update the filtered data
@@ -217,35 +227,49 @@ const filterPYQData = (filterValues) => {
                     />
                   </div>
 
-
-                  {/* Branches Checkboxes */}
-                  <div className="mt-2">
-                    <label className="block text-sm font-semibold text-black">Branch</label>
-                    <div className="flex flex-col md:flex-row gap-4 mt-2">
-                      {["General Science & Humanities", "Computer Engineering", "Information Technology", "Electronics & Telecommunication", "Artificial Intelligence & Data Science", "Electronics & Computer Science"].map((branch) => (
-                        <label key={branch} className="flex items-center hover:text-indigo-700">
-                          <input
-                            type="checkbox"  // Change from radio to checkbox for multiple selections
-                            value={branch}
-                            checked={editedData.branch.includes(branch)}  // Check if branch is selected
-                            onChange={handleBranchChange}
-                            className="mr-2"
-                          />
-                          {branch}
-                        </label>
-                      ))}
-                    </div>
+                  {/* Contributor Name */}
+                  <div className="mt-2 flex flex-col md:flex-row md:items-center justify-between gap-2">
+                    <label className="block text-sm font-semibold text-black w-full md:w-1/4">Contributor Name</label>
+                    <Select
+                      components={makeAnimated()}
+                      options={contributors}
+                      value={{ label: editedData.contributorName, value: editedData.contributorName }}
+                      onChange={(selectedOption) => setEditedData({ ...editedData, contributorName: selectedOption.value })}
+                      placeholder="Select Contributor"
+                      className="w-full md:w-3/4 mt-2 md:mt-0 text-black"
+                      isClearable
+                    />
                   </div>
 
-                {/* Academic Year */}
+                  {/* Selected Branches */}
+                  <div className="mt-2 flex flex-col md:flex-row md:items-center justify-between gap-2">
+                    <label className="block text-sm font-semibold text-black w-full md:w-1/4">Branch</label>
+                    <Select
+                      components={makeAnimated()}
+                      isMulti
+                      options={branches}
+                      value={editedData.branch.map(branch => ({ label: branch, value: branch }))}
+                      onChange={(selectedOptions) => {
+                        const branches = selectedOptions.map(option => option.value);
+                        setEditedData({ ...editedData, branch: branches });
+                      }}
+                      placeholder="Select Branches"
+                      className="w-full md:w-3/4 mt-2 md:mt-0 text-black"
+                      isClearable
+                    />
+                  </div>
+
+                  {/* Academic Year */}
                   <div className="mt-2 flex flex-col md:flex-row md:items-center justify-between gap-2">
                     <label className="block text-sm font-semibold text-black w-full md:w-1/4">Academic Year</label>
-                    <input
-                      type="text"
-                      value={editedData.academicYear}
-                      onChange={(e) => setEditedData({ ...editedData, academicYear: e.target.value })}
-                      className="border p-2 w-full md:w-3/4 mt-2 md:mt-0"
-                      required
+                    <Select
+                      components={makeAnimated()}
+                      options={academicYears}
+                      value={{ label: editedData.academicYear, value: editedData.academicYear }}
+                      onChange={(selectedOption) => setEditedData({ ...editedData, academicYear: selectedOption.value })}
+                      placeholder="Select Academic Year"
+                      className="w-full md:w-3/4 mt-2 md:mt-0 text-black"
+                      isClearable
                     />
                   </div>
 
@@ -253,52 +277,48 @@ const filterPYQData = (filterValues) => {
                   {/* Institution */}
                   <div className="mt-2 flex flex-col md:flex-row md:items-center justify-between gap-2">
                     <label className="block text-sm font-semibold text-black w-full md:w-1/4">Institution</label>
-                    <input
-                      type="text"
-                      value={editedData.institution || ''}
-                      onChange={(e) => setEditedData({ ...editedData, institution: e.target.value })}
-                      className="border p-2 w-full md:w-3/4 mt-2 md:mt-0"
-                      required
+                    <Select
+                      components={makeAnimated()}
+                      options={institutions}
+                      value={{ label: editedData.institution, value: editedData.institution }}
+                      onChange={(selectedOption) => setEditedData({ ...editedData, institution: selectedOption.value })}
+                      placeholder="Select Institution"
+                      className="w-full md:w-3/4 mt-2 md:mt-0 text-black"
+                      isClearable
                     />
                   </div>
 
                   {/* Edit Subject Names */}
-                  <div className="mt-2">
-                    <label className="block text-sm font-semibold text-black">Subject Name</label>
-                    <input
-                      type="text"
-                      value={Array.isArray(editedData.subjectName) ? editedData.subjectName.join(', ') : ''} // Display comma-separated subjects
-                      onChange={(e) => {
-                        const subjects = e.target.value.split(',').map(subject => subject.trim());
-                        setEditedData({
-                          ...editedData,
-                          subjectName: subjects ||[]
-                        });
+                  <div className="mt-2 flex flex-col md:flex-row md:items-center justify-between gap-2">
+                    <label className="block text-sm font-semibold text-black w-full md:w-1/4">Subject Name</label>
+                    <Select
+                      components={makeAnimated()}
+                      isMulti
+                      options={subjects}
+                      value={editedData.subjectName.map(subject => ({ label: subject, value: subject }))}
+                      onChange={(selectedOptions) => {
+                        const subjects = selectedOptions.map(option => option.value);
+                        setEditedData({ ...editedData, subjectName: subjects });
                       }}
-                      className="border p-2 w-full md:w-3/4 mt-2 md:mt-0"
+                      placeholder="Select Subjects"
+                      className="w-full md:w-3/4 mt-2 md:mt-0 text-black"
+                      isClearable
                     />
-                    <p className="text-sm text-gray-500">Enter subject names separated by commas.</p>
                   </div>
 
 
                   {/* Year Radio Buttons */}
-                  <div className="mt-2">
-                    <label className="block text-left text-sm font-semibold text-black">Year</label>
-                    <div className="flex flex-col md:flex-row gap-4 mt-2">
-                      {["First Year", "Second Year", "Third Year", "Final Year"].map((year) => (
-                        <label key={year} className="flex items-center gap-2 hover:text-indigo-700">
-                          <input
-                            type="radio"
-                            value={year}
-                            checked={editedData.year === year}
-                            onChange={handleYearChange}
-                            className="mr-2"
-                            required
-                          />
-                          {year}
-                        </label>
-                      ))}
-                    </div>
+                  <div className="mt-2 flex flex-col md:flex-row md:items-center justify-between gap-2">
+                    <label className="block text-sm font-semibold text-black w-full md:w-1/4">Year</label>
+                    <Select
+                      components={makeAnimated()}
+                      options={years}
+                      value={{ label: editedData.year, value: editedData.year }}
+                      onChange={(selectedOption) => setEditedData({ ...editedData, year: selectedOption.value })}
+                      placeholder="Select Year"
+                      className="w-full md:w-3/4 mt-2 md:mt-0 text-black"
+                      isClearable
+                    />
                   </div>
 
                   {/* Save and Cancel Buttons */}
@@ -323,6 +343,7 @@ const filterPYQData = (filterValues) => {
                   {pyqsCategory.academicYear && (
                     <p className="mt-2 text-gray-700">Academic Year: {pyqsCategory.academicYear}</p>
                   )}
+                  <p className="text-gray-700">Contributor Name: {doc.contributorName}</p>
                   {pyqsCategory.branch && (
                     <p className="text-gray-700">Branch: {pyqsCategory.branch.join(', ')}</p>
                   )}
