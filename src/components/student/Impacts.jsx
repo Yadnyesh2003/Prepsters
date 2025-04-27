@@ -6,13 +6,13 @@ const stats = [
     {
         icon: <Users className="w-6 h-6 text-white" />,
         label: 'Students Helped',
-        value: '10K+',
+        value: '500+',
         bg: 'bg-gray-700',
     },
     {
         icon: <BookOpen className="w-6 h-6 text-white" />,
         label: 'Subjects Covered',
-        value: '50+',
+        value: '5+',
         bg: 'bg-gray-700',
     },
     {
@@ -24,7 +24,7 @@ const stats = [
     {
         icon: <FolderOpen className="w-6 h-6 text-white" />,
         label: 'Resources',
-        value: '1000+',
+        value: '100+',
         bg: 'bg-gray-700',
     },
 ];

@@ -2,15 +2,16 @@ import { motion } from 'framer-motion';
 import parth from '../../assets/1(2).png';
 import yadnu from '../../assets/profile_founder.jpeg';
 import Footer from '../../components/student/Footer';
+import {assets} from '../../assets/assets';
 
 function AboutUs() {
 
   const timelineData = [
     {
-      date: "Apr 7, 2024",
-      title: "Mark Mikrol opened the request",
+      date: "23rd October, 2023",
+      title: "🚀 Launch of Our First Google Site – The Third Tier Engineers",
       description:
-        "Various versions have evolved over the years, sometimes by accident, sometimes on purpose injected humour and the like.",
+        "It all started with a cracked idea during Sem 3 by Yadnyesh, who launched a simple Google Site packed with PYQs and concise notes. Shared among friends in the IT branch, this platform quickly became a hit, helping 60+ students crush their exams! With the motto ‘Minimize Effort, Maximize Output,’ we centralized smart learning—and that was just the beginning!",
       icon: (
         <svg className="fill-emerald-500" xmlns="http://www.w3.org/2000/svg" width="16" height="16">
           <path d="M8 0a8 8 0 1 0 8 8 8.009 8.009 0 0 0-8-8Zm0 12a4 4 0 1 1 0-8 4 4 0 0 1 0 8Z" />
@@ -18,10 +19,10 @@ function AboutUs() {
       ),
     },
     {
-      date: "Apr 7, 2024",
-      title: "John Mirkovic commented the request",
+      date: "May, 2024",
+      title: "📊 Game-Changer Alert – FAQs Based on PYQ Analysis!",
       description:
-        "If you are going to use a passage of Lorem Ipsum, you need to be sure there isn't anything embarrassing hidden in the middle of text.",
+        "FAQs revolutionized our approach! We broke down PYQs subject-wise and filtered them into high-frequency questions—10 to 15 per module. Students now had a laser-focused target to score up to 80% with just a night’s prep! This killer feature DOUBLED our user count and boosted our confidence sky high 🚀🔥",
       icon: (
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16">
           <path className="fill-slate-300" d="M14.853 6.861C14.124 10.348 10.66 13 6.5 13c-.102 0-.201-.016-.302-.019C7.233 13.618 8.557 14 10 14c.51 0 1.003-.053 1.476-.143L14.2 15.9a.499.499 0 0 0 .8-.4v-3.515c.631-.712 1-1.566 1-2.485 0-.987-.429-1.897-1.147-2.639Z" />
@@ -30,10 +31,10 @@ function AboutUs() {
       ),
     },
     {
-      date: "Apr 8, 2024",
-      title: "Vlad Patterson commented the request",
+      date: "Nov, 2024",
+      title: "📈 Massive Growth – From Rejection to Revolution!",
       description:
-        "Letraset sheets containing passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Ipsum.",
+        "May 2024 exams brought insane growth! With 550+ users, 12K+ event counts, and over 10K page visits, our tiny Google Site evolved into a campus legend. We dropped curated notes, numericals, diagrams, and perfect answers across all IT subjects. Many who once laughed at this 'cracked idea' are now our fans. Quietly, we kept building. Now, we’re eyeing our biggest leap: turning this into a dynamic, student-powered platform!",
       icon: (
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16">
           <path className="fill-slate-300" d="M14.853 6.861C14.124 10.348 10.66 13 6.5 13c-.102 0-.201-.016-.302-.019C7.233 13.618 8.557 14 10 14c.51 0 1.003-.053 1.476-.143L14.2 15.9a.499.499 0 0 0 .8-.4v-3.515c.631-.712 1-1.566 1-2.485 0-.987-.429-1.897-1.147-2.639Z" />
@@ -42,10 +43,10 @@ function AboutUs() {
       ),
     },
     {
-      date: "Apr 8, 2024",
-      title: "Mila Capentino commented the request",
+      date: "5th March, 2025",
+      title: "⚙️ Dev Mode ON – Building Our Dream Project Begins!",
       description:
-        "It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout.",
+        "Let’s gooo! We kicked off the development of a full-fledged web app! From finalizing our Tech Stack to learning, debugging, and actually coding everything ourselves—this phase was all hustle. With a launch target for April end, our goal is clear: to give students the best crash-course style resource hub ever made! May 2025 exams? Don’t stress. We gotchu. Late night? Just open FAQs. Chill, ace, repeat. 💻📚💪",
       icon: (
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16">
           <path className="fill-slate-300" d="M14.853 6.861C14.124 10.348 10.66 13 6.5 13c-.102 0-.201-.016-.302-.019C7.233 13.618 8.557 14 10 14c.51 0 1.003-.053 1.476-.143L14.2 15.9a.499.499 0 0 0 .8-.4v-3.515c.631-.712 1-1.566 1-2.485 0-.987-.429-1.897-1.147-2.639Z" />
@@ -54,9 +55,10 @@ function AboutUs() {
       ),
     },
     {
-      date: "Apr 9, 2024",
-      title: "Mark Mikrol closed the request",
-      description: "If you are going to use a passage of Lorem Ipsum!",
+      date: "12th May, 2025",
+      title: "🎉 THE BIG DAY – Official Launch of Our Dream Learning Platform!",
+      description:
+        "After months of sleepless nights, bug fights, and feature-building chaos, we’re LIVE! 🎯 Our new web-based platform backed by a selfless student community is rolling out for beta testing this exam season. We’re expecting a quadruple surge in users—'cause it’s FREE, effective, and built FOR students BY students. The Third Tier Engineers isn’t just a platform—it’s a MOVEMENT. Let’s make history, amigos 🤝💯",
       icon: (
         <svg className="fill-red-500" xmlns="http://www.w3.org/2000/svg" width="16" height="16">
           <path d="M8 0a8 8 0 1 0 8 8 8.009 8.009 0 0 0-8-8Zm0 12a4 4 0 1 1 0-8 4 4 0 0 1 0 8Z" />
@@ -93,7 +95,7 @@ function AboutUs() {
         <motion.div
           initial={{ opacity: 0, y: 80 }}
           whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+          transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
           viewport={{ once: true, margin: "-100px" }}
           className="relative w-full max-w-6xl mx-auto p-8 sm:p-12 bg-white/80 backdrop-blur-xl border border-white/30 rounded-3xl shadow-2xl shadow-indigo-100/50 mb-5"
         >
@@ -102,7 +104,7 @@ function AboutUs() {
             <motion.div
               initial={{ scaleX: 0 }}
               whileInView={{ scaleX: 1 }}
-              transition={{ duration: 0.8, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
+              transition={{ duration: 1.5, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
               className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-indigo-500 to-transparent origin-left"
             />
           </div>
@@ -117,7 +119,7 @@ function AboutUs() {
               viewport={{ once: true }}
             >
               <h2 className="text-4xl sm:text-5xl md:text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-sky-300 mb-4 tracking-tight">
-                About <span className="font-extrabold">TTE</span>
+                <span className="font-extrabold">The Third Tier Engineers</span>
               </h2>
               <div className="h-1 w-24 bg-gradient-to-r from-indigo-400 to-sky-400 rounded-full mb-6"></div>
             </motion.div>
@@ -130,14 +132,14 @@ function AboutUs() {
               viewport={{ once: true }}
               className="text-xl sm:text-2xl font-medium text-indigo-800 mb-8 leading-snug"
             >
-              Transforming Technical Education for the Next Generation of Innovators
+              🕐 One-night prep? 🌙📖 With us, it’s not just possible — it’s the plan. ✅🔥
             </motion.h3>
 
             {/* Description */}
             <motion.div
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
-              transition={{ duration: 0.8, delay: 0.6, staggerChildren: 0.1 }}
+              transition={{ duration: 1, delay: 0.6, staggerChildren: 0.1 }}
               viewport={{ once: true }}
               className="space-y-4 mb-10"
             >
@@ -147,7 +149,7 @@ function AboutUs() {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.6 }}
               >
-                TTE (<span className="font-semibold text-indigo-600">Transform Technical Education</span>) is revolutionizing engineering education by bridging the gap between academic theory and real-world application.
+                🎓 Welcome to (<span className="font-semibold text-indigo-600">The Third Tier Engineers</span>) — the ultimate exam-hack zone built by students, for students!
               </motion.p>
 
               <motion.p
@@ -156,7 +158,10 @@ function AboutUs() {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.8 }}
               >
-                Our platform combines cutting-edge learning resources with personalized mentorship, empowering students to not just pass exams, but to become the innovators and problem-solvers of tomorrow.
+                🚀 What started as a cracked idea during Semester 3 is now a powerful learning platform trusted by 100s across Mumbai University.
+                Whether you're pulling an all-nighter 🌙 or starting prep a week before, we've got your back with 📚 crisp, exam-ready notes, ✅ frequency-based FAQs,
+                📂 a complete PYQ library, and 🎯 syllabus breakdowns — all in one place and absolutely FREE! 🆓 Why struggle when you can study smart? Join our
+                selfless student community today and start scoring higher with lesser stress. 💡📈
               </motion.p>
             </motion.div>
 
@@ -205,7 +210,7 @@ function AboutUs() {
           <motion.h2
             initial={{ opacity: 0, y: 50 }}
             whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, type: 'spring', stiffness: 80 }}
+            transition={{ duration: 1.2, type: 'spring', stiffness: 80 }}
             viewport={{ once: true }}
             className="text-4xl md:text-5xl font-bold text-indigo-700 text-center mb-16"
           >
@@ -225,12 +230,12 @@ function AboutUs() {
                 hidden: { x: '-100%', opacity: 0 },
                 visible: { x: 0, opacity: 1 },
               }}
-              transition={{ duration: 0.5, type: 'spring', stiffness: 100, delay: 0.2 }}
+              transition={{ duration: 1.2, type: 'spring', stiffness: 100, delay: 0.2 }}
               className="relative group flex-shrink-0"
             >
               <div className="absolute inset-0 rounded-full bg-gradient-to-br from-indigo-400 via-purple-500 to-pink-500 blur-lg opacity-0 group-hover:opacity-70 transition-opacity duration-500"></div>
               <img
-                src={yadnu}
+                src={assets.yadnyesh}
                 alt="Dr. James Wilson"
                 className="w-64 h-64 md:w-72 md:h-72 object-cover rounded-full border-4 border-white shadow-lg z-10 relative transition-transform duration-500 group-hover:scale-105 group-hover:shadow-2xl group-hover:shadow-indigo-200/50"
               />
@@ -241,12 +246,16 @@ function AboutUs() {
             <motion.div
               initial={{ opacity: 0, y: 50 }}
               whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, type: 'spring', stiffness: 80, delay: 0.4 }}
+              transition={{ duration: 1.2, type: 'spring', stiffness: 80, delay: 0.4 }}
               className="bg-white/80 backdrop-blur-md p-8 rounded-xl shadow-xl max-w-2xl text-center md:text-left border border-white/30"
             >
-              <h3 className="text-2xl md:text-3xl font-semibold text-indigo-600 mb-4">Meet the Visionaries</h3>
+              <h3 className="text-2xl md:text-3xl font-semibold text-indigo-600 mb-4">👨‍💻 Meet the Visionaries</h3>
               <p className="text-base md:text-lg text-gray-700">
-                Founded in 2018 by Dr. James Wilson and Dr. Sarah Chen, TTE was born from a shared passion for transforming engineering education. With over 30 years of combined experience in academia and industry, our founders identified critical gaps in how engineering students were being prepared for exams and professional challenges. Their complementary expertise in technical education and digital learning has shaped TTE into a platform that combines rigorous academic content with innovative teaching methodologies.
+                Yadnyesh Firke (SAKEC - IT, Mumbai) & Parth Narkhede (VIIT - Comps, Pune) — we're the minds (and coffee-fueled souls ☕) behind The Third Tier Engineers. From the Batch of 2026, just two regular engineering students with an irregularly big vision.
+                It all began when Yadnyesh launched a simple Google Site during Sem 3 📅, packed with handwritten notes and PYQs for friends. What started as a “just-helping-bros-out” idea soon helped 60+ students crack their exams with ease 💯. Meanwhile, Parth jumped on board, and
+                together we turned late-night study trends 🌙📚 into a movement — one that makes learning smart, fun, and community-driven.
+
+
               </p>
             </motion.div>
 
@@ -256,12 +265,12 @@ function AboutUs() {
                 hidden: { x: '100%', opacity: 0 },
                 visible: { x: 0, opacity: 1 },
               }}
-              transition={{ duration: 0.5, type: 'spring', stiffness: 100, delay: 0.2 }}
+              transition={{ duration: 1.2, type: 'spring', stiffness: 100, delay: 0.2 }}
               className="relative group flex-shrink-0"
             >
               <div className="absolute inset-0 rounded-full bg-gradient-to-br from-sky-400 via-teal-500 to-emerald-500 blur-lg opacity-0 group-hover:opacity-70 transition-opacity duration-500"></div>
               <img
-                src={parth}
+                src={assets.parth}
                 alt="Dr. Sarah Chen"
                 className="w-64 h-64 md:w-72 md:h-72 object-cover rounded-full border-4 border-white shadow-lg z-10 relative transition-transform duration-500 group-hover:scale-105 group-hover:shadow-2xl group-hover:shadow-sky-200/50"
               />
@@ -270,29 +279,42 @@ function AboutUs() {
           </motion.div>
         </div>
 
+        {/* Why Join Us Section */}
+        <div className="relative max-w-7xl mx-auto px-6 mt-16">
+          {/* Section Title with Animation */}
+          <motion.h2
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1.2, type: 'spring', stiffness: 80 }}
+            viewport={{ once: true }}
+            className="text-4xl md:text-5xl font-bold text-indigo-700 text-center mb-16"
+          >
+            Why Join Us?
+          </motion.h2>
 
-        <div className="min-h-screen pt-5 pb-20 overflow-hidden relative bg-transparent">
-          {/* Decorative Floating Orbs */}
-          {/* <div className="absolute inset-0 pointer-events-none opacity-20">
-            <motion.div
-              initial={{ y: 0 }}
-              animate={{ y: [-10, 10, -10] }}
-              transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
-              className="absolute top-20 left-10 w-20 h-20 bg-indigo-200 rounded-full blur-3xl"
-            />
-            <motion.div
-              initial={{ y: 0 }}
-              animate={{ y: [10, -10, 10] }}
-              transition={{ duration: 12, repeat: Infinity, ease: "easeInOut", delay: 1 }}
-              className="absolute bottom-20 right-10 w-24 h-24 bg-teal-200 rounded-full blur-3xl"
-            />
-          </div> */}
+          {/* Content Card */}
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 1.2, type: 'spring', stiffness: 80, delay: 0.4 }}
+            viewport={{ once: true }}
+            className="bg-white/80 backdrop-blur-md p-8 rounded-xl shadow-xl max-w-5xl mx-auto text-center md:text-left border border-white/30"
+          >
+            <p className="text-base md:text-lg text-gray-700">
+              Over months, we studied 📖, coded 🧑‍💻, failed 🐞, debugged 💥, and finally built a platform we wish we had from day one. With features like exam-focused notes, analyzed FAQs, year-wise PYQ libraries, and no-nonsense summaries — this isn’t just a project, it's a rebellion against boring textbooks and stressful study marathons 🎯🔥<br /><br />
+              We're not just aspiring developers — we're builders of a student-first learning revolution. If you're someone who believes in sharing knowledge, solving problems, and helping others ace their goals… guess what? You belong here 🙌<br /><br />
+              Join us. Contribute. Build. Because <span className="font-semibold text-indigo-600">The Third Tier Engineers</span> is more than a name — it’s a community of underdogs turning into achievers. 🚀🌟
+            </p>
+          </motion.div>
+        </div>
 
+
+        <div className="min-h-screen py-20 overflow-hidden relative bg-transparent">
           {/* Timeline Title */}
           <motion.h2
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
+            transition={{ duration: 1, ease: "easeOut" }}
             viewport={{ once: true }}
             className="text-3xl md:text-4xl font-bold text-indigo-700 text-center mb-12 relative z-10"
           >
@@ -353,11 +375,6 @@ function AboutUs() {
             ))}
           </div>
         </div>
-
-
-
-
-
       </section>
       <Footer />
     </div>

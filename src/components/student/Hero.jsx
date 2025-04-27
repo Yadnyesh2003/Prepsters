@@ -2,7 +2,7 @@ import React from "react";
 // import heroImage from "../../assets/assets_img.jpg"; // Update path as needed
 import { Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext"
-import heroImage from "../../assets/hero-img.png"; // Update path as needed
+import { assets } from "../../assets/assets";
 
 const Hero = () => {
     const { user, signInWithGoogle } = useAuth();
@@ -11,14 +11,14 @@ const Hero = () => {
             {/* Background Image for mobile */}
             <div className="md:hidden absolute inset-0 z-0">
                 <img
-                    src={heroImage}
+                    src={assets.hero_img}
                     alt="Students studying"
                     className="w-full h-full object-cover brightness-50"
                 />
             </div>
 
             {/* Content Container */}
-            <div className="relative z-10 flex flex-col md:flex-row items-center justify-between px-6 md:px-20 py-16 md:py-24">
+            <div className="relative z-10 flex flex-col md:flex-row items-center justify-between px-6 md:px-20 py-16 md:pb-24 pt-12">
                 {/* Text Section */}
                 <div className="w-full md:w-1/2 text-center md:text-left text-white md:text-black">
                     <h1 className="text-4xl md:text-5xl font-extrabold mb-6 leading-tight">
@@ -44,7 +44,7 @@ const Hero = () => {
                 {/* Image Section for larger screens */}
                 <div className="hidden md:flex w-1/2 justify-center">
                     <img
-                        src={heroImage}
+                        src={assets.hero_img}
                         alt="Students studying"
                         className="w-full max-w-lg rounded-xl shadow-2xl"
                     />
