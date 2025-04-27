@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion';
 import parth from '../../assets/1(2).png';
-import yadnu from '../../assets/cropped_image.png';
+import yadnu from '../../assets/profile_founder.jpeg';
 import Footer from '../../components/student/Footer';
 
 function AboutUs() {
@@ -93,7 +93,7 @@ function AboutUs() {
         <motion.div
           initial={{ opacity: 0, y: 80 }}
           whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
+          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
           viewport={{ once: true, margin: "-100px" }}
           className="relative w-full max-w-6xl mx-auto p-8 sm:p-12 bg-white/80 backdrop-blur-xl border border-white/30 rounded-3xl shadow-2xl shadow-indigo-100/50 mb-5"
         >
@@ -102,7 +102,7 @@ function AboutUs() {
             <motion.div
               initial={{ scaleX: 0 }}
               whileInView={{ scaleX: 1 }}
-              transition={{ duration: 1.5, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
+              transition={{ duration: 0.8, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
               className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-indigo-500 to-transparent origin-left"
             />
           </div>
@@ -137,7 +137,7 @@ function AboutUs() {
             <motion.div
               initial={{ opacity: 0 }}
               whileInView={{ opacity: 1 }}
-              transition={{ duration: 1, delay: 0.6, staggerChildren: 0.1 }}
+              transition={{ duration: 0.8, delay: 0.6, staggerChildren: 0.1 }}
               viewport={{ once: true }}
               className="space-y-4 mb-10"
             >
@@ -205,7 +205,7 @@ function AboutUs() {
           <motion.h2
             initial={{ opacity: 0, y: 50 }}
             whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1.2, type: 'spring', stiffness: 80 }}
+            transition={{ duration: 0.5, type: 'spring', stiffness: 80 }}
             viewport={{ once: true }}
             className="text-4xl md:text-5xl font-bold text-indigo-700 text-center mb-16"
           >
@@ -225,7 +225,7 @@ function AboutUs() {
                 hidden: { x: '-100%', opacity: 0 },
                 visible: { x: 0, opacity: 1 },
               }}
-              transition={{ duration: 1.2, type: 'spring', stiffness: 100, delay: 0.2 }}
+              transition={{ duration: 0.5, type: 'spring', stiffness: 100, delay: 0.2 }}
               className="relative group flex-shrink-0"
             >
               <div className="absolute inset-0 rounded-full bg-gradient-to-br from-indigo-400 via-purple-500 to-pink-500 blur-lg opacity-0 group-hover:opacity-70 transition-opacity duration-500"></div>
@@ -241,7 +241,7 @@ function AboutUs() {
             <motion.div
               initial={{ opacity: 0, y: 50 }}
               whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 1.2, type: 'spring', stiffness: 80, delay: 0.4 }}
+              transition={{ duration: 0.5, type: 'spring', stiffness: 80, delay: 0.4 }}
               className="bg-white/80 backdrop-blur-md p-8 rounded-xl shadow-xl max-w-2xl text-center md:text-left border border-white/30"
             >
               <h3 className="text-2xl md:text-3xl font-semibold text-indigo-600 mb-4">Meet the Visionaries</h3>
@@ -256,7 +256,7 @@ function AboutUs() {
                 hidden: { x: '100%', opacity: 0 },
                 visible: { x: 0, opacity: 1 },
               }}
-              transition={{ duration: 1.2, type: 'spring', stiffness: 100, delay: 0.2 }}
+              transition={{ duration: 0.5, type: 'spring', stiffness: 100, delay: 0.2 }}
               className="relative group flex-shrink-0"
             >
               <div className="absolute inset-0 rounded-full bg-gradient-to-br from-sky-400 via-teal-500 to-emerald-500 blur-lg opacity-0 group-hover:opacity-70 transition-opacity duration-500"></div>
@@ -271,7 +271,7 @@ function AboutUs() {
         </div>
 
 
-        <div className="min-h-screen py-20 overflow-hidden relative bg-transparent">
+        <div className="min-h-screen pt-5 pb-20 overflow-hidden relative bg-transparent">
           {/* Decorative Floating Orbs */}
           {/* <div className="absolute inset-0 pointer-events-none opacity-20">
             <motion.div
@@ -292,7 +292,7 @@ function AboutUs() {
           <motion.h2
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1, ease: "easeOut" }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
             viewport={{ once: true }}
             className="text-3xl md:text-4xl font-bold text-indigo-700 text-center mb-12 relative z-10"
           >
