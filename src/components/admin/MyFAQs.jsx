@@ -1,18 +1,20 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { getDocs, collection, db, doc, updateDoc, deleteDoc, serverTimestamp } from '../../config/firebase'; 
 import { AppContext } from '../../context/AppContext'
+import Select from 'react-select';
+import makeAnimated from 'react-select/animated';
 import AccessForbidden from '../student/AccessForbidden'
-import Loading from '../../components/student/Loading';
+import Loading from '../../components/admin/Loading';
 import FilterComponent from './FilterComponent';
 import PdfViewer from '../student/PdfViewer';
-import { assets } from '../../assets/assets';
+import { assets, branches, years, institutions, subjects, contributors } from '../../assets/assets';
 import { useAuth } from '../../context/AuthContext';
 
 
 const MyFAQs = () => {
   const { isGhost } = useAuth();
   const [faqData, setFaqData] = useState([]);
-  const [filteredData, setFilteredData] = useState([]); // New state to hold the filtered FAQ data
+  const [filteredData, setFilteredData] = useState([]); 
   const [loading, setLoading] = useState(true);
   const [pdfUrl, setPdfUrl] = useState(null);
 
@@ -22,6 +24,7 @@ const MyFAQs = () => {
     faqsTitle: '',
     contributorName: '',
     subjectName: '', 
+    searchQuery: ''
   });
 
   const [filter, setFilter] = useState({
@@ -31,20 +34,15 @@ const MyFAQs = () => {
   });
 
   const { toast } = useContext(AppContext);
+  const animatedComponents = makeAnimated();
 
 //================================================================================================================================================================================================
 
   //For FilterComponent.jsx 
   const filterOptions = {
-    branches: [
-      "General Science & Humanities", 
-      "Computer Engineering", 
-      "Information Technology", 
-      "Electronics & Telecommunication", 
-      "Artificial Intelligence & Data Science", 
-      "Electronics & Computer Science"
-    ],
-    years: ["First Year", "Second Year", "Third Year", "Final Year"]
+    branches: branches.map(b => b.value),
+    years: years.map(y => y.value),
+    institutions: institutions.map(i => i.value)
   };
 
 //===============================================================================================================================================================================================
@@ -93,7 +91,8 @@ const MyFAQs = () => {
           faqsCategory: editedData,
           faqsTitle: editedData.faqsTitle,
           contributorName: editedData.contributorName,
-          updatedAt: serverTimestamp()
+          updatedBy: user.displayName,
+          updatedAt: serverTimestamp(),
         });
         setEditingFAQ(null);
         setEditedData({});
@@ -127,9 +126,14 @@ const MyFAQs = () => {
   const filterFAQData = (filterValues) => {
     const filtered = faqData.filter((doc) => {
       const { branch, institution, year } = doc.faqsCategory || {};
+      const title = doc.faqsTitle || '';
   
       const institutionMatch = filterValues.institution
         ? institution && institution.toLowerCase().includes(filterValues.institution.toLowerCase())
+        : true;
+        
+      const searchMatch = filterValues.searchQuery
+        ? title.toLowerCase().includes(filterValues.searchQuery.toLowerCase())
         : true;
   
       // Check if the branch filter matches any of the branches in the array
@@ -140,7 +144,8 @@ const MyFAQs = () => {
       return (
         branchMatch &&
         institutionMatch &&
-        (filterValues.year ? year === filterValues.year : true)
+        (filterValues.year ? year === filterValues.year : true) &&
+        searchMatch
       );
     });
     setFilteredData(filtered); // Update the filtered data
@@ -210,81 +215,106 @@ const MyFAQs = () => {
                     />
                   </div>
 
-                  {/* Contributor Name */}
+                  {/* Contributor Name Dropdown */}
                   <div className="mt-2 flex flex-col md:flex-row md:items-center justify-between gap-2">
                     <label className="block text-sm font-semibold text-black w-full md:w-1/4">Contributor Name</label>
-                    <input
-                      type="text"
-                      value={editedData.contributorName}
-                      onChange={(e) => setEditedData({ ...editedData, contributorName: e.target.value })}
-                      className="border p-2 w-full md:w-3/4 mt-2 md:mt-0"
-                      required
+                    <Select
+                      name="contributorName"
+                      isClearable={true}
+                      components={animatedComponents}
+                      options={contributors}
+                      value={contributors.find((c) => c.value === editedData.contributorName)}
+                      onChange={(selected) =>
+                        setEditedData((prev) => ({
+                          ...prev,
+                          contributorName: selected ? selected.value : '',
+                        }))
+                      }
+                      className="w-full md:w-3/4 mt-2 md:mt-0 text-black"
+                      placeholder="Select Contributor"
                     />
                   </div>
 
 
-                  {/* Branches Checkboxes */}
-                  <div className="mt-2">
-                    <label className="block text-sm font-semibold text-black">Branch</label>
-                    <div className="flex flex-col md:flex-row gap-4 mt-2">
-                      {["General Science & Humanities", "Computer Engineering", "Information Technology", "Electronics & Telecommunication", "Artificial Intelligence & Data Science", "Electronics & Computer Science"].map((branch) => (
-                        <label key={branch} className="flex items-center hover:text-indigo-700">
-                          <input
-                            type="checkbox"  // Change from radio to checkbox for multiple selections
-                            value={branch}
-                            checked={editedData.branch.includes(branch)}  // Check if branch is selected
-                            onChange={handleBranchChange}
-                            className="mr-2"
-                          />
-                          {branch}
-                        </label>
-                      ))}
-                    </div>
+                  {/* Branches Multi-Select Dropdown */}
+                  <div className="mt-2 flex flex-col md:flex-row md:items-center justify-between gap-2">
+                    <label className="block text-sm font-semibold text-black w-full md:w-1/4">Branch</label>
+                    <Select
+                      isMulti
+                      components={animatedComponents}
+                      name="branch"
+                      options={branches}
+                      value={branches.filter((b) => editedData.branch.includes(b.value))}
+                      onChange={(selectedOptions) =>
+                        setEditedData((prev) => ({
+                          ...prev,
+                          branch: selectedOptions.map((option) => option.value),
+                        }))
+                      }
+                      className="w-full md:w-3/4 mt-2 md:mt-0 text-black"
+                      placeholder="Select Branch(es)"
+                    />
                   </div>
 
-                  {/* Institution */}
+                  {/* Institution Dropdown */}
                   <div className="mt-2 flex flex-col md:flex-row md:items-center justify-between gap-2">
                     <label className="block text-sm font-semibold text-black w-full md:w-1/4">Institution</label>
-                    <input
-                      type="text"
-                      value={editedData.institution || ''}
-                      onChange={(e) => setEditedData({ ...editedData, institution: e.target.value })}
-                      className="border p-2 w-full md:w-3/4 mt-2 md:mt-0"
-                      required
+                    <Select
+                      name="institution"
+                      isClearable
+                      components={animatedComponents}
+                      options={institutions}
+                      value={institutions.find((i) => i.value === editedData.institution)}
+                      onChange={(selected) =>
+                        setEditedData((prev) => ({
+                          ...prev,
+                          institution: selected ? selected.value : '',
+                        }))
+                      }
+                      className="w-full md:w-3/4 mt-2 md:mt-0 text-black"
+                      placeholder="Select Institution"
                     />
                   </div>
 
-                  {/* Edit Subject Names */}
+                  {/* Subject Name Dropdown */}
                   <div className="mt-2 flex flex-col md:flex-row md:items-center justify-between gap-2">
                     <label className="block text-sm font-semibold text-black w-full md:w-1/4">Subject Name</label>
-                    <input
-                      type="text"
-                      value={editedData.subjectName || ''}
-                      onChange={(e) => setEditedData({ ...editedData, subjectName: e.target.value })}
-                      className="border p-2 w-full md:w-3/4 mt-2 md:mt-0"
-                      required
+                    <Select
+                      name="subjectName"
+                      isClearable
+                      components={animatedComponents}
+                      options={subjects}
+                      value={subjects.find((s) => s.value === editedData.subjectName)}
+                      onChange={(selected) =>
+                        setEditedData((prev) => ({
+                          ...prev,
+                          subjectName: selected ? selected.value : '',
+                        }))
+                      }
+                      className="w-full md:w-3/4 mt-2 md:mt-0 text-black"
+                      placeholder="Select Subject"
                     />
                   </div>
 
 
-                  {/* Year Radio Buttons */}
-                  <div className="mt-2">
-                    <label className="block text-left text-sm font-semibold text-black">Year</label>
-                    <div className="flex flex-col md:flex-row gap-4 mt-2">
-                      {["First Year", "Second Year", "Third Year", "Final Year"].map((year) => (
-                        <label key={year} className="flex items-center gap-2 hover:text-indigo-700">
-                          <input
-                            type="radio"
-                            value={year}
-                            checked={editedData.year === year}
-                            onChange={handleYearChange}
-                            className="mr-2"
-                            required
-                          />
-                          {year}
-                        </label>
-                      ))}
-                    </div>
+                  {/* Year Dropdown */}
+                  <div className="mt-2 flex flex-col md:flex-row md:items-center justify-between gap-2">
+                    <label className="block text-sm font-semibold text-black w-full md:w-1/4">Year</label>
+                    <Select
+                      name="year"
+                      isClearable
+                      components={animatedComponents}
+                      options={years}
+                      value={years.find((y) => y.value === editedData.year)}
+                      onChange={(selected) =>
+                        setEditedData((prev) => ({
+                          ...prev,
+                          year: selected ? selected.value : '',
+                        }))
+                      }
+                      className="w-full md:w-3/4 mt-2 md:mt-0 text-black"
+                      placeholder="Select Year"
+                    />
                   </div>
 
                   {/* Save and Cancel Buttons */}
@@ -345,3 +375,4 @@ const MyFAQs = () => {
 }
 
 export default MyFAQs
+

@@ -150,16 +150,14 @@ export default function AddCourse() {
           courseDescription,
           courseThumbnail,
           isPublished: true,
-          createdAt: serverTimestamp(),
-          updatedAt: null,
-          courseRatings: [],
-          adminId: user.uid,
-          createdBy: user.displayName,
           category: {
             branch: selectedBranches,
             year: selectedYears,
           },
-          chapters
+          chapters,
+          adminId: user.uid,
+          createdBy: user.displayName,
+          createdAt: serverTimestamp(),
         });
         toast.success("Course added successfully!");
 

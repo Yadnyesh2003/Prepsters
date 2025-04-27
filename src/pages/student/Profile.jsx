@@ -1,10 +1,10 @@
 import React from 'react'
 import ComingSoon from '../../components/student/ComingSoon'
 
-const CoursesList = () => {
+const Profile = () => {
   return (
-    <ComingSoon/>
+    <ComingSoon />
   )
 }
 
-export default CoursesList
+export default Profile

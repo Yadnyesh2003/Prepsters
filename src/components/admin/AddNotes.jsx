@@ -1,6 +1,9 @@
 import React, { useContext, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { db, collection, addDoc, serverTimestamp, updateDoc } from "../../config/firebase";
+import Select from 'react-select';
+import makeAnimated from "react-select/animated";
+import { subjects, branches, years, contributors } from '../../assets/assets'; // assuming these exist
 import { AppContext } from '../../context/AppContext';
 import AccessForbidden from '../student/AccessForbidden';
 
@@ -9,16 +12,17 @@ const AddNotes = () => {
     notesCategory: {
       branch: [],
       subjectName: [],
-      year: '',
+      year: null,
     },
     notesLink: '',
     notesTitle: '',
-    contributorName: '',
+    contributorName: null,
     adminId: ''
   });
   const [loading, setLoading] = useState(false);
 
   const { toast } = useContext(AppContext);
+  const animatedComponents = makeAnimated();
   const { isGhost, user } = useAuth();
 
   const handleChange = (e) => {
@@ -54,20 +58,6 @@ const AddNotes = () => {
     }
   };
 
-  // Handle year checkbox selection
-  const handleYearChange = (e) => {
-    const selectedYear = e.target.value;
-
-    // Only allow one selection
-    setFormData((prevData) => ({
-      ...prevData,
-      notesCategory: {
-        ...prevData.notesCategory,
-        year: selectedYear,  // Store the selected year as a string
-      },
-    }));
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -75,10 +65,17 @@ const AddNotes = () => {
     try {
       if(isGhost){
         const notesRef = await addDoc(collection(db, 'Notes'), {
-          ...formData,
+          notesCategory: {
+            subjectName: formData.notesCategory.subjectName?.map(s => s.value),
+            branch: formData.notesCategory.branch?.map(b => b.value),
+            year: formData.notesCategory.year?.value || '',
+          },
+          notesLink: formData.notesLink,
+          notesTitle: formData.notesTitle,
+          contributorName: formData.contributorName?.value || '',
+          adminId: user.uid,
+          createdBy: user.displayName,
           createdAt: serverTimestamp(),
-          createdBy: user.displayName, // Correct this line if you have Firebase Auth setup
-          adminId: user.uid
         });
         toast.success('Notes added successfully!');
 
@@ -89,11 +86,11 @@ const AddNotes = () => {
         setFormData({
           notesCategory: {
             branch: [],
-            year: '',
+            year: null,
             subjectName: []
           },
           notesLink: '',
-          contributorName: '',
+          contributorName: null,
           notesTitle: '',
         })
       } else{
@@ -124,67 +121,92 @@ const AddNotes = () => {
   
         {/* Subject Name */}
         <div className='flex flex-col gap-2'>
-          <p className="text-lg text-left">Subject Name (Comma Separated)</p>
-          <input
-            type="text"
-            name="notesCategory.subjectName"
-            value={formData.notesCategory.subjectName.join(', ')} // Show array as comma-separated string
-            onChange={handleChange}
-            className="w-full p-2 border border-gray-300 rounded-md"
-            placeholder="Example: Operating System, Data Structures"
+          <p className="text-lg text-left">Subject Name</p>
+          <Select
+            isMulti
+            closeMenuOnSelect={false}
             required
+            components={animatedComponents}
+            options={subjects}
+            value={formData.notesCategory.subjectName}
+            onChange={(selected) =>
+              setFormData((prev) => ({
+                ...prev,
+                notesCategory: {
+                  ...prev.notesCategory,
+                  subjectName: selected,
+                },
+              }))
+            }
+            className="text-black"
+            placeholder="Select subjects"
           />
         </div>
 
         {/* Branch */}
         <div className='space-y-2 '>
           <p className="text-lg text-left">Branch</p>
-          <div className="flex flex-col gap-2 text-left">
-            {["Computer Engineering", "Information Technology", "Electronics & Telecommunication", "Artificial Intelligence & Data Science", "Electronics & Computer Science"].map((branch) => (
-              <label key={branch} className='flex items-center gap-2 hover:text-amber-400'>
-                <input
-                  type="checkbox"
-                  name="notesCategory.branch"
-                  value={branch}
-                  checked={formData.notesCategory.branch.includes(branch)}
-                  onChange={handleChange}
-                  className="mr-2 hover:text-amber-400"
-                />
-                <span>{branch}</span>
-              </label>
-            ))}
-          </div>
+          <Select
+            isMulti
+            closeMenuOnSelect={false}
+            required
+            components={animatedComponents}
+            options={branches}
+            value={formData.notesCategory.branch}
+            onChange={(selected) =>
+              setFormData((prev) => ({
+                ...prev,
+                notesCategory: {
+                  ...prev.notesCategory,
+                  branch: selected,
+                },
+              }))
+            }
+            className="text-black"
+            placeholder="Select branches"
+          />
         </div>
 
         {/* Year  */}
         <div className="space-y-2">
           <p className="text-lg text-left">Year</p>
-          <div className="flex flex-col gap-2">
-            {["First Year", "Second Year", "Third Year", "Final Year"].map((year) => (
-              <label key={year} className="flex items-center gap-2 hover:text-amber-300">
-                <input
-                  type="radio"
-                  value={year}
-                  checked={formData.notesCategory.year === year} // Check if the year is selected
-                  onChange={handleYearChange} // Handle year change
-                  className="accent-blue-600"
-                />
-                <span>{year}</span>
-              </label>
-            ))}
-          </div>
+          <Select
+            isClearable
+            required
+            components={animatedComponents}
+            options={years}
+            value={formData.notesCategory.year}
+            onChange={(selected) =>
+              setFormData((prev) => ({
+                ...prev,
+                notesCategory: {
+                  ...prev.notesCategory,
+                  year: selected,
+                },
+              }))
+            }
+            className="text-black"
+            placeholder="Select year"
+          />
         </div>
 
        {/* Contributor Name */}
         <div className='flex flex-col gap-2'>
           <p className="text-lg text-left">Contributor Name</p>
-          <input
-            type="text"
-            name="contributorName"
-            value={formData.contributorName}
-            onChange={handleChange}
-            className="w-full p-2 border border-gray-300 rounded-md"
+          <Select
+            isClearable
             required
+            components={animatedComponents}
+            options={contributors}
+            value={formData.contributorName}
+            onChange={(selected) =>
+              setFormData((prev) => ({
+                ...prev,
+                contributorName: selected,
+              }))
+            }
+            className="text-black"
+            placeholder="Select contributor"
           />
         </div>
 

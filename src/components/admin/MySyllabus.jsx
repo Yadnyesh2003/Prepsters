@@ -1,9 +1,10 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { getDocs, collection, db, doc, updateDoc, deleteDoc, serverTimestamp } from '../../config/firebase'; 
+import Select from 'react-select';
 import { AppContext } from '../../context/AppContext';
-import Loading from '../../components/student/Loading';
+import Loading from '../../components/admin/Loading';
 import PdfViewer from '../student/PdfViewer';
-import { assets } from '../../assets/assets';
+import { assets, branches, institutions, years  } from '../../assets/assets';
 import { useAuth } from '../../context/AuthContext';
 
 import FilterComponent from './FilterComponent';
@@ -12,7 +13,7 @@ import AccessForbidden from '../student/AccessForbidden';
 const MySyllabus = () => {
   const {isGhost} = useAuth();
   const [syllabusData, setSyllabusData] = useState([]);
-  const [filteredData, setFilteredData] = useState([]); // New state to hold the filtered syllabus data
+  const [filteredData, setFilteredData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [pdfUrl, setPdfUrl] = useState(null);
 
@@ -22,7 +23,8 @@ const MySyllabus = () => {
   const [filter, setFilter] = useState({
     branch: '',
     institution: '',
-    year: ''
+    year: '',
+    searchQuery: ''
   });
 
   const { toast } = useContext(AppContext)
@@ -31,16 +33,11 @@ const MySyllabus = () => {
 
   //For FilterComponent.jsx 
   const filterOptions = {
-    branches: [
-      "General Science & Humanities", 
-      "Computer Engineering", 
-      "Information Technology", 
-      "Electronics & Telecommunication", 
-      "Artificial Intelligence & Data Science", 
-      "Electronics & Computer Science"
-    ],
-    years: ["First Year", "Second Year", "Third Year", "Final Year"]
+    branches: branches.map(b => b.value),
+    years: years.map(y => y.value),
+    institutions: institutions.map(i => i.value)
   };
+  
 
 //===============================================================================================================================================================================================
 
@@ -70,7 +67,14 @@ const MySyllabus = () => {
   // Handle Edit - Set the syllabus to be edited
   const handleEdit = (syllabus) => {
     setEditingSyllabus(syllabus.id);
-    setEditedData({ ...syllabus.syllabusCategory || {}, syllabusTitle: syllabus.syllabusTitle });
+    setEditedData({
+      syllabusTitle: syllabus.syllabusTitle,
+      academicYear: syllabus.syllabusCategory?.academicYear || '',
+      branch: branches.find(b => b.value === syllabus.syllabusCategory?.branch) || null,
+      institution: institutions.find(i => i.value === syllabus.syllabusCategory?.institution) || null,
+      year: years.find(y => y.value === syllabus.syllabusCategory?.year) || null,
+    });
+    
   };
 
   // Save edited data back to Firestore
@@ -81,10 +85,16 @@ const MySyllabus = () => {
       if(isGhost) {
         const syllabusRef = doc(db, 'Syllabus', editingSyllabus);
         await updateDoc(syllabusRef, {
-          syllabusCategory: editedData,
+          syllabusCategory: {
+            academicYear: editedData.academicYear,
+            branch: editedData.branch?.value || '',
+            institution: editedData.institution?.value || '',
+            year: editedData.year?.value || '',
+          },
           syllabusTitle: editedData.syllabusTitle,
-          updatedAt: serverTimestamp()
-        });
+          updatedBy: user.displayName,
+          updatedAt: serverTimestamp(),
+        });        
         setEditingSyllabus(null);
         setEditedData({});
         getSyllabusData(); // Reload data from Firestore
@@ -123,37 +133,28 @@ const MySyllabus = () => {
   const filterSyllabusData = (filterValues) => {
     const filtered = syllabusData.filter((doc) => {
       const { branch, institution, year } = doc.syllabusCategory || {};
+      const title = doc.syllabusTitle || '';
       
       // Check if the institution matches (case insensitive and partial match)
       const institutionMatch = filterValues.institution
         ? institution && institution.toLowerCase().includes(filterValues.institution.toLowerCase())
         : true;
 
+      const searchMatch = filterValues.searchQuery
+        ? title.toLowerCase().includes(filterValues.searchQuery.toLowerCase())
+        : true;
+        
+
       return (
         (filterValues.branch ? branch === filterValues.branch : true) &&
         institutionMatch &&
-        (filterValues.year ? year === filterValues.year : true)
+        (filterValues.year ? year === filterValues.year : true) &&
+        searchMatch
       );
     });
     setFilteredData(filtered); // Update the filtered data
   };
-
-  // Handle Year Radio Selection
-  const handleYearChange = (e) => {
-    setEditedData({
-      ...editedData,
-      year: e.target.value, // Set selected year
-    });
-  };
-
-  // Handle Branch Checkbox Selection
-  const handleBranchChange = (e) => {
-    setEditedData({
-      ...editedData,
-      branch: e.target.value,
-    });
-  };
-
+  
   const openPdfViewer = (url) => {
     setPdfUrl(url); // Set the PDF URL to be displayed in the viewer
   };
@@ -168,16 +169,14 @@ const MySyllabus = () => {
 
   return isGhost ? (
     <div className="max-w-6xl mx-auto p-4">
-      {/* Filter Component */}
 
+      {/* Filter Component */}
       <FilterComponent 
         filter={filter}
         setFilter={setFilter}
         filterOptions={filterOptions}
         onFilterChange={filterSyllabusData}
       />
-
- {/* INITIAL CODE PRESENT HERE HAS BEEN SHIFTER BELOW OUT OF THE RETURN STATEMENT */}
 
       {/* Displaying Filtered Syllabus Data */}
       <div className="space-y-4">
@@ -212,56 +211,48 @@ const MySyllabus = () => {
                   />
                 </div>
               
-                {/* Branches Checkboxes */}
-                <div className="mt-2">
-                  <label className="block text-sm font-semibold text-black">Branch</label>
-                  <div className="flex flex-col md:flex-row gap-4 mt-2">
-                    {["General Science & Humanities", "Computer Engineering", "Information Technology", "Electronics & Telecommunication", "Artificial Intelligence & Data Science", "Electronics & Computer Science"].map((branch) => (
-                      <label key={branch} className="flex items-center hover:text-indigo-700">
-                        <input
-                          type="radio"
-                          value={branch}
-                          checked={editedData.branch===branch}
-                          onChange={handleBranchChange}
-                          className="mr-2"
-                        />
-                        {branch}
-                      </label>
-                    ))}
-                  </div>
+                {/* Branches Dropdown */}
+                <div className="mt-2 flex flex-col md:flex-row md:items-center justify-between gap-2">
+                  <label className="block text-sm font-semibold text-black w-full md:w-1/4">Branch</label>
+                  <Select
+                    name="branch"
+                    isClearable={true}
+                    options={branches}
+                    value={editedData.branch}
+                    onChange={(selected) => setEditedData(prev => ({ ...prev, branch: selected }))}
+                    className="w-full md:w-3/4 mt-2 md:mt-0 text-black"
+                    placeholder="Select Branch"
+                  />
                 </div>
               
                 {/* Institution */}
                 <div className="mt-2 flex flex-col md:flex-row md:items-center justify-between gap-2">
                   <label className="block text-sm font-semibold text-black w-full md:w-1/4">Institution</label>
-                  <input
-                    type="text"
-                    value={editedData.institution || ''}
-                    onChange={(e) => setEditedData({ ...editedData, institution: e.target.value })}
-                    className="border p-2 w-full md:w-3/4 mt-2 md:mt-0"
-                    required
-                  />
+                  <Select
+                  name="institution"
+                  isClearable={true}
+                  options={institutions}
+                  value={editedData.institution}
+                  onChange={(selected) => setEditedData(prev => ({ ...prev, institution: selected }))}
+                  className="w-full md:w-3/4 mt-2 md:mt-0 text-black"
+                  placeholder="Select Institution"
+                />
                 </div>
               
-                {/* Year Radio Buttons */}
-                <div className="mt-2">
-                  <label className="block text-left text-sm font-semibold text-black">Year</label>
-                  <div className="flex flex-col md:flex-row gap-4 mt-2">
-                    {["First Year", "Second Year", "Third Year", "Final Year"].map((year) => (
-                      <label key={year} className="flex items-center gap-2 hover:text-indigo-700">
-                        <input
-                          type="radio"
-                          value={year}
-                          checked={editedData.year === year}
-                          onChange={handleYearChange}
-                          className="mr-2"
-                          required
-                        />
-                        {year}
-                      </label>
-                    ))}
-                  </div>
+                {/* Year Dropdown */}
+                <div className="mt-2 flex flex-col md:flex-row md:items-center justify-between gap-2">
+                  <label className="block text-sm font-semibold text-black w-full md:w-1/4">Year</label>
+                  <Select
+                    name="year"
+                    isClearable={true}
+                    options={years}
+                    value={editedData.year}
+                    onChange={(selected) => setEditedData(prev => ({ ...prev, year: selected }))}
+                    className="w-full md:w-3/4 mt-2 md:mt-0 text-black"
+                    placeholder="Select Year"
+                  />
                 </div>
+
               
                 {/* Save and Cancel Buttons */}
                 <div className="mt-4 flex gap-4 justify-start">

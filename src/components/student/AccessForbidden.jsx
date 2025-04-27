@@ -4,16 +4,16 @@ import { assets } from '../../assets/assets'
 import { useAuth } from '../../context/AuthContext';
 
 const AccessForbidden = () => {
-  const { role } = useAuth()
+  const { role, logoutUser } = useAuth()
   const navigate = useNavigate() 
   const goBack = () => {
     if(role === "admin") {
       navigate('/ghost')
     } else if (role === "student"){
-      navigate('/Home')
-    } else {
+      logoutUser(),
       navigate('/')
-    }
+    } else (role === null)
+      navigate('/')
   };
 
   return (

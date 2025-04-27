@@ -7,6 +7,7 @@ import ImpactSection from '../../components/student/Impacts'
 import Footer from '../../components/student/Footer'
 import Loader from '../../components/student/Loading'
 import { useTheme } from '../../context/ThemeContext'
+import LatestContent from '../../components/student/LatestContent'
 
 
 function Landing() {
@@ -19,8 +20,9 @@ function Landing() {
         );
     }
     return (
-        <div><Navbar />
+        <div>
             <Hero />
+            <LatestContent/>
             <Features />
             <HowItWorks />
             <ImpactSection />

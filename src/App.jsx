@@ -42,14 +42,14 @@ import { useAuth } from "./context/AuthContext";
 
 import { AuthProvider } from "./context/AuthContext";
 import ProtectedRoute from "./middleware/ProtectedRoute";
-import ProtectedRouteStudent from "./middleware/ProtectedRouteStudent";
 import AccessForbidden from './components/student/AccessForbidden';
 import Navbar from './components/student/NavBar';
+import Profile from './pages/student/Profile';
 
 
 
 
-const Home = lazy(() => import('./pages/student/Home'));
+
 const ExamPrep = lazy(() => import('./pages/student/ExamPrep'));
 const Resources = lazy(() => import('./pages/student/Resourses'));
 
@@ -69,7 +69,8 @@ const Resources = lazy(() => import('./pages/student/Resourses'));
 
 
 function App() {
-  const isAdminRoute = useMatch('/ghost/*')
+  const isAdminRoute = useMatch('/ghost/*');
+  const isUnauthorizedRoute = useMatch('/unauthorized');
 
   return (
     
@@ -80,29 +81,28 @@ function App() {
       />
       <AuthProvider>
         <div className='text-default min-h-screen bg-auto'>
-          {/* {!isAdminRoute && <Navbar/>} */}
+        {!isAdminRoute && !isUnauthorizedRoute && <Navbar />}
 
           <Routes>
             <Route path ='/' element={<Landing />} />
             <Route path ='/contributors' element={<Contributors />} />
             <Route path = '/about-us' element = {<AboutUs />} />
 
-            <Route
-              path="/Home"
-              element={
-                <ProtectedRouteStudent allowedRole="student">
-                  <Home />
-                </ProtectedRouteStudent>
-              }
+            <Route 
+              path='/profile' element={
+                <ProtectedRoute allowedRole="student">
+                  <Profile />
+                </ProtectedRoute>
+              } 
             />
 
 
             <Route
               path="/exam-prep"
               element={
-                <ProtectedRouteStudent allowedRole="student">
+                <ProtectedRoute allowedRole="student">
                   <ExamPrep />
-                </ProtectedRouteStudent>
+                </ProtectedRoute>
               }
             >
               <Route path="syllabus" element={<Syllabus />} />
@@ -114,9 +114,9 @@ function App() {
             <Route
               path="/resources"
               element={
-                <ProtectedRouteStudent allowedRole="student">
+                <ProtectedRoute allowedRole="student">
                   <Resources />
-                </ProtectedRouteStudent>
+                </ProtectedRoute>
               }
             >
               <Route path="course-list" element={<CoursesList />} />
@@ -151,14 +151,9 @@ function App() {
               <Route path='add-pyqs' element={<AddPYQs />} />
               <Route path='add-faqs' element={<AddFAQs />} />
               <Route path='add-notes' element={<AddNotes />} />
-              
             </Route>
-
-
             <Route path='unauthorized' element={<AccessForbidden/>} />
-
           </Routes>
-
 
         </div>
       </AuthProvider >

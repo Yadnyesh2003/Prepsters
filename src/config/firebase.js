@@ -2,7 +2,7 @@
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
 import { getAuth, GoogleAuthProvider  } from "firebase/auth";
-import { getFirestore, collection, addDoc, doc, setDoc, serverTimestamp, updateDoc, getDoc, getDocs, deleteDoc } from "firebase/firestore";
+import { getFirestore, collection, addDoc, doc, setDoc, serverTimestamp, updateDoc, getDoc, getDocs, deleteDoc, query, where, orderBy, limit, arrayUnion, arrayRemove } from "firebase/firestore";
 
 const firebaseConfig = {
     apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -21,4 +21,4 @@ export const auth = getAuth(app);
 // export const googleProvider = new firebase.auth.GoogleAuthProvider();
 export const googleProvider = new GoogleAuthProvider();
 const db= getFirestore(app);
-export { db, collection, addDoc, doc, setDoc, serverTimestamp, updateDoc, getDoc, getDocs, deleteDoc }; 
+export { db, collection, addDoc, doc, setDoc, serverTimestamp, updateDoc, getDoc, getDocs, deleteDoc, query, orderBy, limit, where, arrayUnion, arrayRemove }; 
