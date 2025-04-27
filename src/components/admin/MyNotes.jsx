@@ -13,7 +13,7 @@ import AccessForbidden from '../student/AccessForbidden';
 
 
 const MyNotes = () => {
-  const { isGhost, user } = useAuth();
+  const { isGhost } = useAuth();
   const [noteData, setNoteData] = useState([]);
   const [filteredData, setFilteredData] = useState([]); // New state to hold the filtered syllabus data
   const [loading, setLoading] = useState(true);

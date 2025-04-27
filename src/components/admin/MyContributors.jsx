@@ -7,7 +7,7 @@ import { useAuth } from '../../context/AuthContext';
 import AccessForbidden from '../student/AccessForbidden';
 
 const MyContributors = () => {
-  const { isGhost, user } = useAuth();
+  const { isGhost } = useAuth();
   const [contributorData, setContributorData] = useState([]); // Store contributors data
   const [loading, setLoading] = useState(true); // Manage loading state
 
