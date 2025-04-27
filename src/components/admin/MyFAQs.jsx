@@ -12,7 +12,7 @@ import { useAuth } from '../../context/AuthContext';
 
 
 const MyFAQs = () => {
-  const { isGhost } = useAuth();
+  const { isGhost, user } = useAuth();
   const [faqData, setFaqData] = useState([]);
   const [filteredData, setFilteredData] = useState([]); 
   const [loading, setLoading] = useState(true);
