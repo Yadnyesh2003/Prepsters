@@ -11,7 +11,7 @@ import FilterComponent from './FilterComponent';
 import AccessForbidden from '../student/AccessForbidden';
 
 const MyPYQs = () => {
-  const { isGhost } = useAuth();
+  const { isGhost, user } = useAuth();
   const [pyqData, setPyqData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
   const [loading, setLoading] = useState(true);

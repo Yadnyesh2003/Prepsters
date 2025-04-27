@@ -12,8 +12,7 @@ const AccessForbidden = () => {
     } else if (role === "student"){
       logoutUser(),
       navigate('/')
-    } else (role === null)
-      navigate('/')
+    }
   };
 
   return (
