@@ -11,7 +11,7 @@ import FilterComponent from './FilterComponent';
 import AccessForbidden from '../student/AccessForbidden';
 
 const MySyllabus = () => {
-  const {isGhost} = useAuth();
+  const { isGhost, user } = useAuth();
   const [syllabusData, setSyllabusData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
   const [loading, setLoading] = useState(true);
