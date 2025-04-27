@@ -77,7 +77,7 @@ const LatestContent = () => {
                     >
                         Recently Added Notes
                     </motion.h3>
-                    <div className="grid gap-6 grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+                    <div className="grid gap-6 grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4">
                         {renderCards(notesDataLatest, 'Notes')}
                     </div>
                 </div>
@@ -93,7 +93,7 @@ const LatestContent = () => {
                     >
                         Recently Added FAQs
                     </motion.h3>
-                    <div className="grid gap-6 grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+                    <div className="grid gap-6 grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4">
                         {renderCards(faqDataLatest, 'Faqs')}
                     </div>
                 </div>
@@ -109,7 +109,7 @@ const LatestContent = () => {
                     >
                         Recently Added PYQs
                     </motion.h3>
-                    <div className="grid gap-6 grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+                    <div className="grid gap-6 grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4">
                         {renderCards(pyqDataLatest, 'Pyqs')}
                     </div>
                 </div>
