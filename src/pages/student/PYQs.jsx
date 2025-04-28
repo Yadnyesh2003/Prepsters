@@ -27,7 +27,7 @@ const PYQs = () => {
 
   useEffect(() => {
     if (showFilter) {
-      toast("Apply filter to get data!");
+      toast("Apply filter to get data!", { icon: "⚠️", duration: 1000 });
     }
   }, [showFilter]);
 

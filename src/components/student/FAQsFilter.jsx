@@ -42,7 +42,7 @@ const FAQsFilter = ({ onResults }) => {
         );
       }
       if (filters.contributorName) {
-        conditions.push(where("faqsCategory.contributorName", "==", filters.contributorName.value));
+        conditions.push(where("contributorName", "==", filters.contributorName.value));
       }
       if (filters.institution) {
         conditions.push(where("faqsCategory.institution", "==", filters.institution.value));
