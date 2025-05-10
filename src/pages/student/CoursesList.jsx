@@ -1,8 +1,9 @@
 import React from 'react'
+import ComingSoon from '../../components/student/ComingSoon'
 
 const CoursesList = () => {
   return (
-    <h1>CoursesList Page - This page comes under the Resources Scetion & has the list of Courses available.</h1>
+    <ComingSoon/>
   )
 }
 
