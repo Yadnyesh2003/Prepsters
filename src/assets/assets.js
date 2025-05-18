@@ -104,6 +104,7 @@ export const subjects = [
 
   //COMPUTER & IT THEORY EXAM SUBJECTS (SEM 3 TO SEM 6)
   { value: "Engineering Mathematics 3", label: "Engineering Mathematics 3" },
+  { value: "Integral Transform", label: "Integral Transform" },
   { value: "Engineering Mathematics 4", label: "Engineering Mathematics 4" },
   { value: "Discrete Structures & Graph Theory", label: "Discrete Structures & Graph Theory" },
   { value: "Data Structures and Analysis", label: "Data Structures and Analysis" },
@@ -111,6 +112,7 @@ export const subjects = [
   { value: "Analysis Of Algorithms", label: "Analysis Of Algorithms" },
   { value: "Database Management System", label: "Database Management System" },
   { value: "Computer Organization & Architecture", label: "Computer Organization & Architecture" },
+  { value: "Computer Organization & Microprocessor", label: "Computer Organization & Microprocessor" },
   { value: "Digital Logic & Computer Architecture", label: "Digital Logic & Computer Architecture" },
   { value: "Microprocessor", label: "Microprocessor" },
   { value: "Computer Graphics", label: "Computer Graphics" },
