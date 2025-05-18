@@ -70,7 +70,7 @@ const FAQsFilter = ({ onResults }) => {
 
   const isApplyDisabled =
     (filterMode === "subjectName" &&
-      (!filters.subjectName || !filters.institution || !filters.contributorName)) ||
+      (!filters.subjectName || !filters.institution || filters.contributorName.length === 0)) ||
     (filterMode === "branch" &&
       (!filters.branch || filters.branch.length === 0 || !filters.institution || !filters.year));
 

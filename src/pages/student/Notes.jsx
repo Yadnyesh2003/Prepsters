@@ -67,16 +67,17 @@ const Notes = () => {
     }
   }
   
-
-
   useEffect(() => {
     if (showFilter) {
-      toast("Apply filter to get data!", { icon: "⚠️", duration: 1000 });
-    }    
-  }, [showFilter]);
+      toast.dismiss(); // Dismiss all existing toasts once
+  
+      // Show simple warning toast
+      toast("Apply filter to get data!", {
+        icon: "⚠️",
+        duration: 500,
+      });
 
-  useEffect(() => {
-    if (showFilter) {
+      // Show custom info toast
       toast.custom(
         (t) => (
           <div
@@ -119,9 +120,9 @@ const Notes = () => {
           duration: 5000,
           position: 'bottom-center',
         }
-      )
+      );
     }
-  }, [showFilter, toast])
+  }, [showFilter, toast, assets.tte_transparent_logo]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -151,6 +152,7 @@ const Notes = () => {
             <button
               onClick={() => {
                 setShowFilter(true);
+                toast.dismiss();
                 setNotesData([]);
               }}
               className="text-white px-4 py-2 rounded border-white border-2 bg-yellow-500 hover:bg-purple-700"
