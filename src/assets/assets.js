@@ -131,7 +131,7 @@ export const subjects = [
   { value: "Computer Graphics & Multimedia System", label: "Computer Graphics & Multimedia System" },
   { value: "Probabilistic Graphical Models", label: "Probabilistic Graphical Models" },
   { value: "Data Warehousing & Mining", label: "Data Warehousing & Mining" },
-  { value: "Systerm Programming & Compiler Construction", label: "System Programming & Compiler Construction" },
+  { value: "System Programming & Compiler Construction", label: "System Programming & Compiler Construction" },
   { value: "Mobile Computing", label: "Mobile Computing" },
   { value: "Artificial Intelligence", label: "Artificial Intelligence" },
   { value: "Internet Of Things", label: "Internet Of Things" },
@@ -146,6 +146,17 @@ export const subjects = [
   { value: "Image Processing", label: "Image Processing" },
   { value: "Ethical Hacking & Forensics", label: "Ethical Hacking & Forensics" },
 
+  //AIDS THEORY EXAM SUBJECTS (SEM 5 TO SEM 6)
+  { value: "Web Computing", label: "Web Computing" },
+  { value: "Statistics for Artificial Intelligence & Data Science", label: "Statistics for Artificial Intelligence & Data Science" },
+  { value: "Advanced Algorithms", label: "Advanced Algorithms" },
+  { value: "High Performance Computing", label: "High Performance Computing" },
+  { value: "Distributed Computing", label: "Distributed Computing" },
+  { value: "Image & Video Processing", label: "Image & Video Processing" },
+  { value: "Data Analytics and Visualization", label: "Data Analytics and Visualization" },
+  { value: "Software Engineering and Project Management", label: "Software Engineering and Project Management"},
+  { value: "Machine Learning", label: "Machine Learning" },
+
 ];
 
 export const institutions = [
@@ -156,6 +167,10 @@ export const institutions = [
 export const contributors = [
   { value: "Yadnyesh Firke", label: "Yadnyesh Firke" },
   { value: "Parth Narkhede", label: "Parth Narkhede" },
+  { value: "Parth Chavan", label: "Parth Chavan" },
+  { value: "Vishal Singh", label: "Vishal Singh" },
+  { value: "Tejas Savla", label: "Tejas Savla" },
+
 ];
 
 export const academicYears = [
@@ -172,10 +187,6 @@ export const academicYears = [
   { value: "Dec 19", label: "Dec 19" },
   { value: "May 19", label: "May 19" },
   { value: "Dec 18", label: "Dec 18" },
-  { value: "May 18", label: "May 18" },
-  { value: "Dec 17", label: "Dec 17" },
-  { value: "May 17", label: "May 17" },
-  { value: "Dec 16", label: "Dec 16" },
-  { value: "May 16", label: "May 16" }
+  { value: "May 18", label: "May 18" }
 ];
 
