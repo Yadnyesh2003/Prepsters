@@ -67,61 +67,29 @@ const FAQs = () => {
 
   useEffect(() => {
     if (showFilter) {
-      toast.dismiss(); // Dismiss all existing toasts once
-  
-      // Show simple warning toast
-      toast("Apply filter to get data!", {
-        icon: "⚠️",
-        duration: 1000,
-      });
-  
-      // Show custom info toast
+      toast.dismiss();
       toast.custom(
         (t) => (
           <div
+            onClick={() => toast.remove(t.id)}
             className={`${
-              t.visible ? 'animate-enter' : 'animate-leave'
-            } max-w-md w-full bg-white shadow-lg rounded-lg pointer-events-auto flex flex-col sm:flex-row ring-1 ring-black ring-opacity-5`}
+              t.visible ? "animate-enter" : "animate-leave"
+            } cursor-pointer max-w-xs w-auto bg-yellow-100 text-yellow-800 shadow-lg rounded-lg pointer-events-auto flex items-center justify-center px-6 py-2`}
           >
-            <div className="flex-1 w-full p-4">
-              <div className="flex items-center space-x-3 mb-2">
-                <img
-                  className="h-8 w-8 sm:h-8 sm:w-8 rounded-full"
-                  src={assets.tte_transparent_logo}
-                  alt="Warning"
-                />
-                <p className="text-sm sm:text-base font-medium text-gray-900">
-                  Please review the following points:
-                </p>
-              </div>
-  
-              <ol className="list-decimal list-inside text-xs sm:text-sm text-gray-700 space-y-2 pl-5">
-                <li>
-                  For accessing <strong>"First Year"</strong> Syllabus/ PYQs/ FAQs/ Notes, please select <strong>"General Science & Humanities"</strong> as branch. Other branches won't return First Year data.
-                </li>
-                <li>
-                  Each filter application increases API reads and affects billing 💸. Kindly avoid unnecessary filter requests 🙏.
-                </li>
-              </ol>
-            </div>
-            <div className="w-full sm:w-auto border-t sm:border-t-0 sm:border-l border-gray-200">
-              <button
-                onClick={() => toast.remove(t.id)}
-                className="w-full h-full border border-transparent rounded-b-lg sm:rounded-b-none sm:rounded-r-lg p-4 flex items-center justify-center text-xs sm:text-sm font-medium text-indigo-500 hover:text-red-600 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-              >
-                Close
-              </button>
+            <div className="flex items-center space-x-2">
+              <span className="text-xl">⚠️</span>
+              <p className="text-sm font-medium">Apply filter to get data!</p>
             </div>
           </div>
         ),
         {
-          duration: 5000,
-          position: 'bottom-center',
+          duration: 1000,
+          position: "top-right"
         }
       );
     }
-  }, [showFilter, toast, assets.tte_transparent_logo]);
-
+  }, [showFilter]);
+  
   useEffect(() => {
     const handleScroll = () => {
       const bottom = window.innerHeight + window.scrollY >= document.body.offsetHeight - 100;

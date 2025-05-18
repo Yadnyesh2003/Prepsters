@@ -29,6 +29,8 @@ import parth from './1(2).png'
 import yadnyesh from './profile_founder.jpeg'
 import hero_img from './hero_image.jpeg'
 
+import popSoundFile from './pop.mp3';
+
 export const assets = {
   search_icon,
   arrow_icon,
@@ -61,6 +63,8 @@ export const assets = {
   yadnyesh,
   hero_img
 }
+
+export const popSound = new Audio(popSoundFile);
 
 export const branches = [
   { value: "General Science & Humanities", label: "General Science & Humanities" },
