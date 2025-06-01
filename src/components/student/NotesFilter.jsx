@@ -7,6 +7,10 @@ import { branches, years, subjects, contributors } from "../../assets/assets";
 
 const animatedComponents = makeAnimated();
 
+const allContributorsOption = { value: "ALL_CONTRIBUTORS", label: "All Contributors" };
+const contributorOptions = [allContributorsOption, ...contributors];
+
+
 const NotesFilter = ({ onResults }) => {
   const [filterMode, setFilterMode] = useState("subjectName");
   const [filters, setFilters] = useState({
@@ -25,7 +29,10 @@ const NotesFilter = ({ onResults }) => {
 
   const handleSubjectChange = (selectedOption) => {
     const selectedValue = selectedOption ? selectedOption.value : null;
-    setFilters((prev) => ({ ...prev, subjectName: selectedValue }));
+    setFilters((prev) => {
+      const updatedFilters = { ...prev, subjectName: selectedValue };
+      return updatedFilters;
+    });
   };
 
   const handleYearChange = (selectedOption) => {
@@ -172,15 +179,33 @@ const NotesFilter = ({ onResults }) => {
               isMulti
               name="contributorName"
               components={animatedComponents}
-              options={contributors}
+              options={contributorOptions}
               className="basic-multi-select"
               classNamePrefix="select"
-              value={filters.contributorName.map((val) => ({ value: val, label: val }))}
+              value={
+                filters.contributorName.length === contributors.length
+                  ? [allContributorsOption]
+                  : filters.contributorName.map((val) => ({ value: val, label: val }))
+              }              
               onChange={(selected) => {
-                const values = selected ? selected.map((s) => s.value) : [];
-                setFilters((prev) => ({ ...prev, contributorName: values }));
-              }}
+                if (!selected || selected.length === 0) {
+                  setFilters((prev) => ({ ...prev, contributorName: [] }));
+                  return;
+                }
+              
+                const selectedValues = selected.map((s) => s.value);
+              
+                if (selectedValues.includes("ALL_CONTRIBUTORS")) {
+                  // If user selects "All Contributors", use all contributor values
+                  setFilters((prev) => ({ ...prev, contributorName: contributors.map((c) => c.value) }));
+                } else {
+                  setFilters((prev) => ({ ...prev, contributorName: selectedValues }));
+                }
+              }}              
             />
+            {filters.contributorName.length === contributors.length && (
+              <p className="text-sm text-gray-500 mt-1">(All Contributors Selected)</p>
+            )}
           </div>
         </>
       )}
