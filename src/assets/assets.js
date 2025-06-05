@@ -180,6 +180,7 @@ export const contributors = [
 ];
 
 export const academicYears = [
+  { value: "May 25", label: "May 25" },
   { value: "Dec 24", label: "Dec 24" },
   { value: "May 24", label: "May 24" },
   { value: "Dec 23", label: "Dec 23" },
