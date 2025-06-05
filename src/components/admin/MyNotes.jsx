@@ -9,6 +9,7 @@ import { assets, branches, institutions, years, contributors, subjects } from '.
 import { useAuth } from '../../context/AuthContext';
 import FilterComponent from './FilterComponent';
 import AccessForbidden from '../student/AccessForbidden';
+import Confirmation from './Confirmation';
 
 const MyNotes = () => {
   const { isGhost, user } = useAuth();
@@ -16,6 +17,8 @@ const MyNotes = () => {
   const [filteredData, setFilteredData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [pdfUrl, setPdfUrl] = useState(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [noteToDelete, setNoteToDelete] = useState(null);
 
   const [editingNote, setEditingNote] = useState(null);
   const [editedData, setEditedData] = useState({
@@ -115,19 +118,32 @@ const MyNotes = () => {
     }
   };
 
-  const handleDelete = async (noteId) => {
+  const handleDeleteClick = (noteId) => {
+    setNoteToDelete(noteId);
+    setShowDeleteModal(true);
+  };
+
+  const confirmDelete = async () => {
     try {
       if (isGhost) {
-        const noteRef = doc(db, 'Notes', noteId);
+        const noteRef = doc(db, 'Notes', noteToDelete);
         await deleteDoc(noteRef);
         getNoteData();
-        toast.success('Deleted data!');
+        toast.success('Note deleted successfully!');
       } else {
         toast('Unauthorized Access!', { icon: '🚫' });
       }
     } catch (error) {
       toast.error(`Error deleting data: ${error.message}`);
+    } finally {
+      setShowDeleteModal(false);
+      setNoteToDelete(null);
     }
+  };
+
+  const cancelDelete = () => {
+    setShowDeleteModal(false);
+    setNoteToDelete(null);
   };
 
   const filterNoteData = (filterValues) => {
@@ -176,7 +192,13 @@ const MyNotes = () => {
   }
 
   return isGhost ? (
-    <div className="max-w-6xl mx-auto p-4">
+    <div className="max-w-6xl mx-auto p-4 relative">
+      <Confirmation
+        isOpen={showDeleteModal}
+        onCancel={cancelDelete}
+        onConfirm={confirmDelete}
+      />
+
       <h6 className='text-xs text-black text-center bg-amber-200 border rounded-4xl mb-2'>Institution Filter Is Inactive on This Page!</h6>
 
       <FilterComponent
@@ -347,7 +369,10 @@ const MyNotes = () => {
                       <img src={assets.edit_data} alt="edit" className="w-6 h-6 mr-2" />
                       <span className="hidden md:inline">Edit Notes</span>
                     </button>
-                    <button onClick={() => handleDelete(doc.id)} className="flex bg-red-500 text-white px-4 py-2 rounded-md hover:text-black">
+                    <button
+                      onClick={() => handleDeleteClick(doc.id)}
+                      className="flex bg-red-500 text-white px-4 py-2 rounded-md hover:text-black"
+                    >
                       <img src={assets.delete_data} alt="delete" className="w-6 h-6 mr-2" />
                       <span className="hidden md:inline">Delete Notes</span>
                     </button>

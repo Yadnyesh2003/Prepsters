@@ -9,6 +9,7 @@ import { assets, branches, institutions, subjects, years, contributors, academic
 import { useAuth } from '../../context/AuthContext';
 import FilterComponent from './FilterComponent';
 import AccessForbidden from '../student/AccessForbidden';
+import Confirmation from './Confirmation';
 
 const MyPYQs = () => {
   const { isGhost, user } = useAuth();
@@ -16,6 +17,8 @@ const MyPYQs = () => {
   const [filteredData, setFilteredData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [pdfUrl, setPdfUrl] = useState(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [pyqToDelete, setPyqToDelete] = useState(null);
 
   const [editingPYQ, setEditingPYQ] = useState(null);
   const [editedData, setEditedData] = useState({
@@ -137,6 +140,44 @@ const MyPYQs = () => {
     }
   };
 
+  // Handle delete click - show confirmation modal
+  const handleDeleteClick = (pyqId) => {
+    setPyqToDelete(pyqId);
+    setShowDeleteModal(true);
+  };
+
+  // Confirm delete action
+  const confirmDelete = async () => {
+    try {
+      if (isGhost) {
+        const pyqRef = doc(db, 'PYQs', pyqToDelete);
+        await deleteDoc(pyqRef);
+        getPYQData();
+        toast.success('PYQ deleted successfully!');
+      } else {
+        toast('Unauthorized Access!', { icon: '🚫' });
+      }
+    } catch (error) {
+      toast.error(`Error deleting PYQ: ${error.message}`);
+    } finally {
+      setShowDeleteModal(false);
+      setPyqToDelete(null);
+    }
+  };
+
+  // Cancel delete action
+  const cancelDelete = () => {
+    setShowDeleteModal(false);
+    setPyqToDelete(null);
+  };
+
+  //For FilterComponent.jsx 
+  const filterOptions = {
+    branches: branches.map(b => b.value),
+    years: years.map(y => y.value),
+    institutions: institutions.map(i => i.value)
+  };
+
   // Filter PYQ data based on selected filters
   const filterPYQData = (filterValues) => {
     const filtered = pyqData.filter((doc) => {
@@ -179,6 +220,15 @@ const MyPYQs = () => {
 
   return isGhost ? (
     <div className="max-w-6xl mx-auto p-4">
+      {/* Delete Confirmation Modal */}
+      <Confirmation
+        isOpen={showDeleteModal}
+        onCancel={cancelDelete}
+        onConfirm={confirmDelete}
+        title="Confirm PYQ Deletion"
+        message="Are you sure you want to delete this PYQ? This action cannot be undone."
+      />
+
       <FilterComponent
         filter={filter}
         setFilter={setFilter}
@@ -384,7 +434,10 @@ const MyPYQs = () => {
                       <img src={assets.edit_data} alt="edit" className="w-6 h-6 mr-2" />
                       <span className="hidden md:inline">Edit PYQ</span>
                     </button>
-                    <button onClick={() => handleDelete(doc.id)} className="flex bg-red-500 text-white px-4 py-2 rounded-md hover:text-black">
+                    <button
+                      onClick={() => handleDeleteClick(doc.id)}
+                      className="flex bg-red-500 text-white px-4 py-2 rounded-md hover:text-black"
+                    >
                       <img src={assets.delete_data} alt="delete" className="w-6 h-6 mr-2" />
                       <span className="hidden md:inline">Delete PYQ</span>
                     </button>
