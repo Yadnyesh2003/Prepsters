@@ -9,6 +9,7 @@ import FilterComponent from './FilterComponent';
 import PdfViewer from '../student/PdfViewer';
 import { assets, branches, years, institutions, subjects, contributors } from '../../assets/assets';
 import { useAuth } from '../../context/AuthContext';
+import Confirmation from './Confirmation';
 
 const MyFAQs = () => {
   const { isGhost, user } = useAuth();
@@ -16,6 +17,8 @@ const MyFAQs = () => {
   const [filteredData, setFilteredData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [pdfUrl, setPdfUrl] = useState(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [faqToDelete, setFaqToDelete] = useState(null);
 
   const [editingFAQ, setEditingFAQ] = useState(null);
   const [editedData, setEditedData] = useState({
@@ -119,19 +122,32 @@ const MyFAQs = () => {
     }
   };
 
-  const handleDelete = async (faqId) => {
+  const handleDeleteClick = (faqId) => {
+    setFaqToDelete(faqId);
+    setShowDeleteModal(true);
+  };
+
+  const confirmDelete = async () => {
     try {
       if (isGhost) {
-        const faqRef = doc(db, 'FAQs', faqId);
+        const faqRef = doc(db, 'FAQs', faqToDelete);
         await deleteDoc(faqRef);
         getFAQData();
-        toast.success('Deleted data!');
+        toast.success('FAQ deleted successfully!');
       } else {
         toast('Unauthorized Access!', { icon: '🚫' });
       }
     } catch (error) {
-      toast.error(`Error deleting data: ${error.message}`);
+      toast.error(`Error deleting FAQ: ${error.message}`);
+    } finally {
+      setShowDeleteModal(false);
+      setFaqToDelete(null);
     }
+  };
+
+  const cancelDelete = () => {
+    setShowDeleteModal(false);
+    setFaqToDelete(null);
   };
 
   const filterFAQData = (filterValues) => {
@@ -175,6 +191,15 @@ const MyFAQs = () => {
 
   return isGhost ? (
     <div className='max-w-6xl mx-auto p-4'>
+      {/* Delete Confirmation Modal */}
+      <Confirmation
+        isOpen={showDeleteModal}
+        onCancel={cancelDelete}
+        onConfirm={confirmDelete}
+        title="Confirm FAQ Deletion"
+        message="Are you sure you want to delete this FAQ? This action cannot be undone."
+      />
+
       <FilterComponent
         filter={filter}
         setFilter={setFilter}
@@ -201,24 +226,7 @@ const MyFAQs = () => {
                     />
                   </div>
 
-                  {/* FAQ Link */}
-                  <div className="mt-2 flex flex-col md:flex-row md:items-center justify-between gap-2">
-                    <label className="block text-sm font-semibold text-black w-full md:w-1/4">FAQ Link</label>
-                    <input
-                      type="url"
-                      value={editedData.faqsLink}
-                      onChange={(e) => {
-                        const modifiedLink = e.target.value.replace(/\/view\?usp=drive_link$/, '/preview');
-                        setEditedData(prev => ({
-                          ...prev,
-                          faqsLink: modifiedLink
-                        }));
-                      }}
-                      className="border p-2 w-full md:w-3/4 mt-2 md:mt-0"
-                      required
-                      placeholder='Enter GDrive PDF Link...'
-                    />
-                  </div>
+
 
                   {/* Contributor Name Dropdown */}
                   <div className="mt-2 flex flex-col md:flex-row md:items-center justify-between gap-2">
@@ -332,6 +340,25 @@ const MyFAQs = () => {
                     />
                   </div>
 
+                  {/* FAQ Link */}
+                  <div className="mt-2 flex flex-col md:flex-row md:items-center justify-between gap-2">
+                    <label className="block text-sm font-semibold text-black w-full md:w-1/4">FAQ Link</label>
+                    <input
+                      type="url"
+                      value={editedData.faqsLink}
+                      onChange={(e) => {
+                        const modifiedLink = e.target.value.replace(/\/view\?usp=drive_link$/, '/preview');
+                        setEditedData(prev => ({
+                          ...prev,
+                          faqsLink: modifiedLink
+                        }));
+                      }}
+                      className="border p-2 w-full md:w-3/4 mt-2 md:mt-0"
+                      required
+                      placeholder='Enter GDrive PDF Link...'
+                    />
+                  </div>
+
                   {/* Save and Cancel Buttons */}
                   <div className="mt-4 flex gap-4 justify-start">
                     <button
@@ -373,7 +400,10 @@ const MyFAQs = () => {
                       <img src={assets.edit_data} alt="edit" className="w-6 h-6 mr-2" />
                       <span className="hidden md:inline">Edit FAQ</span>
                     </button>
-                    <button onClick={() => handleDelete(doc.id)} className="flex bg-red-500 text-white px-4 py-2 rounded-md hover:text-black">
+                    <button
+                      onClick={() => handleDeleteClick(doc.id)}
+                      className="flex bg-red-500 text-white px-4 py-2 rounded-md hover:text-black"
+                    >
                       <img src={assets.delete_data} alt="delete" className="w-6 h-6 mr-2" />
                       <span className="hidden md:inline">Delete FAQ</span>
                     </button>
