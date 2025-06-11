@@ -8,7 +8,8 @@ import { AppContext } from "../../context/AppContext";
 const animatedComponents = makeAnimated();
 
 const PYQsFilter = ({ onResults }) => {
-  const [filterMode, setFilterMode] = useState("academicYear"); // "academicYear" or "subjectName"
+  const [filterMode, setFilterMode] = useState("subjectName"); // "academicYear" or "subjectName"
+
   const [filters, setFilters] = useState({
     branch: null,
     institution: null,
@@ -110,22 +111,24 @@ const PYQsFilter = ({ onResults }) => {
       </div>
 
       <div className="space-y-4">
-        {/* Branch */}
-        <div>
-          <label className="block mb-1 font-medium">Branch</label>
-          <Select
-            closeMenuOnSelect={false}
-            isMulti
-            name="branch"
-            components={animatedComponents}
-            options={branches}
-            placeholder="Select Branch"
-            value={filters.branch}
-            onChange={handleChange}
-            className="basic-single"
-            classNamePrefix="select"
-          />
-        </div>
+        {/* Branch - Only show for academicYear mode */}
+        {filterMode === "academicYear" && (
+          <div>
+            <label className="block mb-1 font-medium">Branch</label>
+            <Select
+              closeMenuOnSelect={false}
+              isMulti
+              name="branch"
+              components={animatedComponents}
+              options={branches}
+              placeholder="Select Branch"
+              value={filters.branch}
+              onChange={handleChange}
+              className="basic-single"
+              classNamePrefix="select"
+            />
+          </div>
+        )}
 
         {/* Filter Mode Specific Fields */}
         {filterMode === "academicYear" ? (
@@ -143,6 +146,7 @@ const PYQsFilter = ({ onResults }) => {
               className="basic-single"
               classNamePrefix="select"
             />
+
           </div>
         ) : (
           <div>
@@ -152,7 +156,7 @@ const PYQsFilter = ({ onResults }) => {
               isClearable={true}
               components={animatedComponents}
               options={subjects}
-              placeholder="Select Subject"
+              placeholder="Start typing to find the Subject to select it..."
               value={filters.subjectName}
               onChange={handleChange}
               className="basic-single"
@@ -178,59 +182,55 @@ const PYQsFilter = ({ onResults }) => {
         </div>
 
         {/* Year */}
-        <div>
-          <label className="block mb-1 font-medium">Year</label>
-          <Select
-            name="year"
-            isClearable={true}
-            components={animatedComponents}
-            options={years}
-            placeholder="Select Year"
-            value={filters.year}
-            onChange={handleChange}
-            className="basic-single"
-            classNamePrefix="select"
-          />
-        </div>
+        {filterMode === "academicYear" && (
+          <div>
+            <label className="block mb-1 font-medium">Year</label>
+            <Select
+              name="year"
+              isClearable={true}
+              components={animatedComponents}
+              options={years}
+              placeholder="Select Year"
+              value={filters.year}
+              onChange={handleChange}
+              className="basic-single"
+              classNamePrefix="select"
+            />
+          </div>
+        )}
 
-        {/* Submit */}
-        {/* <button
-          onClick={handleSubmit}
-          className={`w-full py-2 rounded text-white ${
-            (!filters.branch &&
-              !filters.academicYear &&
-              !filters.subjectName &&
-              !filters.institution &&
-              !filters.year)
-              ? "bg-gray-400 cursor-not-allowed"
-              : "bg-blue-600 hover:bg-blue-700"
-          }`}
-          disabled={
-            !filters.branch &&
-            !filters.academicYear &&
-            !filters.subjectName &&
-            !filters.institution &&
-            !filters.year
-          }
-        >
-          Apply Filters
-        </button> */}
         {/* Submit */}
         <button
           onClick={handleSubmit}
-          className={`w-full py-2 rounded text-white ${
-            (filterMode === "academicYear" && (!filters.academicYear || filters.academicYear.length === 0)) ||
-            (filterMode === "subjectName" && !filters.subjectName)
-              ? "bg-gray-400 cursor-not-allowed"
-              : "bg-blue-600 hover:bg-blue-700"
-          }`}
+          className={`w-full py-2 rounded text-white ${(filterMode === "academicYear" &&
+            (!filters.academicYear ||
+              filters.academicYear.length === 0 ||
+              !filters.branch ||
+              filters.branch.length === 0 ||
+              !filters.institution ||
+              !filters.year))
+            ||
+            (filterMode === "subjectName" &&
+              (!filters.subjectName || !filters.institution))
+            ? "bg-gray-400 cursor-not-allowed"
+            : "bg-blue-600 hover:bg-blue-700"
+            }`}
           disabled={
-            (filterMode === "academicYear" && (!filters.academicYear || filters.academicYear.length === 0)) ||
-            (filterMode === "subjectName" && !filters.subjectName)
+            (filterMode === "academicYear" &&
+              (!filters.academicYear ||
+                filters.academicYear.length === 0 ||
+                !filters.branch ||
+                filters.branch.length === 0 ||
+                !filters.institution ||
+                !filters.year))
+            ||
+            (filterMode === "subjectName" &&
+              (!filters.subjectName || !filters.institution))
           }
         >
           Apply Filters
         </button>
+
 
       </div>
     </div>
