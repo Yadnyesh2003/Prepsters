@@ -79,6 +79,8 @@ const MySyllabus = () => {
 
     try {
       if (isGhost) {
+        const modifiedLink = editedData.syllabusLink.replace(/\/view\?usp=drive_link$/, '/preview');
+
         const syllabusRef = doc(db, 'Syllabus', editingSyllabus);
         await updateDoc(syllabusRef, {
           syllabusCategory: {
@@ -88,7 +90,7 @@ const MySyllabus = () => {
             year: editedData.year?.value || '',
           },
           syllabusTitle: editedData.syllabusTitle,
-          syllabusLink: editedData.syllabusLink,
+          syllabusLink: modifiedLink,
           updatedBy: user.displayName,
           updatedAt: serverTimestamp(),
         });

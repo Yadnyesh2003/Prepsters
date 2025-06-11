@@ -202,6 +202,7 @@ const PYQsFilter = ({ onResults }) => {
         {/* Submit */}
         <button
           onClick={handleSubmit}
+
           className={`w-full py-2 rounded text-white ${
             (filterMode === "academicYear" &&
               (!filters.academicYear ||
@@ -216,6 +217,7 @@ const PYQsFilter = ({ onResults }) => {
               ? "bg-gray-400 cursor-not-allowed"
               : "bg-blue-600 hover:bg-blue-700"
           }`}
+
           disabled={
             (filterMode === "academicYear" &&
               (!filters.academicYear ||
