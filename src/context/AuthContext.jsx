@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { db, auth, googleProvider } from "../config/firebase";
+import { db, auth, googleProvider, collection, query, where, getDocs, doc, setDoc, serverTimestamp } from "../config/firebase";
 import {
     signInWithPopup,
     signOut,
@@ -7,7 +7,6 @@ import {
     setPersistence,
     browserLocalPersistence
 } from "firebase/auth";
-import { collection, query, where, getDocs, doc, setDoc } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 
 // Create Authentication Context
@@ -53,10 +52,11 @@ export const AuthProvider = ({ children }) => {
             if (!userExists) {
                 const userRef = doc(db, "Users", user.uid);
                 await setDoc(userRef, {
-                    username: user.displayName,
+                    userName: user.displayName,
                     userEmail: user.email,
                     enrolledCourses: [], // Initialize empty array
                     role: "student", // Default role
+                    createdAt: serverTimestamp()
                 });
                 setRole("student"); // Set default role
                 setIsGhost(false); // Default to non-admin

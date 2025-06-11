@@ -144,16 +144,16 @@ function AboutUs() {
               className="space-y-4 mb-10"
             >
               <motion.p
-                className="text-gray-700 text-lg sm:text-xl leading-relaxed"
+                className="text-gray-700 text-lg sm:text-xl leading-relaxed text-justify"
                 initial={{ opacity: 0, y: 10 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.6 }}
               >
-                🎓 Welcome to (<span className="font-semibold text-indigo-600">The Third Tier Engineers</span>) — the ultimate exam-hack zone built by students, for students!
+                🎓 Hey! Welcome to <span className="font-semibold text-indigo-600">The Third Tier Engineers</span> — the ultimate exam-hack zone built by students, for students!
               </motion.p>
 
               <motion.p
-                className="text-gray-700 text-lg sm:text-xl leading-relaxed"
+                className="sm:text-xl text-base md:text-lg text-gray-700 leading-relaxed text-justify"
                 initial={{ opacity: 0, y: 10 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.8 }}
@@ -236,7 +236,7 @@ function AboutUs() {
               <div className="absolute inset-0 rounded-full bg-gradient-to-br from-indigo-400 via-purple-500 to-pink-500 blur-lg opacity-0 group-hover:opacity-70 transition-opacity duration-500"></div>
               <img
                 src={assets.yadnyesh}
-                alt="Dr. James Wilson"
+                alt="Yadnyesh Firke"
                 className="w-64 h-64 md:w-72 md:h-72 object-cover rounded-full border-4 border-white shadow-lg z-10 relative transition-transform duration-500 group-hover:scale-105 group-hover:shadow-2xl group-hover:shadow-indigo-200/50"
               />
               <div className="absolute -inset-2 rounded-full bg-gradient-to-br from-indigo-400 via-purple-500 to-pink-500 opacity-0 group-hover:opacity-100 -z-10 transition-all duration-500 group-hover:animate-pulse-slow"></div>
@@ -247,11 +247,11 @@ function AboutUs() {
               initial={{ opacity: 0, y: 50 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 1.2, type: 'spring', stiffness: 80, delay: 0.4 }}
-              className="bg-white/80 backdrop-blur-md p-8 rounded-xl shadow-xl max-w-2xl text-center md:text-left border border-white/30"
+              className="bg-white/80 backdrop-blur-md p-8 rounded-xl shadow-xl max-w-2xl md:text-left border border-white/30 "
             >
               <h3 className="text-2xl md:text-3xl font-semibold text-indigo-600 mb-4">👨‍💻 Meet the Visionaries</h3>
-              <p className="text-base md:text-lg text-gray-700">
-                Yadnyesh Firke (SAKEC - IT, Mumbai) & Parth Narkhede (VIIT - Comps, Pune) — we're the minds (and coffee-fueled souls ☕) behind The Third Tier Engineers. From the Batch of 2026, just two regular engineering students with an irregularly big vision.
+              <p className="text-base md:text-lg text-gray-700 text-justify">
+                Yadnyesh Firke (SAKEC - IT, Mumbai) & Parth Narkhede (VIIT - Comps, Pune) — we're the minds & coffee-fueled souls ☕ behind <span className="font-semibold text-indigo-600">The Third Tier Engineers</span>. From the Batch of 2026, just two regular engineering students with an irregularly big vision.
                 It all began when Yadnyesh launched a simple Google Site during Sem 3 📅, packed with handwritten notes and PYQs for friends. What started as a “just-helping-bros-out” idea soon helped 60+ students crack their exams with ease 💯. Meanwhile, Parth jumped on board, and
                 together we turned late-night study trends 🌙📚 into a movement — one that makes learning smart, fun, and community-driven.
 
@@ -300,7 +300,7 @@ function AboutUs() {
             viewport={{ once: true }}
             className="bg-white/80 backdrop-blur-md p-8 rounded-xl shadow-xl max-w-5xl mx-auto text-center md:text-left border border-white/30"
           >
-            <p className="text-base md:text-lg text-gray-700">
+            <p className="text-base md:text-lg text-gray-700 text-justify">
               Over months, we studied 📖, coded 🧑‍💻, failed 🐞, debugged 💥, and finally built a platform we wish we had from day one. With features like exam-focused notes, analyzed FAQs, year-wise PYQ libraries, and no-nonsense summaries — this isn’t just a project, it's a rebellion against boring textbooks and stressful study marathons 🎯🔥<br /><br />
               We're not just aspiring developers — we're builders of a student-first learning revolution. If you're someone who believes in sharing knowledge, solving problems, and helping others ace their goals… guess what? You belong here 🙌<br /><br />
               Join us. Contribute. Build. Because <span className="font-semibold text-indigo-600">The Third Tier Engineers</span> is more than a name — it’s a community of underdogs turning into achievers. 🚀🌟
@@ -365,7 +365,7 @@ function AboutUs() {
                       whileInView={{ opacity: 1, x: 0 }}
                       transition={{ duration: 1, ease: "easeOut", delay: index * 0.2 + 0.3 }}
                       viewport={{ once: true }}
-                      className="bg-white/80 backdrop-blur-md p-4 rounded-md border border-gray-200 text-xs md:text-sm text-gray-600 shadow-sm"
+                      className="bg-white/80 backdrop-blur-md p-4 rounded-md border border-gray-200 text-xs md:text-sm text-gray-600 shadow-sm text-justify"
                     >
                       {item.description}
                     </motion.div>

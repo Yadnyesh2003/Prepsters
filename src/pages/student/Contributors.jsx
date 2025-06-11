@@ -1,36 +1,50 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { collection, getDocs } from "firebase/firestore";
-import { db } from "../../config/firebase"; // your db
+import { collection, getDocs, onSnapshot } from "firebase/firestore";
+import { db } from "../../config/firebase";
 import { motion } from "framer-motion";
 import confetti from "canvas-confetti";
+
+const CONTRIBUTORS_KEY = "contributorsData";
 
 const Contributors = () => {
   const [contributors, setContributors] = useState([]);
 
   useEffect(() => {
-    const fetchContributors = async () => {
-      try {
-        const querySnapshot = await getDocs(collection(db, "Contributors"));
-        const contributorsData = querySnapshot.docs.map((doc) => ({
+    const cachedData = localStorage.getItem(CONTRIBUTORS_KEY);
+    if (cachedData) {
+      setContributors(JSON.parse(cachedData));
+    }
+
+    const colRef = collection(db, "Contributors");
+    // const unsubscribe = onSnapshot(colRef, async (snapshot) => {
+    //   const contributorsData = snapshot.docs.map((doc) => ({
+    //     id: doc.id,
+    //     ...doc.data(),
+    //   }));
+    //   localStorage.setItem(CONTRIBUTORS_KEY, JSON.stringify(contributorsData));
+    //   setContributors(contributorsData);
+    // });
+    const unsubscribe = onSnapshot(colRef, async (snapshot) => {
+      const contributorsData = snapshot.docs
+        .map((doc) => ({
           id: doc.id,
           ...doc.data(),
-        }));
-        setContributors(contributorsData);
-      } catch (error) {
-        console.error("Error fetching contributors:", error);
-      }
-    };
+        }))
+        .sort((a, b) => a.createdAt?.toDate() - b.createdAt?.toDate()); // sorting by timestamp
+    
+      localStorage.setItem(CONTRIBUTORS_KEY, JSON.stringify(contributorsData));
+      setContributors(contributorsData);
+    });    
 
-    fetchContributors();
-
-    // Fire confetti animation after page load
     triggerConfetti();
+
+    return () => unsubscribe();
   }, []);
 
   const triggerConfetti = () => {
-    const end = Date.now() + 3 * 1000; // 3 seconds
+    const end = Date.now() + 3 * 1000;
     const colors = ["#a786ff", "#fd8bbc", "#eca184", "#f8deb1"];
 
     const frame = () => {
@@ -107,4 +121,3 @@ const Contributors = () => {
 };
 
 export default Contributors;
-

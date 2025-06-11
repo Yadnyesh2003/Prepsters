@@ -202,19 +202,22 @@ const PYQsFilter = ({ onResults }) => {
         {/* Submit */}
         <button
           onClick={handleSubmit}
-          className={`w-full py-2 rounded text-white ${(filterMode === "academicYear" &&
-            (!filters.academicYear ||
-              filters.academicYear.length === 0 ||
-              !filters.branch ||
-              filters.branch.length === 0 ||
-              !filters.institution ||
-              !filters.year))
-            ||
+
+          className={`w-full py-2 rounded text-white ${
+            (filterMode === "academicYear" &&
+              (!filters.academicYear ||
+                filters.academicYear.length === 0 ||
+                !filters.branch ||
+                filters.branch.length === 0 ||
+                !filters.institution ||
+                !filters.year))
+              ||
             (filterMode === "subjectName" &&
               (!filters.subjectName || !filters.institution))
-            ? "bg-gray-400 cursor-not-allowed"
-            : "bg-blue-600 hover:bg-blue-700"
-            }`}
+              ? "bg-gray-400 cursor-not-allowed"
+              : "bg-blue-600 hover:bg-blue-700"
+          }`}
+
           disabled={
             (filterMode === "academicYear" &&
               (!filters.academicYear ||
