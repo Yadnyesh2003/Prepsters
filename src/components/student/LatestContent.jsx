@@ -13,7 +13,6 @@ const LatestContent = () => {
 
     const openPdfViewer = (url) => {
         setPdfUrl(url);
-        console.log("URL", url);
     }
     const closePdfViewer = () => setPdfUrl(null);
 

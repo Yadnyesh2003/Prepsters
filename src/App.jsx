@@ -1,19 +1,16 @@
 import React, { lazy, Suspense, useState } from 'react';
 import { Route, Routes, useMatch } from 'react-router-dom'
-import { Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 
 
 import Landing from './pages/student/Landing'
 
-// import Home from './pages/student/Home'
-// import ExamPrep from './pages/student/ExamPrep'
+
 import Contributors from './pages/student/Contributors'
 import AboutUs from './pages/student/AboutUs'
 import Syllabus from './pages/student/Syllabus'
 import PYQs from './pages/student/PYQs'
 import FAQs from './pages/student/FAQs'
-// import Resources from './pages/student/Resourses'
 import CoursesList from './pages/student/CoursesList'
 import CourseDetails from './pages/student/CourseDetails'
 import MyEnrollments from './pages/student/MyEnrollments'
@@ -38,12 +35,9 @@ import AddFAQs from './components/admin/AddFAQs'
 import AddNotes from './components/admin/AddNotes'
 import Loader from './components/student/Loading'
 
-import { useAuth } from "./context/AuthContext";
-
 import { AuthProvider } from "./context/AuthContext";
 import ProtectedRoute from "./middleware/ProtectedRoute";
-import AccessForbidden from './components/student/AcessForbidden';
-// import AccessForbidden from './components/student/AccessForbidden';
+import AccessForbidden from './components/student/AccessForbidden';
 import Navbar from './components/student/NavBar';
 import Profile from './pages/student/Profile';
 
@@ -87,8 +81,6 @@ function App() {
           <Routes>
 
             <Route path='/' element={<Landing />} />
-            {/* <Route path='/login' element={<Login />} /> */}
-            {/* <Route path='/signup' element={<Signup />} /> */}
             <Route path='/contributors' element={<Contributors />} />
             <Route path='/about-us' element={<AboutUs />} />
             

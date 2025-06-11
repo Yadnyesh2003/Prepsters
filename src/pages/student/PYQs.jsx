@@ -32,8 +32,10 @@ const PYQs = () => {
         (t) => (
           <div
             onClick={() => toast.remove(t.id)}
+
             className={`${t.visible ? "animate-enter" : "animate-leave"
               } cursor-pointer max-w-xs w-auto bg-yellow-100 text-yellow-800 shadow-lg rounded-lg pointer-events-auto flex items-center justify-center px-6 py-2`}
+
           >
             <div className="flex items-center space-x-2">
               <span className="text-xl">⚠️</span>
@@ -82,7 +84,9 @@ const PYQs = () => {
           <button
             onClick={() => {
               setShowFilter(true);
+
               toast.dismiss();
+
               setPyqsData([]);
             }}
             className="text-white px-4 py-2 rounded border-white border-2 bg-yellow-500 hover:bg-purple-700"
