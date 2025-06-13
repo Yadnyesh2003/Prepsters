@@ -1,53 +1,54 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { getDocs, collection, db, doc, updateDoc, deleteDoc, serverTimestamp } from '../../config/firebase';
-import { AppContext } from '../../context/AppContext'
+import { AppContext } from '../../context/AppContext';
 import Select from 'react-select';
 import makeAnimated from 'react-select/animated';
-import AccessForbidden from '../student/AccessForbidden'
+import AccessForbidden from '../student/AccessForbidden';
 import Loading from '../../components/admin/Loading';
 import FilterComponent from './FilterComponent';
 import PdfViewer from '../student/PdfViewer';
 import { assets, branches, years, institutions, subjects, contributors } from '../../assets/assets';
 import { useAuth } from '../../context/AuthContext';
-
+import Confirmation from './Confirmation';
 
 const MyFAQs = () => {
   const { isGhost, user } = useAuth();
   const [faqData, setFaqData] = useState([]);
-  const [filteredData, setFilteredData] = useState([]); 
+  const [filteredData, setFilteredData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [pdfUrl, setPdfUrl] = useState(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [faqToDelete, setFaqToDelete] = useState(null);
 
   const [editingFAQ, setEditingFAQ] = useState(null);
   const [editedData, setEditedData] = useState({
-    branch: [],
+    faqsCategory: {
+      branch: [],
+      institution: '',
+      subjectName: '',
+      year: ''
+    },
     faqsTitle: '',
-    contributorName: '',
-    subjectName: '', 
-    searchQuery: ''
+    faqsLink: '',
+    contributorName: ''
   });
 
   const [filter, setFilter] = useState({
     branch: '',
     institution: '',
-    year: ''
+    year: '',
+    searchQuery: ''
   });
 
   const { toast } = useContext(AppContext);
   const animatedComponents = makeAnimated();
 
-  //================================================================================================================================================================================================
-
-  //For FilterComponent.jsx 
   const filterOptions = {
     branches: branches.map(b => b.value),
     years: years.map(y => y.value),
     institutions: institutions.map(i => i.value)
   };
 
-  //===============================================================================================================================================================================================
-
-  // Fetch FAQ data from Firestore
   const getFAQData = async () => {
     try {
       const querySnapshot = await getDocs(collection(db, 'FAQs'));
@@ -56,7 +57,7 @@ const MyFAQs = () => {
         ...doc.data(),
       }));
       setFaqData(faqs);
-      setFilteredData(faqs); // Initially show all data
+      setFilteredData(faqs);
       setLoading(false);
     } catch (error) {
       toast.error(`Error fetching FAQs: ${error.message}`);
@@ -70,17 +71,21 @@ const MyFAQs = () => {
     }
   }, [isGhost]);
 
-  // Handle Edit - Set the FAQ to be edited
   const handleEdit = (faq) => {
     setEditingFAQ(faq.id);
     setEditedData({
-      ...faq.faqsCategory || {},
-      faqsTitle: faq.faqsTitle,
-      contributorName: faq.contributorName
+      faqsCategory: {
+        branch: faq.faqsCategory?.branch || [],
+        institution: faq.faqsCategory?.institution || '',
+        subjectName: faq.faqsCategory?.subjectName || '',
+        year: faq.faqsCategory?.year || ''
+      },
+      faqsTitle: faq.faqsTitle || '',
+      faqsLink: faq.faqsLink || '',
+      contributorName: faq.contributorName || ''
     });
   };
 
-  // Save edited data back to Firestore
   const handleSaveEdit = async () => {
     if (!editingFAQ) return;
 
@@ -88,57 +93,78 @@ const MyFAQs = () => {
       if (isGhost) {
         const faqRef = doc(db, 'FAQs', editingFAQ);
         await updateDoc(faqRef, {
-          faqsCategory: editedData,
+          faqsCategory: editedData.faqsCategory,
           faqsTitle: editedData.faqsTitle,
+          faqsLink: editedData.faqsLink,
           contributorName: editedData.contributorName,
           updatedBy: user.displayName,
           updatedAt: serverTimestamp(),
         });
         setEditingFAQ(null);
-        setEditedData({});
-        getFAQData(); // Reload data from Firestore
-        toast.success('Changes Saved!')
+        setEditedData({
+          faqsCategory: {
+            branch: [],
+            institution: '',
+            subjectName: '',
+            year: ''
+          },
+          faqsTitle: '',
+          faqsLink: '',
+          contributorName: ''
+        });
+        getFAQData();
+        toast.success('Changes Saved!');
       } else {
-        toast('Unauthorized Access!', { icon: '🚫' })
+        toast('Unauthorized Access!', { icon: '🚫' });
       }
     } catch (error) {
       toast.error(`Error saving data: ${error.message}`);
     }
   };
 
-  // Handle Delete - Delete the FAQ from Firestore
-  const handleDelete = async (faqId) => {
+  const handleDeleteClick = (faqId) => {
+    setFaqToDelete(faqId);
+    setShowDeleteModal(true);
+  };
+
+  const confirmDelete = async () => {
     try {
       if (isGhost) {
-        const faqRef = doc(db, 'FAQs', faqId);
+        const faqRef = doc(db, 'FAQs', faqToDelete);
         await deleteDoc(faqRef);
-        getFAQData(); // Reload data from Firestore after deletion
-        toast.success('Deleted data!')
+        getFAQData();
+        toast.success('FAQ deleted successfully!');
       } else {
-        toast('Unauthorized Access!', { icon: '🚫' })
+        toast('Unauthorized Access!', { icon: '🚫' });
       }
     } catch (error) {
-      toast.error(`Error deleting data: ${error.message}`);
+      toast.error(`Error deleting FAQ: ${error.message}`);
+    } finally {
+      setShowDeleteModal(false);
+      setFaqToDelete(null);
     }
   };
 
-  // Filter FAQ data based on selected filters
+  const cancelDelete = () => {
+    setShowDeleteModal(false);
+    setFaqToDelete(null);
+  };
+
   const filterFAQData = (filterValues) => {
     const filtered = faqData.filter((doc) => {
       const { branch, institution, year } = doc.faqsCategory || {};
       const title = doc.faqsTitle || '';
-  
+
       const institutionMatch = filterValues.institution
         ? institution && institution.toLowerCase().includes(filterValues.institution.toLowerCase())
         : true;
-        
+
       const searchMatch = filterValues.searchQuery
         ? title.toLowerCase().includes(filterValues.searchQuery.toLowerCase())
         : true;
-  
-      // Check if the branch filter matches any of the branches in the array
+
       const branchMatch = filterValues.branch
-        ? branch && branch.includes(filterValues.branch) // Check if the selected branch is in the array
+        ? branch && branch.includes(filterValues.branch)
         : true;
 
       return (
@@ -148,36 +174,15 @@ const MyFAQs = () => {
         searchMatch
       );
     });
-    setFilteredData(filtered); // Update the filtered data
+    setFilteredData(filtered);
   };
-
-  // Handle Year Radio Selection
-  const handleYearChange = (e) => {
-    setEditedData({
-      ...editedData,
-      year: e.target.value, // Set selected year
-    });
-  };
-
-  const handleBranchChange = (e) => {
-    const branch = e.target.value;
-    const updatedBranches = e.target.checked
-      ? [...editedData.branch, branch]  // Add branch if checked
-      : editedData.branch.filter((b) => b !== branch);  // Remove branch if unchecked
-
-    setEditedData({
-      ...editedData,
-      branch: updatedBranches,  // Update branch as an array
-    });
-  };
-
 
   const openPdfViewer = (url) => {
-    setPdfUrl(url); // Set the PDF URL to be displayed in the viewer
+    setPdfUrl(url);
   };
 
   const closePdfViewer = () => {
-    setPdfUrl(null); // Close the viewer by setting PDF URL to null
+    setPdfUrl(null);
   };
 
   if (loading) {
@@ -186,7 +191,15 @@ const MyFAQs = () => {
 
   return isGhost ? (
     <div className='max-w-6xl mx-auto p-4'>
-      {/* Filter Component */}
+      {/* Delete Confirmation Modal */}
+      <Confirmation
+        isOpen={showDeleteModal}
+        onCancel={cancelDelete}
+        onConfirm={confirmDelete}
+        title="Confirm FAQ Deletion"
+        message="Are you sure you want to delete this FAQ? This action cannot be undone."
+      />
+
       <FilterComponent
         filter={filter}
         setFilter={setFilter}
@@ -194,14 +207,12 @@ const MyFAQs = () => {
         onFilterChange={filterFAQData}
       />
 
-      {/* Displaying Filtered FAQ Data */}
       <div className="space-y-4">
         {filteredData.map((doc) => {
           const faqsCategory = doc.faqsCategory || {};
           return (
             <div key={doc.id} className="bg-sky-100 shadow-lg rounded-lg p-4 flex flex-col items-start">
               {editingFAQ === doc.id ? (
-                // Edit form here (same as your original code)
                 <div className="w-full max-w-5xl mx-auto p-4">
                   {/* FAQ Title */}
                   <div className="mt-2 flex flex-col md:flex-row md:items-center justify-between gap-2">
@@ -209,11 +220,13 @@ const MyFAQs = () => {
                     <input
                       type="text"
                       value={editedData.faqsTitle}
-                      onChange={(e) => setEditedData({ ...editedData, faqsTitle: e.target.value })}
+                      onChange={(e) => setEditedData(prev => ({ ...prev, faqsTitle: e.target.value }))}
                       className="border p-2 w-full md:w-3/4 mt-2 md:mt-0"
                       required
                     />
                   </div>
+
+
 
                   {/* Contributor Name Dropdown */}
                   <div className="mt-2 flex flex-col md:flex-row md:items-center justify-between gap-2">
@@ -225,7 +238,7 @@ const MyFAQs = () => {
                       options={contributors}
                       value={contributors.find((c) => c.value === editedData.contributorName)}
                       onChange={(selected) =>
-                        setEditedData((prev) => ({
+                        setEditedData(prev => ({
                           ...prev,
                           contributorName: selected ? selected.value : '',
                         }))
@@ -235,7 +248,6 @@ const MyFAQs = () => {
                     />
                   </div>
 
-
                   {/* Branches Multi-Select Dropdown */}
                   <div className="mt-2 flex flex-col md:flex-row md:items-center justify-between gap-2">
                     <label className="block text-sm font-semibold text-black w-full md:w-1/4">Branch</label>
@@ -244,11 +256,14 @@ const MyFAQs = () => {
                       components={animatedComponents}
                       name="branch"
                       options={branches}
-                      value={branches.filter((b) => editedData.branch.includes(b.value))}
+                      value={branches.filter((b) => editedData.faqsCategory.branch.includes(b.value))}
                       onChange={(selectedOptions) =>
-                        setEditedData((prev) => ({
+                        setEditedData(prev => ({
                           ...prev,
-                          branch: selectedOptions.map((option) => option.value),
+                          faqsCategory: {
+                            ...prev.faqsCategory,
+                            branch: selectedOptions.map((option) => option.value),
+                          }
                         }))
                       }
                       className="w-full md:w-3/4 mt-2 md:mt-0 text-black"
@@ -264,11 +279,14 @@ const MyFAQs = () => {
                       isClearable
                       components={animatedComponents}
                       options={institutions}
-                      value={institutions.find((i) => i.value === editedData.institution)}
+                      value={institutions.find((i) => i.value === editedData.faqsCategory.institution)}
                       onChange={(selected) =>
-                        setEditedData((prev) => ({
+                        setEditedData(prev => ({
                           ...prev,
-                          institution: selected ? selected.value : '',
+                          faqsCategory: {
+                            ...prev.faqsCategory,
+                            institution: selected ? selected.value : '',
+                          }
                         }))
                       }
                       className="w-full md:w-3/4 mt-2 md:mt-0 text-black"
@@ -284,18 +302,20 @@ const MyFAQs = () => {
                       isClearable
                       components={animatedComponents}
                       options={subjects}
-                      value={subjects.find((s) => s.value === editedData.subjectName)}
+                      value={subjects.find((s) => s.value === editedData.faqsCategory.subjectName)}
                       onChange={(selected) =>
-                        setEditedData((prev) => ({
+                        setEditedData(prev => ({
                           ...prev,
-                          subjectName: selected ? selected.value : '',
+                          faqsCategory: {
+                            ...prev.faqsCategory,
+                            subjectName: selected ? selected.value : '',
+                          }
                         }))
                       }
                       className="w-full md:w-3/4 mt-2 md:mt-0 text-black"
                       placeholder="Select Subject"
                     />
                   </div>
-
 
                   {/* Year Dropdown */}
                   <div className="mt-2 flex flex-col md:flex-row md:items-center justify-between gap-2">
@@ -305,15 +325,37 @@ const MyFAQs = () => {
                       isClearable
                       components={animatedComponents}
                       options={years}
-                      value={years.find((y) => y.value === editedData.year)}
+                      value={years.find((y) => y.value === editedData.faqsCategory.year)}
                       onChange={(selected) =>
-                        setEditedData((prev) => ({
+                        setEditedData(prev => ({
                           ...prev,
-                          year: selected ? selected.value : '',
+                          faqsCategory: {
+                            ...prev.faqsCategory,
+                            year: selected ? selected.value : '',
+                          }
                         }))
                       }
                       className="w-full md:w-3/4 mt-2 md:mt-0 text-black"
                       placeholder="Select Year"
+                    />
+                  </div>
+
+                  {/* FAQ Link */}
+                  <div className="mt-2 flex flex-col md:flex-row md:items-center justify-between gap-2">
+                    <label className="block text-sm font-semibold text-black w-full md:w-1/4">FAQ Link</label>
+                    <input
+                      type="url"
+                      value={editedData.faqsLink}
+                      onChange={(e) => {
+                        const modifiedLink = e.target.value.replace(/\/view\?usp=drive_link$/, '/preview');
+                        setEditedData(prev => ({
+                          ...prev,
+                          faqsLink: modifiedLink
+                        }));
+                      }}
+                      className="border p-2 w-full md:w-3/4 mt-2 md:mt-0"
+                      required
+                      placeholder='Enter GDrive PDF Link...'
                     />
                   </div>
 
@@ -358,7 +400,10 @@ const MyFAQs = () => {
                       <img src={assets.edit_data} alt="edit" className="w-6 h-6 mr-2" />
                       <span className="hidden md:inline">Edit FAQ</span>
                     </button>
-                    <button onClick={() => handleDelete(doc.id)} className="flex bg-red-500 text-white px-4 py-2 rounded-md hover:text-black">
+                    <button
+                      onClick={() => handleDeleteClick(doc.id)}
+                      className="flex bg-red-500 text-white px-4 py-2 rounded-md hover:text-black"
+                    >
                       <img src={assets.delete_data} alt="delete" className="w-6 h-6 mr-2" />
                       <span className="hidden md:inline">Delete FAQ</span>
                     </button>
@@ -371,8 +416,7 @@ const MyFAQs = () => {
       </div>
       {pdfUrl && <PdfViewer pdfUrl={pdfUrl} onClose={closePdfViewer} />}
     </div>
-  ) : (<AccessForbidden />)
+  ) : <AccessForbidden />;
 }
 
-export default MyFAQs
-
+export default MyFAQs;

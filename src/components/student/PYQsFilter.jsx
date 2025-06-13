@@ -4,13 +4,13 @@ import makeAnimated from "react-select/animated";
 import { db, collection, query, where, getDocs } from "../../config/firebase";
 import { branches, years, institutions, subjects, academicYears } from "../../assets/assets";
 import { AppContext } from "../../context/AppContext";
+import { usePersistentState } from '../../hooks/usePersistentState';
 
 const animatedComponents = makeAnimated();
 
 const PYQsFilter = ({ onResults }) => {
-  const [filterMode, setFilterMode] = useState("subjectName"); // "academicYear" or "subjectName"
-
-  const [filters, setFilters] = useState({
+  const [filterMode, setFilterMode] = usePersistentState('pyqsFilterMode', 'subjectName');
+  const [filters, setFilters] = usePersistentState('pyqsFilters', {
     branch: null,
     institution: null,
     year: null,
@@ -98,10 +98,38 @@ const PYQsFilter = ({ onResults }) => {
     }
   };
 
+
+  const clearFilters = () => {
+    setFilters({
+      branch: null,
+      institution: null,
+      year: null,
+      subjectName: null,
+      academicYear: null,
+    });
+    // onResults([]);
+    toast.dismiss();
+    toast.success("Filters cleared!");
+  };
+
+  // Cleanup effect when component unmounts
+  // useEffect(() => {
+  //   return () => {
+  //     // Optional: Clear filters when component unmounts
+  //     // localStorage.removeItem('faqsFilters');
+  //   };
+  // }, []);
+
   return (
     <div className="bg-white border-2 border-indigo-500 p-6 rounded-lg shadow-md space-y-4 max-w-md mx-auto">
       <div className="flex justify-between items-center mb-4">
         <h3 className="text-lg font-semibold">Filter PYQs</h3>
+        {/* <button
+          onClick={clearFilters}
+          className="text-sm text-white bg-red-500 hover:bg-red-600 px-3 py-1 rounded"
+        >
+          Clear All
+        </button> */}
         <button
           onClick={handleToggle}
           className="text-sm text-white hover:animate-pulse hover:bg-indigo-700 bg-indigo-500 rounded-full h-6 w-[50%]"
@@ -199,11 +227,20 @@ const PYQsFilter = ({ onResults }) => {
           </div>
         )}
 
-        {/* Submit */}
-        <button
-          onClick={handleSubmit}
-          className={`w-full py-2 rounded text-white ${
-            (filterMode === "academicYear" &&
+        <div className="flex space-x-2">
+
+          <button
+            type="button"
+            onClick={clearFilters}
+            className=" text-sm text-white bg-red-500 hover:bg-red-600 px-3 py-1 rounded"
+          >
+            Clear
+          </button>
+
+          {/* Submit */}
+          <button
+            onClick={handleSubmit}
+            className={`w-full py-2 rounded text-white ${(filterMode === "academicYear" &&
               (!filters.academicYear ||
                 filters.academicYear.length === 0 ||
                 !filters.branch ||
@@ -211,26 +248,27 @@ const PYQsFilter = ({ onResults }) => {
                 !filters.institution ||
                 !filters.year))
               ||
-            (filterMode === "subjectName" &&
-              (!filters.subjectName || !filters.institution))
+              (filterMode === "subjectName" &&
+                (!filters.subjectName || !filters.institution))
               ? "bg-gray-400 cursor-not-allowed"
               : "bg-blue-600 hover:bg-blue-700"
-          }`}
-          disabled={
-            (filterMode === "academicYear" &&
-              (!filters.academicYear ||
-                filters.academicYear.length === 0 ||
-                !filters.branch ||
-                filters.branch.length === 0 ||
-                !filters.institution ||
-                !filters.year))
-            ||
-            (filterMode === "subjectName" &&
-              (!filters.subjectName || !filters.institution))
-          }
-        >
-          Apply Filters
-        </button>
+              }`}
+            disabled={
+              (filterMode === "academicYear" &&
+                (!filters.academicYear ||
+                  filters.academicYear.length === 0 ||
+                  !filters.branch ||
+                  filters.branch.length === 0 ||
+                  !filters.institution ||
+                  !filters.year))
+              ||
+              (filterMode === "subjectName" &&
+                (!filters.subjectName || !filters.institution))
+            }
+          >
+            Apply Filters
+          </button>
+        </div>
 
 
       </div>

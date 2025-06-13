@@ -1,30 +1,35 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { getDocs, collection, db, doc, updateDoc, deleteDoc, serverTimestamp } from '../../config/firebase'; 
+import { getDocs, collection, db, doc, updateDoc, deleteDoc, serverTimestamp } from '../../config/firebase';
 import { AppContext } from '../../context/AppContext';
 import Select from 'react-select';
 import makeAnimated from 'react-select/animated';
 import Loading from '../../components/admin/Loading';
 import PdfViewer from '../student/PdfViewer';
-import { assets, branches, institutions, years, contributors, subjects} from '../../assets/assets';
+import { assets, branches, institutions, years, contributors, subjects } from '../../assets/assets';
 import { useAuth } from '../../context/AuthContext';
-
 import FilterComponent from './FilterComponent';
 import AccessForbidden from '../student/AccessForbidden';
-
+import Confirmation from './Confirmation';
 
 const MyNotes = () => {
   const { isGhost, user } = useAuth();
   const [noteData, setNoteData] = useState([]);
-  const [filteredData, setFilteredData] = useState([]); // New state to hold the filtered syllabus data
+  const [filteredData, setFilteredData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [pdfUrl, setPdfUrl] = useState(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [noteToDelete, setNoteToDelete] = useState(null);
 
   const [editingNote, setEditingNote] = useState(null);
   const [editedData, setEditedData] = useState({
-    branch: [],
-    subjectName: [],   //subjectName can be selected multiple as array element
-    pyqsTitle: '',
+    notesCategory: {
+      branch: [],
+      subjectName: [],
+      year: ''
+    },
+    notesTitle: '',
     contributorName: '',
+    notesLink: ''
   });
 
   const [filter, setFilter] = useState({
@@ -36,17 +41,12 @@ const MyNotes = () => {
   const { toast } = useContext(AppContext);
   const animatedComponents = makeAnimated();
 
-//================================================================================================================================================================================================
-
-  //For FilterComponent.jsx 
   const filterOptions = {
     branches: branches.map(b => b.value),
     years: years.map(y => y.value),
     institutions: institutions.map(i => i.value)
   };
 
-//===============================================================================================================================================================================================
-  
   const getNoteData = async () => {
     try {
       const querySnapshot = await getDocs(collection(db, 'Notes'));
@@ -54,9 +54,8 @@ const MyNotes = () => {
         id: doc.id,
         ...doc.data(),
       }));
-
       setNoteData(notes);
-      setFilteredData(notes); // Initially show all data
+      setFilteredData(notes);
       setLoading(false);
     } catch (error) {
       toast.error(`Error fetching Notes: ${error.message}`);
@@ -64,121 +63,128 @@ const MyNotes = () => {
     }
   };
 
-  useEffect(()=>{
-    if(isGhost){
+  useEffect(() => {
+    if (isGhost) {
       getNoteData();
     }
   }, [isGhost]);
 
-  // Handle Edit - Set the PYQ to be edited
   const handleEdit = (note) => {
     setEditingNote(note.id);
-    setEditedData({ 
-      ...note.notesCategory || {}, 
-      notesTitle: note.notesTitle ,
-      contributorName: note.contributorName
+    setEditedData({
+      notesCategory: {
+        branch: note.notesCategory?.branch || [],
+        subjectName: note.notesCategory?.subjectName || [],
+        year: note.notesCategory?.year || ''
+      },
+      notesTitle: note.notesTitle || '',
+      contributorName: note.contributorName || '',
+      notesLink: note.notesLink || ''
     });
   };
 
-  // Save edited data back to Firestore
   const handleSaveEdit = async () => {
     if (!editingNote) return;
 
     try {
-      if(isGhost) {
+      if (isGhost) {
         const noteRef = doc(db, 'Notes', editingNote);
         await updateDoc(noteRef, {
-          notesCategory: editedData,
+          notesCategory: editedData.notesCategory,
           notesTitle: editedData.notesTitle,
           contributorName: editedData.contributorName,
+          notesLink: editedData.notesLink,
           updatedBy: user.displayName,
           updatedAt: serverTimestamp(),
         });
         setEditingNote(null);
-        setEditedData({});
-        getNoteData(); // Reload data from Firestore
-        toast.success('Changes Saved!')
+        setEditedData({
+          notesCategory: {
+            branch: [],
+            subjectName: [],
+            year: ''
+          },
+          notesTitle: '',
+          contributorName: '',
+          notesLink: ''
+        });
+        getNoteData();
+        toast.success('Changes Saved!');
+      } else {
+        toast('Unauthorized Access!', { icon: '🚫' });
       }
     } catch (error) {
-      toast('Unauthorized Access!', {icon: '🚫'})
+      toast.error(`Error saving data: ${error.message}`);
     }
   };
 
-  // Handle Delete - Delete the PYQ from Firestore
-  const handleDelete = async (noteId) => {
+  const handleDeleteClick = (noteId) => {
+    setNoteToDelete(noteId);
+    setShowDeleteModal(true);
+  };
+
+  const confirmDelete = async () => {
     try {
-      if(isGhost) {
-        const noteRef = doc(db, 'Notes', noteId);
+      if (isGhost) {
+        const noteRef = doc(db, 'Notes', noteToDelete);
         await deleteDoc(noteRef);
-        getNoteData(); // Reload data from Firestore after deletion
-        toast.success('Deleted data!')
+        getNoteData();
+        toast.success('Note deleted successfully!');
       } else {
-        toast('Unauthorized Access!', {icon: '🚫'})
+        toast('Unauthorized Access!', { icon: '🚫' });
       }
     } catch (error) {
       toast.error(`Error deleting data: ${error.message}`);
+    } finally {
+      setShowDeleteModal(false);
+      setNoteToDelete(null);
     }
   };
 
-//======================================================================================================
-  // const handleFilterChange = (e) => {
-  //   const { name, value } = e.target;
-  //   const updatedFilter = { ...filter, [name]: value };
-  //   setFilter(updatedFilter); // Update filter state
-  //   filterPYQData(updatedFilter); // Immediately apply the filter with the updated state
-  // };
-//=======================================================================================================
+  const cancelDelete = () => {
+    setShowDeleteModal(false);
+    setNoteToDelete(null);
+  };
 
-  // Filter PYQ data based on selected filters
   const filterNoteData = (filterValues) => {
     const filtered = noteData.filter((doc) => {
       const { branch, year } = doc.notesCategory || {};
       const title = doc.notesTitle || '';
-  
-      // Check if the branch filter matches any of the branches in the array
+
       const branchMatch = filterValues.branch
-        ? branch && branch.includes(filterValues.branch) // Check if the selected branch is in the array
+        ? branch && branch.includes(filterValues.branch)
         : true;
-    
+
       const searchMatch = filterValues.searchQuery
         ? title.toLowerCase().includes(filterValues.searchQuery.toLowerCase())
         : true;
-  
+
       return (
         branchMatch &&
         (filterValues.year ? year === filterValues.year : true) &&
         searchMatch
       );
     });
-    setFilteredData(filtered); // Update the filtered data
+    setFilteredData(filtered);
   };
 
-  // Handle Year Radio Selection
-  const handleYearChange = (e) => {
-    setEditedData({
-      ...editedData,
-      year: e.target.value, // Set selected year
-    });
+  const handleLinkChange = (e) => {
+    let modifiedLink = e.target.value;
+    if (modifiedLink.includes("/view?usp=drive_link")) {
+      modifiedLink = modifiedLink.replace(/\/view\?usp=drive_link$/, '/preview');
+    }
+    setEditedData(prev => ({
+      ...prev,
+      notesLink: modifiedLink
+    }));
   };
 
-  const handleBranchChange = (e) => {
-    const branch = e.target.value;
-    const updatedBranches = e.target.checked
-      ? [...editedData.branch, branch]  // Add branch if checked
-      : editedData.branch.filter((b) => b !== branch);  // Remove branch if unchecked
-  
-    setEditedData({
-      ...editedData,
-      branch: updatedBranches,  // Update branch as an array
-    });
-  };
-  
   const openPdfViewer = (url) => {
-    setPdfUrl(url); // Set the PDF URL to be displayed in the viewer
+    setPdfUrl(url);
   };
 
   const closePdfViewer = () => {
-    setPdfUrl(null); // Close the viewer by setting PDF URL to null
+    setPdfUrl(null);
   };
 
   if (loading) {
@@ -186,24 +192,28 @@ const MyNotes = () => {
   }
 
   return isGhost ? (
-    <div className="max-w-6xl mx-auto p-4">
-    <h6 className='text-xs text-black text-center bg-amber-200 border rounded-4xl mb-2'>Institution Filter Is Inactive on This Page!</h6>
-    {/* Filter Component */}
-    <FilterComponent 
-      filter={filter}
-      setFilter={setFilter}
-      filterOptions={filterOptions}
-      onFilterChange={filterNoteData}
-    />
+    <div className="max-w-6xl mx-auto p-4 relative">
+      <Confirmation
+        isOpen={showDeleteModal}
+        onCancel={cancelDelete}
+        onConfirm={confirmDelete}
+      />
 
-    {/* Displaying Filtered PYQ Data */}
-    <div className="space-y-4">
+      <h6 className='text-xs text-black text-center bg-amber-200 border rounded-4xl mb-2'>Institution Filter Is Inactive on This Page!</h6>
+
+      <FilterComponent
+        filter={filter}
+        setFilter={setFilter}
+        filterOptions={filterOptions}
+        onFilterChange={filterNoteData}
+      />
+
+      <div className="space-y-4">
         {filteredData.map((doc) => {
           const notesCategory = doc.notesCategory || {};
           return (
             <div key={doc.id} className="bg-sky-100 shadow-lg rounded-lg p-4 flex flex-col items-start">
               {editingNote === doc.id ? (
-                // Edit form here (same as your original code)
                 <div className="w-full max-w-5xl mx-auto p-4">
                   {/* Notes Title */}
                   <div className="mt-2 flex flex-col md:flex-row md:items-center justify-between gap-2">
@@ -211,7 +221,7 @@ const MyNotes = () => {
                     <input
                       type="text"
                       value={editedData.notesTitle}
-                      onChange={(e) => setEditedData({ ...editedData, notesTitle: e.target.value })}
+                      onChange={(e) => setEditedData(prev => ({ ...prev, notesTitle: e.target.value }))}
                       className="border p-2 w-full md:w-3/4 mt-2 md:mt-0"
                       required
                     />
@@ -227,7 +237,7 @@ const MyNotes = () => {
                       options={contributors}
                       value={contributors.find((c) => c.value === editedData.contributorName)}
                       onChange={(selected) =>
-                        setEditedData((prev) => ({
+                        setEditedData(prev => ({
                           ...prev,
                           contributorName: selected ? selected.value : '',
                         }))
@@ -237,49 +247,53 @@ const MyNotes = () => {
                     />
                   </div>
 
-
                   {/* Branches Drop Down */}
                   <div className="mt-2 flex flex-col md:flex-row md:items-center justify-between gap-2">
-                  <label className="block text-sm font-semibold text-black w-full md:w-1/4">Branch</label>
-                  <Select
-                    name="branch"
-                    isMulti
-                    closeMenuOnSelect={false}
-                    components={animatedComponents}
-                    options={branches}
-                    value={branches.filter((b) => editedData.branch.includes(b.value))}
-                    onChange={(selected) =>
-                      setEditedData((prev) => ({
-                        ...prev,
-                        branch: selected.map((s) => s.value),
-                      }))
-                    }
-                    className="w-full md:w-3/4 mt-2 md:mt-0 text-black"
-                    placeholder="Select Branch(es)"
-                  />
-                </div>
+                    <label className="block text-sm font-semibold text-black w-full md:w-1/4">Branch</label>
+                    <Select
+                      name="branch"
+                      isMulti
+                      closeMenuOnSelect={false}
+                      components={animatedComponents}
+                      options={branches}
+                      value={branches.filter((b) => editedData.notesCategory.branch.includes(b.value))}
+                      onChange={(selected) =>
+                        setEditedData(prev => ({
+                          ...prev,
+                          notesCategory: {
+                            ...prev.notesCategory,
+                            branch: selected.map((s) => s.value),
+                          }
+                        }))
+                      }
+                      className="w-full md:w-3/4 mt-2 md:mt-0 text-black"
+                      placeholder="Select Branch(es)"
+                    />
+                  </div>
 
-                  {/* Edit Subject Names */}
+                  {/* Subject Names */}
                   <div className="mt-2 flex flex-col md:flex-row md:items-center justify-between gap-2">
-                  <label className="block text-sm font-semibold text-black w-full md:w-1/4">Subject Name</label>
-                  <Select
-                    name="subjectName"
-                    isMulti
-                    closeMenuOnSelect={false}
-                    components={animatedComponents}
-                    options={subjects}
-                    value={subjects.filter((s) => editedData.subjectName.includes(s.value))}
-                    onChange={(selected) =>
-                      setEditedData((prev) => ({
-                        ...prev,
-                        subjectName: selected.map((s) => s.value),
-                      }))
-                    }
-                    className="w-full md:w-3/4 mt-2 md:mt-0 text-black"
-                    placeholder="Select Subject(s)"
-                  />
-                </div>
-
+                    <label className="block text-sm font-semibold text-black w-full md:w-1/4">Subject Name</label>
+                    <Select
+                      name="subjectName"
+                      isMulti
+                      closeMenuOnSelect={false}
+                      components={animatedComponents}
+                      options={subjects}
+                      value={subjects.filter((s) => editedData.notesCategory.subjectName.includes(s.value))}
+                      onChange={(selected) =>
+                        setEditedData(prev => ({
+                          ...prev,
+                          notesCategory: {
+                            ...prev.notesCategory,
+                            subjectName: selected.map((s) => s.value),
+                          }
+                        }))
+                      }
+                      className="w-full md:w-3/4 mt-2 md:mt-0 text-black"
+                      placeholder="Select Subject(s)"
+                    />
+                  </div>
 
                   {/* Year DropDown */}
                   <div className="mt-2 flex flex-col md:flex-row md:items-center justify-between gap-2">
@@ -289,16 +303,32 @@ const MyNotes = () => {
                       isClearable
                       components={animatedComponents}
                       options={years}
-                      value={years.find((y) => y.value === editedData.year)}
+                      value={years.find((y) => y.value === editedData.notesCategory.year)}
                       onChange={(selected) =>
-                        setEditedData((prev) => ({
+                        setEditedData(prev => ({
                           ...prev,
-                          year: selected ? selected.value : '',
+                          notesCategory: {
+                            ...prev.notesCategory,
+                            year: selected ? selected.value : '',
+                          }
                         }))
                       }
                       className="w-full md:w-3/4 mt-2 md:mt-0 text-black"
                       placeholder="Select Year"
-                  />
+                    />
+                  </div>
+
+                  {/* Notes Link */}
+                  <div className="mt-2 flex flex-col md:flex-row md:items-center justify-between gap-2">
+                    <label className="block text-sm font-semibold text-black w-full md:w-1/4">Notes Link</label>
+                    <input
+                      type="url"
+                      value={editedData.notesLink}
+                      onChange={handleLinkChange}
+                      className="border p-2 w-full md:w-3/4 mt-2 md:mt-0"
+                      required
+                      placeholder="Enter GDrive PDF Link..."
+                    />
                   </div>
 
                   {/* Save and Cancel Buttons */}
@@ -325,7 +355,7 @@ const MyNotes = () => {
                     <p className="text-gray-700">Subject Name: {Array.isArray(notesCategory.subjectName) ? notesCategory.subjectName.join(', ') : ''}</p>
                   )}
                   {notesCategory.branch && (
-                    <p className="text-gray-700">Branch: {Array.isArray(notesCategory.branch) ? notesCategory.branch.join(', '): ''}</p>
+                    <p className="text-gray-700">Branch: {Array.isArray(notesCategory.branch) ? notesCategory.branch.join(', ') : ''}</p>
                   )}
                   {notesCategory.year && (
                     <p className="text-gray-700">Year: {notesCategory.year}</p>
@@ -339,7 +369,10 @@ const MyNotes = () => {
                       <img src={assets.edit_data} alt="edit" className="w-6 h-6 mr-2" />
                       <span className="hidden md:inline">Edit Notes</span>
                     </button>
-                    <button onClick={() => handleDelete(doc.id)} className="flex bg-red-500 text-white px-4 py-2 rounded-md hover:text-black">
+                    <button
+                      onClick={() => handleDeleteClick(doc.id)}
+                      className="flex bg-red-500 text-white px-4 py-2 rounded-md hover:text-black"
+                    >
                       <img src={assets.delete_data} alt="delete" className="w-6 h-6 mr-2" />
                       <span className="hidden md:inline">Delete Notes</span>
                     </button>
@@ -352,7 +385,7 @@ const MyNotes = () => {
       </div>
       {pdfUrl && <PdfViewer pdfUrl={pdfUrl} onClose={closePdfViewer} />}
     </div>
-  ) : <AccessForbidden />
+  ) : <AccessForbidden />;
 }
 
-export default MyNotes
+export default MyNotes;

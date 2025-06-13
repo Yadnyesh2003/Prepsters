@@ -9,6 +9,7 @@ import { assets, branches, institutions, subjects, years, contributors, academic
 import { useAuth } from '../../context/AuthContext';
 import FilterComponent from './FilterComponent';
 import AccessForbidden from '../student/AccessForbidden';
+import Confirmation from './Confirmation';
 
 const MyPYQs = () => {
   const { isGhost, user } = useAuth();
@@ -16,12 +17,20 @@ const MyPYQs = () => {
   const [filteredData, setFilteredData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [pdfUrl, setPdfUrl] = useState(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [pyqToDelete, setPyqToDelete] = useState(null);
 
   const [editingPYQ, setEditingPYQ] = useState(null);
   const [editedData, setEditedData] = useState({
-    branch: [],
+    pyqsCategory: {
+      academicYear: '',
+      branch: [],
+      institution: '',
+      subjectName: [],
+      year: ''
+    },
     pyqsTitle: '',
-    subjectName: [], 
+    pyqsLink: '',
     contributorName: ''
   });
 
@@ -32,30 +41,19 @@ const MyPYQs = () => {
     searchQuery: ''
   });
 
-  const {toast} = useContext(AppContext)
-
-//================================================================================================================================================================================================
-
-  //For FilterComponent.jsx 
-  const filterOptions = {
-    branches: branches.map(b => b.value),
-    years: years.map(y => y.value),
-    institutions: institutions.map(i => i.value)
-  };
-
-//===============================================================================================================================================================================================
+  const { toast } = useContext(AppContext);
 
   // Fetch PYQ data from Firestore
   const getPYQData = async () => {
     try {
-        const querySnapshot = await getDocs(collection(db, 'PYQs'));
-        const pyqs = querySnapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-        setPyqData(pyqs);
-        setFilteredData(pyqs); // Initially show all data
-        setLoading(false);
+      const querySnapshot = await getDocs(collection(db, 'PYQs'));
+      const pyqs = querySnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setPyqData(pyqs);
+      setFilteredData(pyqs);
+      setLoading(false);
     } catch (error) {
       toast.error(`Error fetching PYQs: ${error.message}`);
       setLoading(false);
@@ -71,11 +69,33 @@ const MyPYQs = () => {
   // Handle Edit - Set the PYQ to be edited
   const handleEdit = (pyq) => {
     setEditingPYQ(pyq.id);
-    setEditedData({ 
-      ...pyq.pyqsCategory || {}, 
-      pyqsTitle: pyq.pyqsTitle,
+    setEditedData({
+      pyqsCategory: {
+        academicYear: pyq.pyqsCategory?.academicYear || '',
+        branch: pyq.pyqsCategory?.branch || [],
+        institution: pyq.pyqsCategory?.institution || '',
+        subjectName: pyq.pyqsCategory?.subjectName || [],
+        year: pyq.pyqsCategory?.year || ''
+      },
+      pyqsTitle: pyq.pyqsTitle || '',
+      pyqsLink: pyq.pyqsLink || '',
       contributorName: pyq.contributorName || ''
     });
+  };
+
+  // Handle link change with the same logic as AddPYQs
+  const handleLinkChange = (e) => {
+    let modifiedLink = e.target.value;
+
+    // Check if the link matches the Google Drive view URL pattern
+    if (modifiedLink.includes("/view?usp=drive_link")) {
+      modifiedLink = modifiedLink.replace(/\/view\?usp=drive_link$/, '/preview');
+    }
+
+    setEditedData(prev => ({
+      ...prev,
+      pyqsLink: modifiedLink
+    }));
   };
 
   // Save edited data back to Firestore
@@ -83,109 +103,115 @@ const MyPYQs = () => {
     if (!editingPYQ) return;
 
     try {
-      if(isGhost) {
+      if (isGhost) {
         const pyqRef = doc(db, 'PYQs', editingPYQ);
         await updateDoc(pyqRef, {
-          pyqsCategory: editedData,
+          pyqsCategory: {
+            academicYear: editedData.pyqsCategory.academicYear,
+            branch: editedData.pyqsCategory.branch,
+            institution: editedData.pyqsCategory.institution,
+            subjectName: editedData.pyqsCategory.subjectName,
+            year: editedData.pyqsCategory.year
+          },
           pyqsTitle: editedData.pyqsTitle,
+          pyqsLink: editedData.pyqsLink,
           contributorName: editedData.contributorName,
           updatedBy: user.displayName,
           updatedAt: serverTimestamp(),
         });
         setEditingPYQ(null);
-        setEditedData({});
-        getPYQData(); // Reload data from Firestore
-        toast.success('Changes Saved!')
+        setEditedData({
+          pyqsCategory: {
+            academicYear: '',
+            branch: [],
+            institution: '',
+            subjectName: [],
+            year: ''
+          },
+          pyqsTitle: '',
+          pyqsLink: '',
+          contributorName: ''
+        });
+        getPYQData();
+        toast.success('Changes Saved!');
       }
     } catch (error) {
-      toast('Unauthorized Access!', {icon: '🚫'})
+      toast('Unauthorized Access!', { icon: '🚫' });
     }
   };
 
-  // Handle Delete - Delete the PYQ from Firestore
-  const handleDelete = async (pyqId) => {
+  // Handle delete click - show confirmation modal
+  const handleDeleteClick = (pyqId) => {
+    setPyqToDelete(pyqId);
+    setShowDeleteModal(true);
+  };
+
+  // Confirm delete action
+  const confirmDelete = async () => {
     try {
-      if(isGhost) {
-        const pyqRef = doc(db, 'PYQs', pyqId);
+      if (isGhost) {
+        const pyqRef = doc(db, 'PYQs', pyqToDelete);
         await deleteDoc(pyqRef);
-        getPYQData(); // Reload data from Firestore after deletion
-        toast.success('Deleted data!')
+        getPYQData();
+        toast.success('PYQ deleted successfully!');
       } else {
-    toast('Unauthorized Access!', {icon: '🚫'})
+        toast('Unauthorized Access!', { icon: '🚫' });
+      }
+    } catch (error) {
+      toast.error(`Error deleting PYQ: ${error.message}`);
+    } finally {
+      setShowDeleteModal(false);
+      setPyqToDelete(null);
     }
-  } catch (error) {
-    toast.error(`Error deleting data: ${error.message}`);
-  }
-};
+  };
 
+  // Cancel delete action
+  const cancelDelete = () => {
+    setShowDeleteModal(false);
+    setPyqToDelete(null);
+  };
 
-//======================================================================================================
-  // const handleFilterChange = (e) => {
-  //   const { name, value } = e.target;
-  //   const updatedFilter = { ...filter, [name]: value };
-  //   setFilter(updatedFilter); // Update filter state
-  //   filterPYQData(updatedFilter); // Immediately apply the filter with the updated state
-  // };
-//=======================================================================================================
+  //For FilterComponent.jsx 
+  const filterOptions = {
+    branches: branches.map(b => b.value),
+    years: years.map(y => y.value),
+    institutions: institutions.map(i => i.value)
+  };
 
   // Filter PYQ data based on selected filters
-const filterPYQData = (filterValues) => {
-  const filtered = pyqData.filter((doc) => {
-    const { branch, institution, year } = doc.pyqsCategory || {};
-    const title = doc.pyqsTitle || '';
+  const filterPYQData = (filterValues) => {
+    const filtered = pyqData.filter((doc) => {
+      const { branch, institution, year } = doc.pyqsCategory || {};
+      const title = doc.pyqsTitle || '';
 
-    const institutionMatch = filterValues.institution
-      ? institution && institution.toLowerCase().includes(filterValues.institution.toLowerCase())
-      : true;
+      const institutionMatch = filterValues.institution
+        ? institution && institution.toLowerCase().includes(filterValues.institution.toLowerCase())
+        : true;
 
-    // Check if the branch filter matches any of the branches in the array
-    const branchMatch = filterValues.branch
-      ? branch && branch.includes(filterValues.branch) // Check if the selected branch is in the array
-      : true;
+      const branchMatch = filterValues.branch
+        ? branch && branch.includes(filterValues.branch)
+        : true;
 
-    const searchMatch = filterValues.searchQuery
-      ? title.toLowerCase().includes(filterValues.searchQuery.toLowerCase())
-      : true;
+      const searchMatch = filterValues.searchQuery
+        ? title.toLowerCase().includes(filterValues.searchQuery.toLowerCase())
+        : true;
 
-    return (
-      branchMatch &&
-      institutionMatch &&
-      (filterValues.year ? year === filterValues.year : true) &&
-      searchMatch
-    );
-  });
-  setFilteredData(filtered); // Update the filtered data
-};
-
-
-  // Handle Year Radio Selection
-  const handleYearChange = (e) => {
-    setEditedData({
-      ...editedData,
-      year: e.target.value, // Set selected year
+      return (
+        branchMatch &&
+        institutionMatch &&
+        (filterValues.year ? year === filterValues.year : true) &&
+        searchMatch
+      );
     });
+    setFilteredData(filtered);
   };
-
-
-  const handleBranchChange = (e) => {
-    const branch = e.target.value;
-    const updatedBranches = e.target.checked
-      ? [...editedData.branch, branch]  // Add branch if checked
-      : editedData.branch.filter((b) => b !== branch);  // Remove branch if unchecked
-  
-    setEditedData({
-      ...editedData,
-      branch: updatedBranches,  // Update branch as an array
-    });
-  };
-  
 
   const openPdfViewer = (url) => {
-    setPdfUrl(url); // Set the PDF URL to be displayed in the viewer
+    setPdfUrl(url);
   };
 
   const closePdfViewer = () => {
-    setPdfUrl(null); // Close the viewer by setting PDF URL to null
+    setPdfUrl(null);
   };
 
   if (loading) {
@@ -194,26 +220,28 @@ const filterPYQData = (filterValues) => {
 
   return isGhost ? (
     <div className="max-w-6xl mx-auto p-4">
-      {/* Filter Component */}
-      <FilterComponent 
+      {/* Delete Confirmation Modal */}
+      <Confirmation
+        isOpen={showDeleteModal}
+        onCancel={cancelDelete}
+        onConfirm={confirmDelete}
+        title="Confirm PYQ Deletion"
+        message="Are you sure you want to delete this PYQ? This action cannot be undone."
+      />
+
+      <FilterComponent
         filter={filter}
         setFilter={setFilter}
         filterOptions={filterOptions}
         onFilterChange={filterPYQData}
       />
 
-
-      {/* INITIAL CODE PRESENT HERE HAS BEEN SHIFTER BELOW OUT OF THE RETURN STATEMENT */}
-  
-
-      {/* Displaying Filtered PYQ Data */}
       <div className="space-y-4">
         {filteredData.map((doc) => {
           const pyqsCategory = doc.pyqsCategory || {};
           return (
             <div key={doc.id} className="bg-sky-100 shadow-lg rounded-lg p-4 flex flex-col items-start">
               {editingPYQ === doc.id ? (
-                // Edit form here (same as your original code)
                 <div className="w-full max-w-5xl mx-auto p-4">
                   {/* PYQ Title */}
                   <div className="mt-2 flex flex-col md:flex-row md:items-center justify-between gap-2">
@@ -221,7 +249,7 @@ const filterPYQData = (filterValues) => {
                     <input
                       type="text"
                       value={editedData.pyqsTitle}
-                      onChange={(e) => setEditedData({ ...editedData, pyqsTitle: e.target.value })}
+                      onChange={(e) => setEditedData(prev => ({ ...prev, pyqsTitle: e.target.value }))}
                       className="border p-2 w-full md:w-3/4 mt-2 md:mt-0"
                       required
                     />
@@ -234,7 +262,7 @@ const filterPYQData = (filterValues) => {
                       components={makeAnimated()}
                       options={contributors}
                       value={{ label: editedData.contributorName, value: editedData.contributorName }}
-                      onChange={(selectedOption) => setEditedData({ ...editedData, contributorName: selectedOption.value })}
+                      onChange={(selectedOption) => setEditedData(prev => ({ ...prev, contributorName: selectedOption.value }))}
                       placeholder="Select Contributor"
                       className="w-full md:w-3/4 mt-2 md:mt-0 text-black"
                       isClearable
@@ -248,10 +276,16 @@ const filterPYQData = (filterValues) => {
                       components={makeAnimated()}
                       isMulti
                       options={branches}
-                      value={editedData.branch.map(branch => ({ label: branch, value: branch }))}
+                      value={editedData.pyqsCategory.branch.map(branch => ({ label: branch, value: branch }))}
                       onChange={(selectedOptions) => {
                         const branches = selectedOptions.map(option => option.value);
-                        setEditedData({ ...editedData, branch: branches });
+                        setEditedData(prev => ({
+                          ...prev,
+                          pyqsCategory: {
+                            ...prev.pyqsCategory,
+                            branch: branches
+                          }
+                        }));
                       }}
                       placeholder="Select Branches"
                       className="w-full md:w-3/4 mt-2 md:mt-0 text-black"
@@ -265,14 +299,19 @@ const filterPYQData = (filterValues) => {
                     <Select
                       components={makeAnimated()}
                       options={academicYears}
-                      value={{ label: editedData.academicYear, value: editedData.academicYear }}
-                      onChange={(selectedOption) => setEditedData({ ...editedData, academicYear: selectedOption.value })}
+                      value={{ label: editedData.pyqsCategory.academicYear, value: editedData.pyqsCategory.academicYear }}
+                      onChange={(selectedOption) => setEditedData(prev => ({
+                        ...prev,
+                        pyqsCategory: {
+                          ...prev.pyqsCategory,
+                          academicYear: selectedOption.value
+                        }
+                      }))}
                       placeholder="Select Academic Year"
                       className="w-full md:w-3/4 mt-2 md:mt-0 text-black"
                       isClearable
                     />
                   </div>
-
 
                   {/* Institution */}
                   <div className="mt-2 flex flex-col md:flex-row md:items-center justify-between gap-2">
@@ -280,8 +319,14 @@ const filterPYQData = (filterValues) => {
                     <Select
                       components={makeAnimated()}
                       options={institutions}
-                      value={{ label: editedData.institution, value: editedData.institution }}
-                      onChange={(selectedOption) => setEditedData({ ...editedData, institution: selectedOption.value })}
+                      value={{ label: editedData.pyqsCategory.institution, value: editedData.pyqsCategory.institution }}
+                      onChange={(selectedOption) => setEditedData(prev => ({
+                        ...prev,
+                        pyqsCategory: {
+                          ...prev.pyqsCategory,
+                          institution: selectedOption.value
+                        }
+                      }))}
                       placeholder="Select Institution"
                       className="w-full md:w-3/4 mt-2 md:mt-0 text-black"
                       isClearable
@@ -295,10 +340,16 @@ const filterPYQData = (filterValues) => {
                       components={makeAnimated()}
                       isMulti
                       options={subjects}
-                      value={editedData.subjectName.map(subject => ({ label: subject, value: subject }))}
+                      value={editedData.pyqsCategory.subjectName.map(subject => ({ label: subject, value: subject }))}
                       onChange={(selectedOptions) => {
                         const subjects = selectedOptions.map(option => option.value);
-                        setEditedData({ ...editedData, subjectName: subjects });
+                        setEditedData(prev => ({
+                          ...prev,
+                          pyqsCategory: {
+                            ...prev.pyqsCategory,
+                            subjectName: subjects
+                          }
+                        }));
                       }}
                       placeholder="Select Subjects"
                       className="w-full md:w-3/4 mt-2 md:mt-0 text-black"
@@ -306,18 +357,36 @@ const filterPYQData = (filterValues) => {
                     />
                   </div>
 
-
-                  {/* Year Radio Buttons */}
+                  {/* Year Selection */}
                   <div className="mt-2 flex flex-col md:flex-row md:items-center justify-between gap-2">
                     <label className="block text-sm font-semibold text-black w-full md:w-1/4">Year</label>
                     <Select
                       components={makeAnimated()}
                       options={years}
-                      value={{ label: editedData.year, value: editedData.year }}
-                      onChange={(selectedOption) => setEditedData({ ...editedData, year: selectedOption.value })}
+                      value={{ label: editedData.pyqsCategory.year, value: editedData.pyqsCategory.year }}
+                      onChange={(selectedOption) => setEditedData(prev => ({
+                        ...prev,
+                        pyqsCategory: {
+                          ...prev.pyqsCategory,
+                          year: selectedOption.value
+                        }
+                      }))}
                       placeholder="Select Year"
                       className="w-full md:w-3/4 mt-2 md:mt-0 text-black"
                       isClearable
+                    />
+                  </div>
+
+                  {/* PYQs Link (Newly Added) */}
+                  <div className="mt-2 flex flex-col md:flex-row md:items-center justify-between gap-2">
+                    <label className="block text-sm font-semibold text-black w-full md:w-1/4">PYQs Link</label>
+                    <input
+                      type="url"
+                      value={editedData.pyqsLink}
+                      onChange={handleLinkChange}
+                      className="w-full md:w-3/4 mt-2 md:mt-0 border p-2"
+                      required
+                      placeholder="Enter GDrive PDF Link..."
                     />
                   </div>
 
@@ -365,7 +434,10 @@ const filterPYQData = (filterValues) => {
                       <img src={assets.edit_data} alt="edit" className="w-6 h-6 mr-2" />
                       <span className="hidden md:inline">Edit PYQ</span>
                     </button>
-                    <button onClick={() => handleDelete(doc.id)} className="flex bg-red-500 text-white px-4 py-2 rounded-md hover:text-black">
+                    <button
+                      onClick={() => handleDeleteClick(doc.id)}
+                      className="flex bg-red-500 text-white px-4 py-2 rounded-md hover:text-black"
+                    >
                       <img src={assets.delete_data} alt="delete" className="w-6 h-6 mr-2" />
                       <span className="hidden md:inline">Delete PYQ</span>
                     </button>
@@ -378,7 +450,7 @@ const filterPYQData = (filterValues) => {
       </div>
       {pdfUrl && <PdfViewer pdfUrl={pdfUrl} onClose={closePdfViewer} />}
     </div>
-  ) : <AccessForbidden/>
+  ) : <AccessForbidden />
 };
 
 export default MyPYQs;

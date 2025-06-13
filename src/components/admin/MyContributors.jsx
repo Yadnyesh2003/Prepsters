@@ -5,47 +5,40 @@ import Loading from '../../components/admin/Loading'
 import { assets } from '../../assets/assets';
 import { useAuth } from '../../context/AuthContext';
 import AccessForbidden from '../student/AccessForbidden';
+import Confirmation from './Confirmation';
 
 const MyContributors = () => {
   const { isGhost, user } = useAuth();
-  const [contributorData, setContributorData] = useState([]); // Store contributors data
-  const [loading, setLoading] = useState(true); // Manage loading state
-
-  // Track which contributor is being edited
+  const [contributorData, setContributorData] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [editingContributor, setEditingContributor] = useState(null);
   const [editedData, setEditedData] = useState({});
+  const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
+  const [contributorToDelete, setContributorToDelete] = useState(null);
 
-  const { toast } = useContext(AppContext)
+  const { toast } = useContext(AppContext);
 
-  // Function to fetch contributor data from Firestore
   const getContributorData = async () => {
     try {
-      // Reference to the 'contributors' collection in Firestore
       const querySnapshot = await getDocs(collection(db, 'Contributors'));
-
-      // Create an array to store fetched data
       const contributors = [];
       querySnapshot.forEach((doc) => {
-        // Add each document data to the contributors array
         contributors.push({ ...doc.data(), id: doc.id });
       });
-
-      setContributorData(contributors); // Set the fetched data to state
-      setLoading(false); // Set loading state to false after data is fetched
+      setContributorData(contributors);
+      setLoading(false);
     } catch (error) {
-      toast.error(`Oops! Couldn't fetch Contributors. ${error.message}`); // Set error state in case of failure
-      setLoading(false); // Stop loading state if there's an error
+      toast.error(`Oops! Couldn't fetch Contributors. ${error.message}`);
+      setLoading(false);
     }
   };
 
-  // Fetch data when component mounts and `isGhost` is true
   useEffect(() => {
     if (isGhost) {
-      getContributorData(); // Fetch data if user is 'Ghost'
+      getContributorData();
     }
-  }, [isGhost]); // Re-run effect if `isGhost` changes
+  }, [isGhost]);
 
-  // Handle Edit button click: set the contributor as editable
   const handleEdit = (contributor) => {
     setEditingContributor(contributor.id);
     setEditedData({
@@ -56,25 +49,38 @@ const MyContributors = () => {
     });
   };
 
-  const handleDelete = async (id) => {
+  const handleDeleteClick = (id) => {
+    setContributorToDelete(id);
+    setShowDeleteConfirmation(true);
+  };
+
+  const handleDeleteCancel = () => {
+    setShowDeleteConfirmation(false);
+    setContributorToDelete(null);
+  };
+
+  const handleDeleteConfirm = async () => {
     try {
-      if (isGhost) {
-        const contributorToDelete = contributorData.find(contributor => contributor.id === id);
-        const contributorName = contributorToDelete?.contributorName || 'Contributor';
-        await deleteDoc(doc(db, 'Contributors', id));
+      if (isGhost && contributorToDelete) {
+        const contributorToDeleteData = contributorData.find(contributor => contributor.id === contributorToDelete);
+        const contributorName = contributorToDeleteData?.contributorName || 'Contributor';
+
+        await deleteDoc(doc(db, 'Contributors', contributorToDelete));
         setContributorData(prevData =>
-          prevData.filter(contributor => contributor.id !== id)
+          prevData.filter(contributor => contributor.id !== contributorToDelete)
         );
         toast.success(`Deleted contributions of ${contributorName}`);
       } else {
-        toast('Unauthorized Access!', { icon: '🚫' })
+        toast('Unauthorized Access!', { icon: '🚫' });
       }
     } catch (error) {
       toast.error(`Oops! Couldn't delete. ${error.message}`);
+    } finally {
+      setShowDeleteConfirmation(false);
+      setContributorToDelete(null);
     }
   };
 
-  // Handle change in form inputs
   const handleChange = (e) => {
     const { name, value } = e.target;
     setEditedData(prevData => ({
@@ -83,13 +89,11 @@ const MyContributors = () => {
     }));
   };
 
-  // Save edited data to Firestore
   const handleSave = async (id) => {
     try {
       if (isGhost) {
         const contributorRef = doc(db, 'Contributors', id);
 
-        // Update contributor data in Firestore
         await updateDoc(contributorRef, {
           contributorName: editedData.contributorName,
           contributorRole: editedData.contributorRole,
@@ -99,16 +103,15 @@ const MyContributors = () => {
           updatedAt: serverTimestamp(),
         });
 
-        // Update the local state after saving
         setContributorData(prevData =>
           prevData.map((contributor) =>
             contributor.id === id ? { ...contributor, ...editedData } : contributor
           )
         );
-        setEditingContributor(null); // Reset editing state
-        toast.success('Changes Saved!')
+        setEditingContributor(null);
+        toast.success('Changes Saved!');
       } else {
-        toast('Unauthorized Access!', { icon: '🚫' })
+        toast('Unauthorized Access!', { icon: '🚫' });
       }
     } catch (error) {
       toast.error(`Error saving data: ${error.message}`);
@@ -116,11 +119,20 @@ const MyContributors = () => {
   };
 
   if (loading) {
-    return <Loading />; // Show loading indicator while fetching
+    return <Loading />;
   }
 
   return isGhost ? (
     <div className="container mx-auto py-2 px-2">
+      {/* Delete Confirmation Dialog */}
+      <Confirmation
+        isOpen={showDeleteConfirmation}
+        onCancel={handleDeleteCancel}
+        onConfirm={handleDeleteConfirm}
+        title="Confirm Contributor Deletion"
+        message="Are you sure you want to delete this contributor? This action cannot be undone."
+      />
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 space-x-0.5">
         {contributorData.map((contributor) => (
           <div key={contributor.id} className="bg-sky-100 p-6 rounded-lg shadow-lg hover:bg-blue-200">
@@ -181,7 +193,7 @@ const MyContributors = () => {
                   <img src={assets.edit_data} alt='edit' className='w-6 h-6 mr-2' />
                   <span className="hidden md:inline">Edit Contributor</span>
                 </button>
-                <button onClick={() => handleDelete(contributor.id)} className="mt-4 flex bg-red-500 text-white px-4 py-2 rounded-md hover:text-black">
+                <button onClick={() => handleDeleteClick(contributor.id)} className="mt-4 flex bg-red-500 text-white px-4 py-2 rounded-md hover:text-black">
                   <img src={assets.delete_data} alt='delete' className='md:justify-center w-6 h-6 mr-2' />
                   <span className="hidden md:inline">Delete Contributor</span>
                 </button>
