@@ -220,7 +220,12 @@ const MySyllabus = () => {
                     <input
                       type="text"
                       value={editedData.syllabusLink}
-                      onChange={(e) => setEditedData({ ...editedData, syllabusLink: e.target.value })}
+                      // onChange={(e) => setEditedData({ ...editedData, syllabusLink: e.target.value })}
+                      onChange={(e) => {
+                        const inputValue = e.target.value;
+                        const modifiedLink = inputValue.replace(/\/view\?usp=drive_link$/, '/preview');
+                        setEditedData({ ...editedData, syllabusLink: modifiedLink });
+                      }}                      
                       className="border p-2 w-full md:w-3/4 mt-2 md:mt-0"
                       required
                       placeholder="Enter PDF URL"
