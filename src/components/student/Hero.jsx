@@ -18,10 +18,10 @@ const Hero = () => {
             </div>
 
             {/* Content Container */}
-            <div className="relative z-10 flex flex-col md:flex-row items-center justify-between px-6 md:px-20 py-16 md:pb-24 pt-12">
+            <div className="relative z-10 flex flex-col md:flex-row items-center justify-between px-6 md:px-20 py-16 md:pb-16 pt-12">
                 {/* Text Section */}
                 <div className="w-full md:w-1/2 text-center md:text-left text-white md:text-black">
-                    <h1 className="text-4xl md:text-5xl font-extrabold mb-6 leading-tight">
+                    <h1 className="text-5xl md:text-6xl font-extrabold mb-6 leading-tight">
                         Engineering Exam <br />
                         <span className="bg-gradient-to-r from-violet-500 via-purple-500 to-fuchsia-600 bg-clip-text text-transparent font-bold">
                             Success Partner
@@ -29,7 +29,7 @@ const Hero = () => {
 
 
                     </h1>
-                    <p className="text-lg mb-8 text-gray-200 md:text-gray-600">
+                    <p className="text-2xl mb-8 text-gray-200 md:text-gray-600">
                         Navigate your B.Tech journey with confidence. Access personalized learning analytics,
                         comprehensive study materials, and FAQs — all in one place.
                     </p>

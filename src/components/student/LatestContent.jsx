@@ -68,7 +68,7 @@ const LatestContent = () => {
 
     return user ? (
         <section className="relative w-full">
-            <div className="px-4 py-8 w-full">
+            <div className="px-4 py-2 pb-8 w-full">
                 <h2 className="text-2xl font-bold mb-6 text-center">Check out our Latest Study Resources!</h2>
 
                 {/* NOTES */}
