@@ -193,7 +193,7 @@ const NavbarHome = () => {
           </button>
 
           {dropdown.profile && (
-            <div className="absolute right-0 mt-2 w-64 bg-white text-black rounded-lg shadow-xl z-50 border border-gray-100 overflow-hidden">
+            <div className="absolute right-0 mt-2 w-85 bg-white text-black rounded-lg shadow-xl z-50 border border-gray-100 overflow-hidden">
               <div className="p-4 border-b border-gray-100">
                 <div className="flex items-center space-x-3 mb-3">
                   {userAvatar ? (
