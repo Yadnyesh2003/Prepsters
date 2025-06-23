@@ -160,7 +160,7 @@ export const subjects = [
   { value: "Distributed Computing", label: "Distributed Computing" },
   { value: "Image & Video Processing", label: "Image & Video Processing" },
   { value: "Data Analytics and Visualization", label: "Data Analytics and Visualization" },
-  { value: "Software Engineering and Project Management", label: "Software Engineering and Project Management"},
+  { value: "Software Engineering and Project Management", label: "Software Engineering and Project Management" },
   { value: "Machine Learning", label: "Machine Learning" },
 
 ];
@@ -196,4 +196,7 @@ export const academicYears = [
   { value: "Dec 18", label: "Dec 18" },
   { value: "May 18", label: "May 18" }
 ];
+
+
+export const avatarNicheOptions = ["adventurer", "bottts", "rings", "bottts-neutral", "pixel-art"];
 

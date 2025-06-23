@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { db, auth, googleProvider, collection, query, where, getDocs, doc, setDoc, serverTimestamp } from "../config/firebase";
+import { db, auth, googleProvider, collection, query, where, getDoc, getDocs, doc, setDoc, serverTimestamp, updateDoc } from "../config/firebase";
 import {
     signInWithPopup,
     signOut,
@@ -19,8 +19,9 @@ export const AuthProvider = ({ children }) => {
     const [isGhost, setIsGhost] = useState(false);
     const navigate = useNavigate();
     const [loading, setLoading] = useState(true); // Add this
+    const [isProfileComplete, setIsProfileComplete] = useState(false);
 
-    
+
 
 
     // Function to fetch user role from Firestore based on email
@@ -56,13 +57,34 @@ export const AuthProvider = ({ children }) => {
                     userEmail: user.email,
                     enrolledCourses: [], // Initialize empty array
                     role: "student", // Default role
-                    createdAt: serverTimestamp()
+                    createdAt: serverTimestamp(),
+                    isProfileComplete: false,
+                    userData: {
+                        userYear: null,
+                        userBranch: null,
+                        userInstitution: null,
+                    },
+                    userAvatar: null,
+                    bookmarks: {
+                        bookmarkedNotes: [],
+                        bookmarkedPYQs: [],
+                        bookmarkedSyllabus: [],
+                        bookmarkedFAQs: [],
+                    },
+                    createdCourses: []
                 });
                 setRole("student"); // Set default role
                 setIsGhost(false); // Default to non-admin
                 redirectUser("student"); // Redirect as a new student
             } else {
-                redirectUser(userExists); // Redirect based on existing role
+                const userRef = doc(db, "Users", user.uid);
+                const userDoc = await getDoc(userRef);
+                if (userDoc.exists()) {
+                    const userData = userDoc.data();
+                    setIsProfileComplete(userData.isProfileComplete || false);
+                    // Add other user data to state if needed
+                    redirectUser(userExists); // Redirect based on existing role
+                }
             }
         } catch (error) {
             console.error("Error saving user:", error);
@@ -87,6 +109,8 @@ export const AuthProvider = ({ children }) => {
 
         return () => unsubscribe();
     }, []);
+
+
 
 
 
@@ -157,8 +181,25 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
+    const updateProfile = async (userId, updatedData) => {
+        try {
+            const userRef = doc(db, "Users", userId);
+            await updateDoc(userRef, {
+                ...updatedData,
+                isProfileComplete: true
+            });
+            setIsProfileComplete(true);
+            return true;
+        } catch (error) {
+            console.error("Error updating profile:", error);
+            return false;
+        }
+    };
+
     return (
-        <AuthContext.Provider value={{ user, isAuth, role, isGhost, loading, signInWithGoogle, logoutUser }}>
+        <AuthContext.Provider value={{
+            user, isAuth, role, isGhost, loading, signInWithGoogle, logoutUser, isProfileComplete, updateProfile
+        }}>
             {children}
         </AuthContext.Provider>
     );
