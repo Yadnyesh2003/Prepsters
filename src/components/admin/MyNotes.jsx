@@ -64,6 +64,7 @@ const MyNotes = () => {
   };
 
   useEffect(() => {
+    document.title = "My Notes"
     if (isGhost) {
       getNoteData();
     }

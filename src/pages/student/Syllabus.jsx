@@ -16,15 +16,32 @@ const Syllabus = () => {
   const [isFetchingMore, setIsFetchingMore] = useState(false);
 
 
-  const { toast } = useContext(AppContext);
+  const { toast, trackPdfViewEvent } = useContext(AppContext);
 
-  const openPdfViewer = (url) => {
+  const openPdfViewer = (url, item) => {
     setPdfUrl(url); // Set the PDF URL to be displayed in the viewer
+    // console.log("Item is: ", item)
+    // Track Analytics Event
+    trackPdfViewEvent({
+      contentType: "Syllabus",
+      details: {
+        pdf_branch: item.syllabusCategory?.branch || "unknown",
+        pdf_institution: item.syllabusCategory?.institution || "unknown",
+        pdf_year: item.syllabusCategory?.year || "unknown",
+        pdf_title: item.syllabusTitle || "untitled",
+      }
+    });
+    
+    // console.log("Item after track event is: ", item)
   };
 
   const closePdfViewer = () => {
     setPdfUrl(null); // Close the viewer by setting PDF URL to null
   };
+
+  useEffect(()=>{
+    document.title = "Syllabus"
+  },[])
 
   useEffect(() => {
     if (showFilter) {
@@ -113,7 +130,7 @@ const Syllabus = () => {
               <p className="text-xs sm:text-sm md:text-base text-gray-700">Year: {item.syllabusCategory.year}</p>
             )}
             <div className="mt-2 mb-1 flex justify-center">
-              <button onClick={() => openPdfViewer(item.syllabusLink)} className="flex items-center bg-indigo-500 text-white px-4 py-2 rounded-md hover:bg-indigo-600 transition">
+              <button onClick={() => openPdfViewer(item.syllabusLink, item)} className="flex items-center bg-indigo-500 text-white px-4 py-2 rounded-md hover:bg-indigo-600 transition">
                 <img src={assets.view_data} alt="view" className="w-5 h-5 mr-2" />
                   View Syllabus
               </button>

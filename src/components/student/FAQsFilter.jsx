@@ -21,7 +21,7 @@ const FAQsFilter = ({ onResults }) => {
     contributorName: [],
   });
 
-  const { toast } = useContext(AppContext);
+  const { toast, trackFilterEvent } = useContext(AppContext);
 
   const handleChange = (selectedOption, { name }) => {
     const value = name === "branch" || name === "contributorName"
@@ -52,6 +52,20 @@ const FAQsFilter = ({ onResults }) => {
     try {
       let q = collection(db, "FAQs");
       const conditions = [];
+
+      //For Google Analytics
+      const selectedBranch =
+        Array.isArray(filters.branch) && filters.branch.length > 0
+          ? filters.branch.join(', ')
+          : "not_selected";
+      const selectedContributorName =
+        Array.isArray(filters.contributorName) && filters.contributorName.length > 0
+          ? filters.contributorName.join(', ')
+          : "not_selected";
+      const selectedYear = filters.year || "not_selected";
+      const selectedInstitution = filters.institution || "not_selected";
+      const selectedSubject = filters.subjectName || "not_selected";
+    
 
       if (filterMode === "subjectName") {
         if (!filters.subjectName) {
@@ -102,6 +116,19 @@ const FAQsFilter = ({ onResults }) => {
 
       onResults(faqs);
       toast.dismiss();
+
+      //Google Analytics logEvent
+      trackFilterEvent({
+        contentType: "FAQs",
+        filters: {
+          filtered_branch: selectedBranch,
+          filtered_institution: selectedInstitution,
+          filtered_contributor: selectedContributorName,
+          filtered_year: selectedYear,
+          filtered_subject: selectedSubject
+        },
+      });
+
       if (faqs.length === 0) {
         toast.error("No FAQs found!");
       } else {

@@ -966,6 +966,8 @@ function Landing() {
     }, [user]);
 
     useEffect(() => {
+        document.title = "Landing"
+
         const handleInteraction = () => {
             setHasInteracted(true);
             window.removeEventListener('click', handleInteraction);

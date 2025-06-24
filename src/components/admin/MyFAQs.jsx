@@ -66,6 +66,7 @@ const MyFAQs = () => {
   };
 
   useEffect(() => {
+    document.title = "My FAQs"
     if (isGhost) {
       getFAQData();
     }

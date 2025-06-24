@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import Select from 'react-select';
 import { AppContext } from '../../context/AppContext';
 import { useAuth } from '../../context/AuthContext';
@@ -22,6 +22,10 @@ const AddSyllabus = () => {
   const [loading, setLoading] = useState(false);
   const { toast } = useContext(AppContext);
   const { isGhost, user } = useAuth();
+
+  useEffect(()=>{
+    document.title = "Add Syllabus"
+  })
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;

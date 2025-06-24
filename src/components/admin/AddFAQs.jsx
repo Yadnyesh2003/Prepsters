@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { db, collection, addDoc, serverTimestamp, updateDoc } from "../../config/firebase";
 import Select from 'react-select';
 import makeAnimated from "react-select/animated";
@@ -20,6 +20,10 @@ const AddFAQs = () => {
     contributorName: null,
     adminId: ''
   });
+
+  useEffect(()=>{
+    document.title = "Add FAQs"
+  }, [])
 
   const animatedComponents = makeAnimated();
   

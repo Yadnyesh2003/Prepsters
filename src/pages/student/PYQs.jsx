@@ -15,15 +15,38 @@ const PYQs = () => {
   const [visibleCount, setVisibleCount] = useState(3); // Initial cards  
   const [isFetchingMore, setIsFetchingMore] = useState(false);
 
-  const { toast } = useContext(AppContext);
+  const { toast, trackPdfViewEvent } = useContext(AppContext);
 
-  const openPdfViewer = (url) => {
-    setPdfUrl(url);
+  const openPdfViewer = (url, item) => {
+    setPdfUrl(url); // Set the PDF URL to be displayed in the viewer
+    console.log("PYQ pdf clicked is: ", item)
+    // Track Analytics Event
+    trackPdfViewEvent({
+      contentType: "PYQs",
+      details: {
+        pdf_branch: Array.isArray(item.pyqsCategory?.branch)
+        ? item.pyqsCategory.branch.join(', ')
+        : item.pyqsCategory?.branch || "unknown",
+        pdf_subject: Array.isArray(item.pyqsCategory?.subjectName)
+        ? item.pyqsCategory.subjectName.join(', ')
+        : item.pyqsCategory?.subjectName || "unknown",
+        pdf_institution: item.pyqsCategory?.institution || "unknown",
+        pdf_academicYear: item.pyqsCategory?.academicYear || "unknown",
+        pdf_year: item.pyqsCategory?.year || "unknown",
+        pdf_contributor: item.contributorName || "unknown",
+        pdf_title: item.pyqsTitle || "untitled",
+      }
+    });
+    // console.log("Note pdf after tracking is: ", note)
   };
 
   const closePdfViewer = () => {
     setPdfUrl(null);
   };
+
+  useEffect(()=>{
+    document.title = "PYQs"
+  },[])
 
   useEffect(() => {
     if (showFilter) {
@@ -159,7 +182,7 @@ const PYQs = () => {
 
                   <div className="mt-2 mb-1 flex justify-center">
                     <button
-                      onClick={() => openPdfViewer(item.pyqsLink)}
+                      onClick={() => openPdfViewer(item.pyqsLink, item)}
                       className="flex items-center bg-indigo-500 text-white px-4 py-2 rounded-md hover:bg-indigo-600 transition"
                     >
                       <img

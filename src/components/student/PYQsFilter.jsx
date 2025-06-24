@@ -18,7 +18,7 @@ const PYQsFilter = ({ onResults }) => {
     academicYear: null,
   });
 
-  const { toast } = useContext(AppContext);
+  const { toast, trackFilterEvent } = useContext(AppContext);
 
   const handleChange = (selectedOption, { name }) => {
     setFilters((prev) => ({
@@ -43,41 +43,46 @@ const PYQsFilter = ({ onResults }) => {
       let q = collection(db, "PYQs");
       const conditions = [];
 
+      //For Google Analytics
+      const selectedBranch = Array.isArray(filters.branch) && filters.branch.length > 0
+      ? filters.branch.map((b) => b.value).join(', ')
+      : "not_selected";
+      const selectedAcademicYear = Array.isArray(filters.academicYear) && filters.academicYear.length > 0
+        ? filters.academicYear.map((a) => a.value).join(', ')
+        : "not_selected";
+      const selectedYear = filters.year?.value || "not_selected";
+      const selectedInstitution = filters.institution?.value || "not_selected";
+      const selectedSubject = filters.subjectName?.value || "not_selected";
+    
+
       if (filterMode === "academicYear") {
         if (filters.academicYear && filters.academicYear.length > 0) {
           const academicYears = filters.academicYear.map((a) => a.value);
           conditions.push(where("pyqsCategory.academicYear", "in", academicYears));
-        } else {
-          toast.error("Please select Academic Year.");
-          return;
+        }
+        if (filters.institution) {
+          conditions.push(where("pyqsCategory.institution", "==", filters.institution.value));
+        }
+        if (filters.year) {
+          conditions.push(where("pyqsCategory.year", "==", filters.year.value));
+        }
+        if (filters.branch && filters.branch.length > 0) {
+          const selectedBranches = filters.branch.map((b) => b.value);
+          conditions.push(where("pyqsCategory.branch", "array-contains-any", selectedBranches));
         }
       } else if (filterMode === "subjectName") {
         if (filters.subjectName) {
           conditions.push(
             where("pyqsCategory.subjectName", "array-contains", filters.subjectName.value)
           );
-        } else {
+        }
+        if (filters.institution) {
+          conditions.push(where("pyqsCategory.institution", "==", filters.institution.value));
+        }
+        else {
           toast.error("Please select Subject Name.");
           return;
         }
-      }
-
-      if (filters.branch && filters.branch.length > 0) {
-        const selectedBranches = filters.branch.map((b) => b.value);
-        conditions.push(where("pyqsCategory.branch", "array-contains-any", selectedBranches));
-      }
-
-      if (filters.institution) {
-        conditions.push(where("pyqsCategory.institution", "==", filters.institution.value));
-      }
-
-      if (filters.year) {
-        conditions.push(where("pyqsCategory.year", "==", filters.year.value));
-      }
-
-      if (conditions.length === 0) {
-        toast.error("Please select at least one filter.");
-        return;
       }
 
       q = query(q, ...conditions);
@@ -89,6 +94,19 @@ const PYQsFilter = ({ onResults }) => {
 
       onResults(pyqs);
       toast.dismiss();
+
+      //Google Analytics logEvent
+      trackFilterEvent({
+        contentType: "PYQs",
+        filters: {
+          filtered_branch: selectedBranch,
+          filtered_institution: selectedInstitution,
+          filtered_academicYear: selectedAcademicYear,
+          filtered_year: selectedYear,
+          filtered_subject: selectedSubject
+        },
+      });
+
       if (pyqs.length === 0) toast.error("No PYQs found!");
       else toast.success("PYQs loaded!");
     } catch (error) {

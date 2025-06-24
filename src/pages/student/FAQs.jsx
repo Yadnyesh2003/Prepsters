@@ -19,15 +19,33 @@ const FAQs = () => {
   const [isFetchingMore, setIsFetchingMore] = useState(false); // To track if we're fetching more items
 
 
-  const { toast } = useContext(AppContext);
+  const { toast, trackPdfViewEvent } = useContext(AppContext);
 
-  const openPdfViewer = (url) => {
-    setPdfUrl(url);
+  const openPdfViewer = (url, item) => {
+    setPdfUrl(url); // Set the PDF URL to be displayed in the viewer
+    // console.log("FAQs pdf clicked is: ", item)
+    // Track Analytics Event
+    trackPdfViewEvent({
+      contentType: "FAQs",
+      details: {
+        pdf_branch: item.faqsCategory?.branch || "unknown",
+        pdf_subject: item.faqsCategory?.subjectName || "unknown",
+        pdf_year: item.faqsCategory?.year || "unknown",
+        pdf_institution: item.faqsCategory.institution || "unknown",
+        pdf_contributor: item.contributorName || "unknown",
+        pdf_title: item.faqsTitle || "untitled",
+      }
+    });
+    // console.log("FAQs pdf after tracking is: ", item);
   };
 
   const closePdfViewer = () => {
     setPdfUrl(null);
   };
+
+  useEffect(()=>{
+    document.title = "FAQs"
+  },[])
 
   const handleFaqRating = async (faqId, newRating) => {
     try {
@@ -209,7 +227,7 @@ const FAQs = () => {
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between mt-2 gap-2">
                   <div className="flex justify-center">
                     <button
-                      onClick={() => openPdfViewer(item.faqsLink)}
+                      onClick={() => openPdfViewer(item.faqsLink, item)}
                       className="flex items-center bg-indigo-500 text-white px-4 py-2 rounded-md hover:bg-indigo-600 transition"
                     >
                       <img src={assets.view_data} alt="view" className="w-5 h-5 mr-2" />

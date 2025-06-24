@@ -3,8 +3,13 @@ import parth from '../../assets/1(2).png';
 import yadnu from '../../assets/profile_founder.jpeg';
 import Footer from '../../components/student/Footer';
 import {assets} from '../../assets/assets';
+import { useEffect } from 'react';
 
 function AboutUs() {
+
+  useEffect(()=>{
+    document.title = "About Us"
+  },[])
 
   const timelineData = [
     {
