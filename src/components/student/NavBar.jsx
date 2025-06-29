@@ -10,7 +10,6 @@ import { useAuth } from '../../context/AuthContext';
 import { assets } from '../../assets/assets';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../../config/firebase';
-import CaptchaModal from './CaptchaModal';
 
 const NAV_ITEMS = {
   auth: [
@@ -34,19 +33,6 @@ const NavbarHome = () => {
   const [dropdown, setDropdown] = useState({ examPrep: false, resources: false, profile: false });
   const [userAvatar, setUserAvatar] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [showCaptcha, setShowCaptcha] = useState(false);
-
-  const handleCaptchaVerify = (token) => {
-    if (token) {
-      setShowCaptcha(false);
-      signInWithGoogle(); // Your existing function
-    }
-  };
-  
-  const handleGetStarted = () => {
-    setShowCaptcha(true);
-  };
-  
 
   const refs = {
     examPrep: useRef(null),
@@ -252,7 +238,7 @@ const NavbarHome = () => {
       ) : (
         <button
           className="px-5 py-2 bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-semibold rounded-lg hover:from-purple-700 hover:to-indigo-700 transition-all duration-200 shadow-md hover:shadow-lg"
-          onClick={handleGetStarted}
+          onClick={signInWithGoogle}
         >
           Get Started
         </button>
@@ -298,11 +284,6 @@ const NavbarHome = () => {
         userAvatar={userAvatar}
         logoutUser={logoutUser}
         signInWithGoogle={signInWithGoogle}
-      />
-      <CaptchaModal
-        show={showCaptcha}
-        onVerify={handleCaptchaVerify}
-        onClose={() => setShowCaptcha(false)}
       />
     </nav>
   );
