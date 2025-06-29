@@ -20,7 +20,7 @@ export const app = initializeApp(firebaseConfig);
 const appCheck = initializeAppCheck(app,
     {
         provider: new
-        ReCaptchaV3Provider(import.meta.env.VITE_RECAPTCHA_SITE_KEY),
+        ReCaptchaV3Provider(import.meta.env.VITE_RECAPTCHA_V3_SITE_KEY),
         isTokenAutoRefreshEnabled: true //Optional, but recommended
     }
 )
