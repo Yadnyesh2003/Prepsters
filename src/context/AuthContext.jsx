@@ -65,12 +65,6 @@ export const AuthProvider = ({ children }) => {
                         userInstitution: null,
                     },
                     userAvatar: null,
-                    bookmarks: {
-                        bookmarkedNotes: [],
-                        bookmarkedPYQs: [],
-                        bookmarkedSyllabus: [],
-                        bookmarkedFAQs: [],
-                    },
                     createdCourses: []
                 });
                 setRole("student"); // Set default role

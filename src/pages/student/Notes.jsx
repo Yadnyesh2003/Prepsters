@@ -12,13 +12,13 @@ const Notes = () => {
   const [pdfUrl, setPdfUrl] = useState(null);
   const [showFilter, setShowFilter] = useState(true);
 
-  //LazyLoad
+  // LazyLoad
   const [visibleCount, setVisibleCount] = useState(3);
   const [isFetchingMore, setIsFetchingMore] = useState(false);
 
   const { toast } = useContext(AppContext)
   const { isGhost, user } = useAuth();
-  
+
   const openPdfViewer = (url) => {
     setPdfUrl(url); // Set the PDF URL to be displayed in the viewer
   };
@@ -31,39 +31,135 @@ const Notes = () => {
     try {
       const userId = user?.uid
       if (!userId) return toast.error("You must be logged in to rate");
-  
+
       const noteRef = doc(db, "Notes", noteId)
       const noteSnap = await getDoc(noteRef)
       if (!noteSnap.exists()) return toast.error("Note not found")
-  
+
       const noteData = noteSnap.data()
-      // const existingRatings = noteData.ratings || []
       const existingRatings = noteData.notesRatings || []
-  
+
       const alreadyRated = existingRatings.find(r => r.userId === userId)
-  
+
       let updatedRatings
       if (alreadyRated) {
-        // Remove old rating and add new one
         updatedRatings = existingRatings.map(r =>
           r.userId === userId ? { ...r, rating: newRating } : r
         )
       } else {
         updatedRatings = [...existingRatings, { userId, rating: newRating }]
       }
-  
+
       await updateDoc(noteRef, { notesRatings: updatedRatings })
       toast.success("Thank You for Rating!")
-  
-      // To update UI with latest rating.
+
       setNotesData(prev =>
         prev.map(note =>
           note.id === noteId ? { ...note, notesRatings: updatedRatings } : note
         )
       )
-  
+
     } catch (error) {
       toast(error.message)
+    }
+  }
+
+  const handleBookmarkToggle = async (noteId) => {
+    try {
+      const userId = user?.uid
+      if (!userId) return toast.error("You must be logged in to bookmark");
+
+      const userRef = doc(db, "Users", userId)
+      const userSnap = await getDoc(userRef)
+      if (!userSnap.exists()) return toast.error("User not found")
+
+      const userData = userSnap.data()
+      const bookmarkedNotes = userData.bookmarkedNotes || []
+
+      const isBookmarked = bookmarkedNotes.includes(noteId)
+
+      if (isBookmarked) {
+        // Prompt to remove bookmark
+        toast.custom(
+          (t) => (
+            <div
+              className={`${t.visible ? "animate-enter" : "animate-leave"
+                } max-w-xs w-auto bg-red-100 text-red-800 shadow-lg rounded-lg pointer-events-auto flex flex-col items-center justify-center px-6 py-4`}
+            >
+              <p className="text-sm font-medium">Remove from bookmarks?</p>
+              <div className="flex gap-4 mt-2">
+                <button
+                  onClick={async () => {
+                    const updatedBookmarks = bookmarkedNotes.filter(id => id !== noteId)
+                    await updateDoc(userRef, { bookmarkedNotes: updatedBookmarks })
+                    toast.success("Removed from bookmarks!")
+                    setNotesData(prev =>
+                      prev.map(note =>
+                        note.id === noteId ? { ...note, isBookmarked: false } : note
+                      )
+                    )
+                    toast.dismiss(t.id)
+                  }}
+                  className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600"
+                >
+                  Yes
+                </button>
+                <button
+                  onClick={() => toast.dismiss(t.id)}
+                  className="bg-gray-300 text-gray-800 px-3 py-1 rounded hover:bg-gray-400"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          ),
+          { duration: Infinity, position: "top-right" }
+        )
+      } else {
+        // Check bookmark limit
+        if (bookmarkedNotes.length >= 10) {
+          return toast.error("Bookmark limit reached (10). Remove some bookmarks to add new ones.")
+        }
+
+        // Prompt to add bookmark
+        toast.custom(
+          (t) => (
+            <div
+              className={`${t.visible ? "animate-enter" : "animate-leave"
+                } max-w-xs w-auto bg-green-100 text-green-800 shadow-lg rounded-lg pointer-events-auto flex flex-col items-center justify-center px-6 py-4`}
+            >
+              <p className="text-sm font-medium">Add to bookmarks?</p>
+              <div className="flex gap-4 mt-2">
+                <button
+                  onClick={async () => {
+                    const updatedBookmarks = [...bookmarkedNotes, noteId]
+                    await updateDoc(userRef, { bookmarkedNotes: updatedBookmarks })
+                    toast.success("Added to bookmarks!")
+                    setNotesData(prev =>
+                      prev.map(note =>
+                        note.id === noteId ? { ...note, isBookmarked: true } : note
+                      )
+                    )
+                    toast.dismiss(t.id)
+                  }}
+                  className="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600"
+                >
+                  Yes
+                </button>
+                <button
+                  onClick={() => toast.dismiss(t.id)}
+                  className="bg-gray-300 text-gray-800 px-3 py-1 rounded hover:bg-gray-400"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          ),
+          { duration: Infinity, position: "top-right" }
+        )
+      }
+    } catch (error) {
+      toast.error(error.message)
     }
   }
 
@@ -74,9 +170,8 @@ const Notes = () => {
         (t) => (
           <div
             onClick={() => toast.remove(t.id)}
-            className={`${
-              t.visible ? "animate-enter" : "animate-leave"
-            } cursor-pointer max-w-xs w-auto bg-yellow-100 text-yellow-800 shadow-lg rounded-lg pointer-events-auto flex items-center justify-center px-6 py-2`}
+            className={`${t.visible ? "animate-enter" : "animate-leave"
+              } cursor-pointer max-w-xs w-auto bg-yellow-100 text-yellow-800 shadow-lg rounded-lg pointer-events-auto flex items-center justify-center px-6 py-2`}
           >
             <div className="flex items-center space-x-2">
               <span className="text-xl">⚠️</span>
@@ -103,32 +198,52 @@ const Notes = () => {
         }, 500);
       }
     };
-  
+
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, [visibleCount, isFetchingMore, notesData]);
-  
+
+  // Initialize isBookmarked for each note based on user's bookmarkedNotes
+  useEffect(() => {
+    if (user?.uid && notesData.length > 0) {
+      const userRef = doc(db, "Users", user.uid)
+      getDoc(userRef).then(userSnap => {
+        if (userSnap.exists()) {
+          const userData = userSnap.data()
+          const bookmarkedNotes = userData.bookmarkedNotes || []
+          setNotesData(prev =>
+            prev.map(note => ({
+              ...note,
+              isBookmarked: bookmarkedNotes.includes(note.id)
+            }))
+          )
+        }
+      }).catch(error => {
+        toast.error("Error fetching bookmarks: " + error.message)
+      })
+    }
+  }, [user, notesData.length, toast])
 
   return (
     <div className="min-h-screen p-6 bg-gradient-to-b from-purple-500 to-transparent">
       {showFilter && <NotesFilter onResults={(data) => {
         setNotesData(data);
-        setShowFilter(false); 
+        setShowFilter(false);
       }} />}
-        {!showFilter && (
-          <div className="mb-4 text-right max-w-6xl mx-auto">
-            <button
-              onClick={() => {
-                setShowFilter(true);
-                toast.dismiss();
-                setNotesData([]);
-              }}
-              className="text-white px-4 py-2 rounded border-white border-2 bg-yellow-500 hover:bg-purple-700"
-            >
-              Change Filters
-            </button>
-          </div>
-        )}
+      {!showFilter && (
+        <div className="mb-4 text-right max-w-6xl mx-auto">
+          <button
+            onClick={() => {
+              setShowFilter(true);
+              toast.dismiss();
+              setNotesData([]);
+            }}
+            className="text-white px-4 py-2 rounded border-white border-2 bg-yellow-500 hover:bg-purple-700"
+          >
+            Change Filters
+          </button>
+        </div>
+      )}
 
       <div className="max-w-6xl mx-auto p-4">
         <div className="space-y-4">
@@ -143,13 +258,23 @@ const Notes = () => {
                   {note.notesTitle}
                 </h2>
 
-                {/* Desktop only: Rating stars */}
-                <div className="hidden md:flex items-center gap-2">
+                {/* Desktop only: Bookmark + Rating stars */}
+                <div className="hidden md:flex items-center gap-25">
+
                   <Rating
                     initialRating={note.notesRatings?.find(r => r.userId === user?.uid)?.rating || 0}
                     onRate={(rating) => handleNoteRating(note.id, rating)}
                     size={20}
                   />
+
+
+                  <button onClick={() => handleBookmarkToggle(note.id)}>
+                    <img
+                      src={note.isBookmarked ? assets.bookmark_done : assets.bookmark}
+                      alt="bookmark"
+                      className="w-6 h-6"
+                    />
+                  </button>
                 </div>
               </div>
 
@@ -173,7 +298,7 @@ const Notes = () => {
                 </p>
               )}
 
-              {/* Mobile only: Avg Rating + Stars */}
+              {/* Mobile only: Avg Rating + Bookmark + Stars */}
               <div className="block md:hidden mt-2">
                 {note.notesRatings?.length > 0 && (
                   <p className="text-xs sm:text-sm text-indigo-700 font-bold">
@@ -182,12 +307,22 @@ const Notes = () => {
                     ).toFixed(1)} / 5
                   </p>
                 )}
-                <div className="flex items-center gap-2 mt-1">
+                <div className="flex items-center gap-30 mb-2 mt-1">
+
                   <Rating
                     initialRating={note.notesRatings?.find(r => r.userId === user?.uid)?.rating || 0}
                     onRate={(rating) => handleNoteRating(note.id, rating)}
                     size={20}
                   />
+
+
+                  <button onClick={() => handleBookmarkToggle(note.id)}>
+                    <img
+                      src={note.isBookmarked ? assets.bookmark_done : assets.bookmark}
+                      alt="bookmark"
+                      className="w-5 h-5"
+                    />
+                  </button>
                 </div>
               </div>
 
@@ -223,7 +358,7 @@ const Notes = () => {
             </div>
           )}
         </div>
-      </div>    
+      </div>
     </div>
   );
 };

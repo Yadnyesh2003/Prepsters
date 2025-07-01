@@ -28,6 +28,8 @@ import star_yellow from './star_yellow.png'
 import parth from './1(2).png'
 import yadnyesh from './profile_founder.jpeg'
 import hero_img from './hero_image.jpeg'
+import bookmark from './bookmark.png';
+import bookmark_done from './bookmark_done.png';
 
 import popSoundFile from './pop.mp3';
 
@@ -61,7 +63,9 @@ export const assets = {
   star_yellow,
   parth,
   yadnyesh,
-  hero_img
+  hero_img,
+  bookmark,
+  bookmark_done
 }
 
 export const popSound = new Audio(popSoundFile);
