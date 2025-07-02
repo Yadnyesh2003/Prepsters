@@ -155,24 +155,6 @@ export const AppContextProvider = (props) => {
 
 
 
-      useEffect(() => {
-        if(user){
-        getFAQDataLatest();
-        getPYQDataLatest();
-        getNotesDataLatest();
-        }
-      }, [user]);
-      
-
-    const value = {
-        trackPageView, trackFilterEvent, trackPdfViewEvent,
-        
-        navigate, toast, getFAQDataLatest, faqDataLatest, getPYQDataLatest, pyqDataLatest, 
-        getNotesDataLatest, notesDataLatest
-    }
-  };
-
-
 
   useEffect(() => {
     if (user) {
@@ -184,8 +166,8 @@ export const AppContextProvider = (props) => {
 
 
   const value = {
-    navigate, toast, getFAQDataLatest, faqDataLatest, getPYQDataLatest, pyqDataLatest,
-    getNotesDataLatest, notesDataLatest
+    trackPageView, trackFilterEvent, trackPdfViewEvent,navigate, toast, getFAQDataLatest, faqDataLatest, getPYQDataLatest, pyqDataLatest, 
+        getNotesDataLatest, notesDataLatest
   }
 
   return (
