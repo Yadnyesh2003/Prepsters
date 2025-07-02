@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import { toast } from 'react-hot-toast'
 import { getDocs, collection, db, doc, updateDoc, deleteDoc, serverTimestamp, query, orderBy, limit, analytics, logEvent, setUserId, setUserProperties } from '../config/firebase'; 
 import { useAuth } from './AuthContext';
+import { useUserSync } from '../hooks/useUserSync';
 
 
 
@@ -169,10 +170,27 @@ export const AppContextProvider = (props) => {
         navigate, toast, getFAQDataLatest, faqDataLatest, getPYQDataLatest, pyqDataLatest, 
         getNotesDataLatest, notesDataLatest
     }
+  };
 
-    return(
-        <AppContext.Provider value = {value}>
-            {props.children}
-        </AppContext.Provider>
-    )
+
+
+  useEffect(() => {
+    if (user) {
+      getFAQDataLatest();
+      getPYQDataLatest();
+      getNotesDataLatest();
+    }
+  }, [user]);
+
+
+  const value = {
+    navigate, toast, getFAQDataLatest, faqDataLatest, getPYQDataLatest, pyqDataLatest,
+    getNotesDataLatest, notesDataLatest
+  }
+
+  return (
+    <AppContext.Provider value={value}>
+      {props.children}
+    </AppContext.Provider>
+  )
 }

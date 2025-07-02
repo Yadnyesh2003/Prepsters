@@ -193,10 +193,10 @@ const NavbarHome = () => {
           </button>
 
           {dropdown.profile && (
-            <div className="absolute right-0 mt-2 w-85 bg-white text-black rounded-lg shadow-xl z-50 border border-gray-100 overflow-hidden">
-              <div className="p-4 border-b border-gray-100">
+            <div className="absolute right-0 mt-2 w-70 bg-white text-black rounded-lg shadow-xl z-50 border border-gray-100 overflow-hidden">
+              <div className="p-4 border-b border-black">
                 <div className="flex items-center space-x-3 mb-3">
-                  {userAvatar ? (
+                  {/* {userAvatar ? (
                     <img
                       src={`https://api.dicebear.com/9.x/${userAvatar.niche}/png/seed=${userAvatar.seed}`}
                       alt="User Avatar"
@@ -206,8 +206,8 @@ const NavbarHome = () => {
                     <div className="w-12 h-12 rounded-full bg-purple-600 flex items-center justify-center">
                       <AiOutlineUser className="text-white text-xl" />
                     </div>
-                  )}
-                  <div>
+                  )} */}
+                  <div className='overflow-hidden'>
                     <p className="font-semibold text-lg truncate">Hello, {user.displayName || 'User'}!</p>
                     <p className="text-sm text-gray-600 truncate">{user.email}</p>
                   </div>
@@ -220,7 +220,7 @@ const NavbarHome = () => {
               <div className="border-b border-gray-100">
                 <Link
                   to="/profile"
-                  className="block px-4 py-3 hover:bg-purple-50 text-gray-800 hover:text-purple-700 transition-colors duration-200"
+                  className=" px-4 py-3 border-b border-black hover:bg-purple-50 text-gray-800 hover:text-purple-700 flex items-center justify-center transition-colors duration-200"
                   onClick={closeAllDropdowns}
                 >
                   My Profile
@@ -228,7 +228,7 @@ const NavbarHome = () => {
               </div>
               <button
                 onClick={logoutUser}
-                className="w-full px-4 py-3 text-left text-red-600 font-medium hover:bg-red-50 flex items-center gap-2 transition-colors duration-200"
+                className="w-full px-4 py-3 text-left text-red-600 font-medium hover:bg-red-50 flex items-center justify-center gap-2 transition-colors duration-200"
               >
                 <AiOutlineLogout /> Logout
               </button>
@@ -242,8 +242,9 @@ const NavbarHome = () => {
         >
           Get Started
         </button>
-      )}
-    </div>
+      )
+      }
+    </div >
   );
 
   return (

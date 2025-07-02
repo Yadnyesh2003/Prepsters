@@ -45,6 +45,7 @@ import Profile from './pages/student/Profile';
 
 
 
+
 const ExamPrep = lazy(() => import('./pages/student/ExamPrep'));
 const Resources = lazy(() => import('./pages/student/Resourses'));
 
