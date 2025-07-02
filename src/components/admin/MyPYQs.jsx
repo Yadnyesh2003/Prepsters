@@ -61,6 +61,7 @@ const MyPYQs = () => {
   };
 
   useEffect(() => {
+    document.title = "My PYQs"
     if (isGhost) {
       getPYQData();
     }

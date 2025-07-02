@@ -55,6 +55,7 @@ const MySyllabus = () => {
   };
 
   useEffect(() => {
+    document.title = "My Syllabus"
     if (isGhost) {
       getSyllabusData();
     }

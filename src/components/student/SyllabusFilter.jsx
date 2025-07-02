@@ -15,7 +15,7 @@ const SyllabusFilter = ({ onResults }) => {
     year: null,
   });
 
-  const { toast } = useContext(AppContext);
+  const { toast, trackFilterEvent } = useContext(AppContext);
 
   const handleChange = (selectedOption, { name }) => {
     setFilters((prev) => ({
@@ -33,6 +33,11 @@ const SyllabusFilter = ({ onResults }) => {
     try {
       let q = collection(db, "Syllabus");
       const conditions = [];
+
+      //For Google Analytics
+      const selectedBranch = filters.branch?.value || "not_selected";
+      const selectedInstitution = filters.institution?.value || "not_selected";
+      const selectedYear = filters.year?.value || "not_selected";
 
       if (filters.branch) {
         conditions.push(where("syllabusCategory.branch", "==", filters.branch.value));
@@ -60,6 +65,17 @@ const SyllabusFilter = ({ onResults }) => {
       toast.dismiss();
       if (syllabus.length === 0) toast.error("No syllabus found!");
       else toast.success(`${syllabus.length} syllabus items loaded!`);
+
+      //Google Analytics logEvent
+      trackFilterEvent({
+        contentType: "Syllabus",
+        filters: {
+          filtered_branch: selectedBranch,
+          filtered_institution: selectedInstitution,
+          filtered_year: selectedYear,
+        },
+      });
+
     } catch (error) {
       console.error("Error fetching syllabus:", error);
       toast.dismiss();

@@ -190,6 +190,8 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
+    // console.log(user)
+
     return (
         <AuthContext.Provider value={{
             user, isAuth, role, isGhost, loading, signInWithGoogle, logoutUser, isProfileComplete, updateProfile

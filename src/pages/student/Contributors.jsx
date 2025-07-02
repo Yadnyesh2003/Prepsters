@@ -12,6 +12,7 @@ const Contributors = () => {
   const [contributors, setContributors] = useState([]);
 
   useEffect(() => {
+    document.title = "Contributors"
     const cachedData = localStorage.getItem(CONTRIBUTORS_KEY);
     if (cachedData) {
       setContributors(JSON.parse(cachedData));

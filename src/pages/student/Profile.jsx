@@ -27,6 +27,7 @@ const Profile = () => {
 
   // Fetch user data on component mount
   useEffect(() => {
+    document.title = "Profile"
     const fetchUserData = async () => {
       if (user) {
         try {

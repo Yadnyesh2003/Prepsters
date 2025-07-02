@@ -16,16 +16,38 @@ const Notes = () => {
   const [visibleCount, setVisibleCount] = useState(3);
   const [isFetchingMore, setIsFetchingMore] = useState(false);
 
-  const { toast } = useContext(AppContext)
+  const { toast, trackPdfViewEvent } = useContext(AppContext)
   const { isGhost, user } = useAuth();
+  
+  const openPdfViewer = (url, note) => {
 
-  const openPdfViewer = (url) => {
     setPdfUrl(url); // Set the PDF URL to be displayed in the viewer
+    // console.log("Note pdf clicked is: ", note)
+    // Track Analytics Event
+    trackPdfViewEvent({
+      contentType: "Notes",
+      details: {
+        pdf_branch: Array.isArray(note.notesCategory?.branch)
+        ? note.notesCategory.branch.join(', ')
+        : note.notesCategory?.branch || "unknown",
+        pdf_subject: Array.isArray(note.notesCategory?.subjectName)
+        ? note.notesCategory.subjectName.join(', ')
+        : note.notesCategory?.subjectName || "unknown",
+        pdf_year: note.notesCategory?.year || "unknown",
+        pdf_contributor: note.contributorName || "unknown",
+        pdf_title: note.notesTitle || "untitled",
+      }
+    });
+    // console.log("Note pdf after tracking is: ", note)
   };
 
   const closePdfViewer = () => {
     setPdfUrl(null); // Close the viewer by setting PDF URL to null
   };
+
+  useEffect(()=>{
+    document.title = "Notes"
+  },[])
 
   const handleNoteRating = async (noteId, newRating) => {
     try {
@@ -330,7 +352,7 @@ const Notes = () => {
               <div className="flex flex-col md:flex-row md:items-center md:justify-between mt-2 gap-2">
                 <div className="flex justify-center">
                   <button
-                    onClick={() => openPdfViewer(note.notesLink)}
+                    onClick={() => openPdfViewer(note.notesLink, note)}
                     className="flex items-center bg-indigo-500 text-white px-4 py-2 rounded-md hover:bg-indigo-600 transition"
                   >
                     <img src={assets.view_data} alt="view" className="w-5 h-5 mr-2" />

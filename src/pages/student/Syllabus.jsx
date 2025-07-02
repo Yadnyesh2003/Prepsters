@@ -169,11 +169,29 @@ const Syllabus = () => {
   const [visibleCount, setVisibleCount] = useState(3);
   const [isFetchingMore, setIsFetchingMore] = useState(false);
 
-  const { toast } = useContext(AppContext);
+
   const { user } = useAuth();
 
-  const openPdfViewer = (url) => {
-    setPdfUrl(url);
+
+
+  const { toast, trackPdfViewEvent } = useContext(AppContext);
+
+  const openPdfViewer = (url, item) => {
+    setPdfUrl(url); // Set the PDF URL to be displayed in the viewer
+    // console.log("Item is: ", item)
+    // Track Analytics Event
+    trackPdfViewEvent({
+      contentType: "Syllabus",
+      details: {
+        pdf_branch: item.syllabusCategory?.branch || "unknown",
+        pdf_institution: item.syllabusCategory?.institution || "unknown",
+        pdf_year: item.syllabusCategory?.year || "unknown",
+        pdf_title: item.syllabusTitle || "untitled",
+      }
+    });
+    
+    // console.log("Item after track event is: ", item)
+
   };
 
   const closePdfViewer = () => {
@@ -280,6 +298,10 @@ const Syllabus = () => {
     }
   };
 
+  useEffect(()=>{
+    document.title = "Syllabus"
+  },[])
+
   useEffect(() => {
     if (showFilter) {
       toast.dismiss();
@@ -373,6 +395,7 @@ const Syllabus = () => {
           <Loader />
         ) : (
           <div className="space-y-4">
+
             {syllabusData.length > 0 &&
               syllabusData.slice(0, visibleCount).map((item) => (
                 <div
@@ -432,6 +455,7 @@ const Syllabus = () => {
                   {pdfUrl && <PdfViewer pdfUrl={pdfUrl} onClose={closePdfViewer} />}
                 </div>
               ))}
+
             {isFetchingMore && (
               <div className="flex justify-center py-4">
                 <div className="w-16 sm:w-20 aspect-square border-4 border-gray-300 border-t-4 border-t-blue-400 rounded-full animate-spin"></div>

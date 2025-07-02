@@ -20,7 +20,7 @@ const NotesFilter = ({ onResults }) => {
     contributorName: []
   });
 
-  const { toast } = useContext(AppContext);
+  const { toast, trackFilterEvent } = useContext(AppContext);
 
   const handleBranchChange = (selectedOption) => {
     const selectedValue = selectedOption ? selectedOption.value : null;
@@ -52,6 +52,15 @@ const NotesFilter = ({ onResults }) => {
     try {
       const notesRef = collection(db, "Notes");
       let conditions = [];
+
+      //For Google Analytics
+      const selectedContributorName =
+        Array.isArray(filters.contributorName) && filters.contributorName.length > 0
+          ? filters.contributorName.join(', ')
+          : "not_selected";
+      const selectedYear = filters.year || "not_selected";
+      const selectedBranch = filters.branch || "not_selected";
+      const selectedSubject = filters.subjectName || "not_selected";
 
       if (filterMode === "branch") {
         if (filters.branch) {
@@ -96,6 +105,18 @@ const NotesFilter = ({ onResults }) => {
       onResults(notes);
 
       toast.dismiss();
+
+      //Google Analytics logEvent
+      trackFilterEvent({
+        contentType: "Notes",
+        filters: {
+          filtered_branch: selectedBranch,
+          filtered_contributor: selectedContributorName,
+          filtered_year: selectedYear,
+          filtered_subject: selectedSubject
+        },
+      });
+
       if (notes.length === 0) {
         toast.error("No notes found!");
       } else {
