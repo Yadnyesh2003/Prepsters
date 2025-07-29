@@ -113,6 +113,13 @@ const NavbarHome = () => {
     <ul className="hidden md:flex space-x-8 ml-auto items-center">
       {user && (
         <>
+          <li className="relative group">
+            <Link to="/bookmarks" className="block">
+              <button className="flex items-center text-lg font-medium hover:text-purple-300 transition-colors duration-200">
+                Bookmarks
+              </button>
+            </Link>
+          </li>
           <li className="relative group" ref={refs.examPrep}>
             <button
               onClick={() => toggleDropdown('examPrep')}
@@ -130,6 +137,7 @@ const NavbarHome = () => {
             </button>
             {renderDropdown(NAV_ITEMS.examPrep, 'examPrep', refs.examPrep)}
           </li>
+
           <li className="relative group" ref={refs.resources}>
             <button
               onClick={() => toggleDropdown('resources')}
@@ -148,19 +156,22 @@ const NavbarHome = () => {
             {renderDropdown(NAV_ITEMS.resources, 'resources', refs.resources)}
           </li>
         </>
-      )}
-      {NAV_ITEMS.auth.map(({ text, path }) => (
-        <li key={path}>
-          <Link
-            to={path}
-            className="text-lg font-medium hover:text-purple-300 transition-colors duration-200"
-            onClick={closeAllDropdowns}
-          >
-            {text}
-          </Link>
-        </li>
-      ))}
-    </ul>
+      )
+      }
+      {
+        NAV_ITEMS.auth.map(({ text, path }) => (
+          <li key={path}>
+            <Link
+              to={path}
+              className="text-lg font-medium hover:text-purple-300 transition-colors duration-200"
+              onClick={closeAllDropdowns}
+            >
+              {text}
+            </Link>
+          </li>
+        ))
+      }
+    </ul >
   );
 
   const renderUserProfile = () => (
@@ -297,6 +308,7 @@ const MobileSidebar = ({ open, setOpen, user, userAvatar, logoutUser, signInWith
 
   const handleLinkClick = () => setTimeout(() => setOpen(false), 300);
 
+
   const renderList = (items, key) =>
     expanded[key] && (
       <ul className="ml-4 mt-2 space-y-2 text-sm text-gray-300">
@@ -355,6 +367,17 @@ const MobileSidebar = ({ open, setOpen, user, userAvatar, logoutUser, signInWith
       <ul className="flex flex-col space-y-1 p-4">
         {user && (
           <>
+            <li className="relative group">
+              <Link
+                to="/bookmarks"
+                className="block"
+                onClick={handleLinkClick}
+              >
+                <button className="w-full text-left py-3 px-4 rounded-lg text-white hover:bg-purple-800 transition-colors duration-200 flex justify-between items-center">
+                  Bookmarks
+                </button>
+              </Link>
+            </li>
             <li>
               <button
                 onClick={() => toggle('examPrep')}
