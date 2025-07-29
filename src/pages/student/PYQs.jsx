@@ -13,6 +13,8 @@ const PYQs = () => {
   const [showFilter, setShowFilter] = useState(true);
   const [loading, setLoading] = useState(false);
 
+  const { user } = useAuth();
+
   // Lazy loading state
   const [visibleCount, setVisibleCount] = useState(3);
   const [isFetchingMore, setIsFetchingMore] = useState(false);
@@ -28,11 +30,11 @@ const PYQs = () => {
       contentType: "PYQs",
       details: {
         pdf_branch: Array.isArray(item.pyqsCategory?.branch)
-        ? item.pyqsCategory.branch.join(', ')
-        : item.pyqsCategory?.branch || "unknown",
+          ? item.pyqsCategory.branch.join(', ')
+          : item.pyqsCategory?.branch || "unknown",
         pdf_subject: Array.isArray(item.pyqsCategory?.subjectName)
-        ? item.pyqsCategory.subjectName.join(', ')
-        : item.pyqsCategory?.subjectName || "unknown",
+          ? item.pyqsCategory.subjectName.join(', ')
+          : item.pyqsCategory?.subjectName || "unknown",
         pdf_institution: item.pyqsCategory?.institution || "unknown",
         pdf_academicYear: item.pyqsCategory?.academicYear || "unknown",
         pdf_year: item.pyqsCategory?.year || "unknown",
@@ -148,9 +150,9 @@ const PYQs = () => {
     }
   };
 
-  useEffect(()=>{
+  useEffect(() => {
     document.title = "PYQs"
-  },[])
+  }, [])
 
 
   useEffect(() => {
