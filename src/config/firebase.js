@@ -1,9 +1,8 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 
-import { initializeAppCheck, ReCaptchaV3Provider } from "firebase/app-check"
 import { getAnalytics, logEvent, setUserId, setUserProperties } from "firebase/analytics";
-import { getAuth, GoogleAuthProvider  } from "firebase/auth";
+import { getAuth, GoogleAuthProvider } from "firebase/auth";
 
 import { getFirestore, collection, addDoc, doc, setDoc, serverTimestamp, updateDoc, getDoc, getDocs, deleteDoc, query, where, orderBy, limit, arrayUnion, arrayRemove } from "firebase/firestore";
 
@@ -25,7 +24,7 @@ export const app = initializeApp(firebaseConfig);
 const appCheck = initializeAppCheck(app,
     {
         provider: new
-        ReCaptchaV3Provider(import.meta.env.VITE_RECAPTCHA_V3_SITE_KEY),
+            ReCaptchaV3Provider(import.meta.env.VITE_RECAPTCHA_V3_SITE_KEY),
         isTokenAutoRefreshEnabled: true //Optional, but recommended
     }
 )
@@ -35,6 +34,6 @@ export const auth = getAuth(app);
 // export const googleProvider = new firebase.auth.GoogleAuthProvider();
 export const googleProvider = new GoogleAuthProvider();
 
-const db= getFirestore(app);
-export { db, collection, addDoc, doc, setDoc, serverTimestamp, updateDoc, getDoc, getDocs, deleteDoc, query, orderBy, limit, where, arrayUnion, arrayRemove, logEvent, analytics, setUserId, setUserProperties }; 
+const db = getFirestore(app);
+export { db, collection, addDoc, doc, setDoc, serverTimestamp, updateDoc, getDoc, getDocs, deleteDoc, query, orderBy, limit, where, arrayUnion, arrayRemove, logEvent, analytics, setUserId, setUserProperties };
 

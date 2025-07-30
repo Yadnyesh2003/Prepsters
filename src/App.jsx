@@ -40,6 +40,7 @@ import ProtectedRoute from "./middleware/ProtectedRoute";
 import AccessForbidden from './components/student/AccessForbidden';
 import Navbar from './components/student/NavBar';
 import Profile from './pages/student/Profile';
+import Bookmarks from './pages/student/Bookmarks';
 
 
 
@@ -77,22 +78,31 @@ function App() {
       />
       <AuthProvider>
         <div className='text-default min-h-screen bg-auto'>
-        {!isAdminRoute && !isUnauthorizedRoute && <Navbar />}
+          {!isAdminRoute && !isUnauthorizedRoute && <Navbar />}
 
           <Routes>
 
             <Route path='/' element={<Landing />} />
             <Route path='/contributors' element={<Contributors />} />
             <Route path='/about-us' element={<AboutUs />} />
-            
 
-            <Route 
+
+            <Route
               path='/profile' element={
                 <ProtectedRoute allowedRole="student">
                   <Profile />
                 </ProtectedRoute>
-              } 
+              }
             />
+            <Route
+              path='/bookmarks' element={
+                <ProtectedRoute allowedRole="student">
+                  <Bookmarks />
+                </ProtectedRoute>
+              }
+            />
+
+
 
 
             <Route
@@ -151,7 +161,7 @@ function App() {
               <Route path='add-faqs' element={<AddFAQs />} />
               <Route path='add-notes' element={<AddNotes />} />
             </Route>
-            <Route path='unauthorized' element={<AccessForbidden/>} />
+            <Route path='unauthorized' element={<AccessForbidden />} />
           </Routes>
 
         </div>

@@ -6,6 +6,7 @@ import { useAuth } from "../../context/AuthContext";
 import { institutions, years, branches, avatarNicheOptions } from "../../assets/assets";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../../config/firebase";
+import ProfileBookmarksSection from '../../components/student/ProfileBookmarksSection';
 
 const animatedComponents = makeAnimated();
 
@@ -236,70 +237,7 @@ const Profile = () => {
               </div>
             </div>
 
-            {/* Bookmarks Section */}
-            {userData.bookmarks && (
-              <div className="border-t border-purple-100 p-8">
-                <h2 className="text-2xl font-bold text-gray-800 mb-6">Your Bookmarks</h2>
-                {Object.values(userData.bookmarks).some(arr => arr.length > 0) ? (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {userData.bookmarks.bookmarkedNotes.length > 0 && (
-                      <div className="bg-white p-5 rounded-xl border border-purple-100 shadow-sm hover:shadow-md transition-shadow">
-                        <h3 className="text-lg font-semibold text-purple-700 mb-3 flex items-center">
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                          </svg>
-                          Notes ({userData.bookmarks.bookmarkedNotes.length})
-                        </h3>
-                        <div className="space-y-2">
-                          {userData.bookmarks.bookmarkedNotes.slice(0, 3).map((note, index) => (
-                            <div key={index} className="text-sm text-gray-600 truncate">
-                              {note.title || `Note ${index + 1}`}
-                            </div>
-                          ))}
-                          {userData.bookmarks.bookmarkedNotes.length > 3 && (
-                            <div className="text-sm text-purple-600 font-medium">
-                              +{userData.bookmarks.bookmarkedNotes.length - 3} more
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    )}
-                    {userData.bookmarks.bookmarkedPYQs.length > 0 && (
-                      <div className="bg-white p-5 rounded-xl border border-purple-100 shadow-sm hover:shadow-md transition-shadow">
-                        <h3 className="text-lg font-semibold text-purple-700 mb-3 flex items-center">
-                          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                          </svg>
-                          PYQs ({userData.bookmarks.bookmarkedPYQs.length})
-                        </h3>
-                        <div className="space-y-2">
-                          {userData.bookmarks.bookmarkedPYQs.slice(0, 3).map((pyq, index) => (
-                            <div key={index} className="text-sm text-gray-600 truncate">
-                              {pyq.title || `PYQ ${index + 1}`}
-                            </div>
-                          ))}
-                          {userData.bookmarks.bookmarkedPYQs.length > 3 && (
-                            <div className="text-sm text-purple-600 font-medium">
-                              +{userData.bookmarks.bookmarkedPYQs.length - 3} more
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                ) : (
-                  <div className="text-center py-8">
-                    <div className="mx-auto h-24 w-24 text-purple-300 mb-4">
-                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-                      </svg>
-                    </div>
-                    <h3 className="text-lg font-medium text-gray-700">No bookmarks yet</h3>
-                    <p className="mt-1 text-sm text-gray-500">Save notes and PYQs to access them quickly here</p>
-                  </div>
-                )}
-              </div>
-            )}
+            <ProfileBookmarksSection />
           </div>
         </div>
       </div>

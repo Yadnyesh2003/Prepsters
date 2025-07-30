@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect } from "react";
 import { db, auth, googleProvider, collection, query, where, getDoc, getDocs, doc, setDoc, serverTimestamp, updateDoc } from "../config/firebase";
 import {
     signInWithPopup,
+    signInWithRedirect,
     signOut,
     onAuthStateChanged,
     setPersistence,
@@ -128,6 +129,7 @@ export const AuthProvider = ({ children }) => {
             const loggedInUser = userCredential.user;
             setUser(loggedInUser);
             setIsAuth(true);
+
 
             // Check if user exists & save if new
             await saveUserToFirestore(loggedInUser);
