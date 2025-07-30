@@ -21,7 +21,7 @@ const PYQs = () => {
 
 
   const { toast, trackPdfViewEvent } = useContext(AppContext);
-
+  const { user } = useAuth();
   const openPdfViewer = (url, item) => {
     setPdfUrl(url); // Set the PDF URL to be displayed in the viewer
     console.log("PYQ pdf clicked is: ", item)

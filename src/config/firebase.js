@@ -6,7 +6,6 @@ import { getAuth, GoogleAuthProvider } from "firebase/auth";
 
 import { getFirestore, collection, addDoc, doc, setDoc, serverTimestamp, updateDoc, getDoc, getDocs, deleteDoc, query, where, orderBy, limit, arrayUnion, arrayRemove } from "firebase/firestore";
 
-import { initializeAppCheck, ReCaptchaV3Provider } from 'firebase/app-check';
 
 const firebaseConfig = {
     apiKey: import.meta.env.VITE_FIREBASE_API_KEY,

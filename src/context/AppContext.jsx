@@ -86,6 +86,7 @@ export const AppContextProvider = (props) => {
       ...details,  // Spread optional fields like pdf_branch, pdf_title, etc.
     };
 
+
     console.log("Tracking PDF view event:", analyticsData);
     logEvent(analytics, eventName, analyticsData);
   };
@@ -156,6 +157,7 @@ export const AppContextProvider = (props) => {
 
 
 
+
   useEffect(() => {
     if (user) {
       getFAQDataLatest();
@@ -166,8 +168,10 @@ export const AppContextProvider = (props) => {
 
 
   const value = {
+
     trackPageView, trackFilterEvent, trackPdfViewEvent, navigate, toast, getFAQDataLatest, faqDataLatest, getPYQDataLatest, pyqDataLatest,
     getNotesDataLatest, notesDataLatest
+
   }
 
   return (
