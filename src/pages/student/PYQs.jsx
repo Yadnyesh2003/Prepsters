@@ -13,7 +13,7 @@ const PYQs = () => {
   const [showFilter, setShowFilter] = useState(true);
   const [loading, setLoading] = useState(false);
 
-  const { user } = useAuth();
+  
 
   // Lazy loading state
   const [visibleCount, setVisibleCount] = useState(3);
