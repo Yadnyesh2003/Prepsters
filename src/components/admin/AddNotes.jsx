@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { db, collection, addDoc, serverTimestamp, updateDoc } from "../../config/firebase";
 import Select from 'react-select';
@@ -24,6 +24,10 @@ const AddNotes = () => {
   const { toast } = useContext(AppContext);
   const animatedComponents = makeAnimated();
   const { isGhost, user } = useAuth();
+
+  useEffect(()=>{
+    document.title = "Add Notes"
+  })
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;

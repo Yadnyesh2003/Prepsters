@@ -34,6 +34,7 @@ const MyContributors = () => {
   };
 
   useEffect(() => {
+    document.title = "My Contributors"
     if (isGhost) {
       getContributorData();
     }

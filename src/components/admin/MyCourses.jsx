@@ -1,6 +1,9 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 
 const MyCourses = () => {
+  useEffect(()=>{
+    document.title = "My Courses"
+  }, [])
   return (
     <div className='flex flex-col items-center justify-center h-screen'>
       <h1 className='text-3xl font-bold'>My Courses</h1>

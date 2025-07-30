@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { db, collection, addDoc, doc, setDoc, serverTimestamp, updateDoc } from "../../config/firebase";
 import { useAuth } from '../../context/AuthContext'
 import AccessForbidden from "../student/AccessForbidden";
@@ -14,6 +14,9 @@ const AddContributors = () => {
   const { toast } = useContext(AppContext);
   const { isGhost, user } = useAuth();
 
+  useEffect(()=>{
+    document.title = "Add Contributors"
+  },[])
 
   const handleSubmit = async (e) => {
     e.preventDefault();

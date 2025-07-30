@@ -31,6 +31,7 @@ export default function AddCourse() {
     const { isGhost, user } = useAuth();
 
     useEffect(() => {
+        document.title = "Add Course"
         if (!quillRef.current && editorRef.current) {
             quillRef.current = new Quill(editorRef.current, {
                 theme: "snow",

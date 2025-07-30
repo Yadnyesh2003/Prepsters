@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { AppContext } from '../../context/AppContext';
 import { db, collection, addDoc, serverTimestamp, updateDoc } from "../../config/firebase";
 import Select from 'react-select';
@@ -26,6 +26,10 @@ import { branches, years, academicYears, contributors, institutions, subjects } 
     const { toast } = useContext(AppContext);
     const animatedComponents = makeAnimated();
     const { isGhost, user } = useAuth();
+
+    useEffect(()=>{
+      document.title = "Add PYQs"
+    },[])
 
     const handleChange = (e) => {
       const { name, value, type, checked } = e.target;
