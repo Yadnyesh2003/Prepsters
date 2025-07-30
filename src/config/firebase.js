@@ -1,6 +1,6 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
-
+import { initializeAppCheck, ReCaptchaV3Provider } from "firebase/app-check"
 import { getAnalytics, logEvent, setUserId, setUserProperties } from "firebase/analytics";
 import { getAuth, GoogleAuthProvider } from "firebase/auth";
 
