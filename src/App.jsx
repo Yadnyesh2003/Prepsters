@@ -85,6 +85,9 @@ function App() {
             <Route path='/' element={<Landing />} />
             <Route path='/contributors' element={<Contributors />} />
             <Route path='/about-us' element={<AboutUs />} />
+            <Route path="*" element={<Navigate to="/unauthorized" replace />} />
+
+            
 
 
             <Route

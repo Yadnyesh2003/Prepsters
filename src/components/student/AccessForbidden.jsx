@@ -13,6 +13,9 @@ const AccessForbidden = () => {
       logoutUser(),
       navigate('/')
     }
+    else{
+      navigate("/")
+    }
   };
 
   return (
