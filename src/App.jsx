@@ -1,5 +1,5 @@
 import React, { lazy, Suspense, useState } from 'react';
-import { Route, Routes, useMatch } from 'react-router-dom'
+import { Route, Routes, useMatch,Navigate } from 'react-router-dom'
 import { Toaster } from 'react-hot-toast';
 
 
@@ -85,6 +85,9 @@ function App() {
             <Route path='/' element={<Landing />} />
             <Route path='/contributors' element={<Contributors />} />
             <Route path='/about-us' element={<AboutUs />} />
+            <Route path="*" element={<Navigate to="/unauthorized" replace />} />
+
+            
 
 
             <Route
