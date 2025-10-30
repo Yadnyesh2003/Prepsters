@@ -7,6 +7,10 @@ import { institutions, years, branches, avatarNicheOptions } from "../../assets/
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../../config/firebase";
 import ProfileBookmarksSection from '../../components/student/ProfileBookmarksSection';
+import ResumeUpload from '../../components/student/ResumeUpload';
+import { Doughnut } from 'react-chartjs-2'; // Add this import
+import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js'; // Add this import
+ChartJS.register(ArcElement, Tooltip, Legend);
 
 const animatedComponents = makeAnimated();
 
@@ -25,6 +29,50 @@ const Profile = () => {
     year: null,
     branch: null,
   });
+  const [profileCompletion, setProfileCompletion] = useState(0);
+  const [showPdf, setShowPdf] = useState(false);
+
+  
+  // Calculate profile completion
+  const calculateProfileCompletion = (userData) => {
+    let completion = 0;
+    const weights = {
+      userEmail: 15,
+      userName: 10,
+      userAvatar: 10,
+      userInstitution: 15,
+      userYear: 10,
+      userBranch: 10,
+      resumes: 30 // 30% weight for resumes
+    };
+
+    if (userData) {
+      // Check each field and add to completion
+      if (userData.userEmail && userData.userEmail.trim() !== '') completion += weights.userEmail;
+      if (userData.userName && userData.userName.trim() !== '') completion += weights.userName;
+      if (userData.userAvatar !== null) completion += weights.userAvatar;
+
+      // Check userData fields
+      if (userData.userData) {
+        if (userData.userData.userInstitution && userData.userData.userInstitution.trim() !== '') {
+          completion += weights.userInstitution;
+        }
+        if (userData.userData.userYear && userData.userData.userYear.trim() !== '') {
+          completion += weights.userYear;
+        }
+        if (userData.userData.userBranch && userData.userData.userBranch.trim() !== '') {
+          completion += weights.userBranch;
+        }
+      }
+
+      // Check resumes - user must have at least one resume
+      if (userData.resumes && userData.resumes.length > 0) {
+        completion += weights.resumes;
+      }
+    }
+
+    return Math.min(100, completion);
+  };
 
   // Fetch user data on component mount
   useEffect(() => {
@@ -38,6 +86,10 @@ const Profile = () => {
           if (userDoc.exists()) {
             const data = userDoc.data();
             setUserData(data);
+            
+            // Calculate profile completion
+            const completion = calculateProfileCompletion(data);
+            setProfileCompletion(completion);
 
             // Set avatar config if exists
             if (data.userAvatar) {
@@ -81,8 +133,6 @@ const Profile = () => {
       niche: randomNiche,
       seed: randomSeed
     });
-
-    // toast.success("New avatar generated!");
   };
 
   const handleChange = (selectedOption, { name }) => {
@@ -116,33 +166,35 @@ const Profile = () => {
           userYear: formData.year,
           userBranch: formData.branch,
         },
-        isProfileComplete: true
+        // Note: We don't set isProfileComplete to true here because resume is required
+        profileCompletionPercentage: calculateProfileCompletion({
+          ...userData,
+          userAvatar: { niche: avatarConfig.niche, seed: avatarConfig.seed },
+          userData: {
+            userInstitution: formData.institution,
+            userYear: formData.year,
+            userBranch: formData.branch,
+          }
+        })
       };
 
       const success = await updateProfile(user.uid, updatedData);
       if (success) {
-        toast.success("Profile saved successfully!");
+        toast.success("Profile saved successfully! Don't forget to upload at least one resume to complete your profile.");
         setIsEditing(false);
         // Update local state
-        setUserData(prev => ({
-          ...prev,
-          ...updatedData,
-          isProfileComplete: true
-        }));
+        const newUserData = {
+          ...userData,
+          ...updatedData
+        };
+        setUserData(newUserData);
+        setProfileCompletion(calculateProfileCompletion(newUserData));
       }
     } catch (error) {
       console.error("Error saving profile:", error);
       toast.error("Failed to save profile");
     }
   };
-
-  // if (isLoading) {
-  //   return (
-  //     <div className="min-h-screen flex items-center justify-center bg-gradient-to-r from-violet-500 via-purple-500 to-fuchsia-600">
-  //       <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-purple-200"></div>
-  //     </div>
-  //   );
-  // }
 
   // View Mode - Show profile information
   if (!isEditing && userData?.isProfileComplete) {
@@ -195,7 +247,7 @@ const Profile = () => {
                       className="px-6 py-2 bg-gradient-to-r from-violet-600 to-purple-600 text-white rounded-full shadow-lg hover:from-violet-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-all duration-200 flex items-center"
                     >
                       <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-8 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                       </svg>
                       Edit Profile
                     </button>
@@ -233,11 +285,26 @@ const Profile = () => {
                       </p>
                     </div>
                   </div>
+
+                  {/* Resume Status */}
+                  {/* <div className={`p-5 rounded-xl ${userData.resumes && userData.resumes.length > 0 ? 'bg-gradient-to-r from-green-50 to-emerald-50' : 'bg-gradient-to-r from-amber-50 to-orange-50'}`}>
+                    <h3 className="text-sm font-semibold text-purple-800 uppercase tracking-wider mb-2">Resume Status</h3>
+                    <p className="text-lg font-medium text-gray-900">
+                      {userData.resumes && userData.resumes.length > 0 
+                        ? `✅ ${userData.resumes.length} resume(s) uploaded` 
+                        : '❌ No resume uploaded (required for complete profile)'}
+                    </p>
+                  </div> */}
                 </div>
               </div>
             </div>
-
-            <ProfileBookmarksSection />
+          </div>
+          
+                <ResumeUpload />
+         
+          
+          <div className="p-6 mt-8 bg-white/90 backdrop-blur-sm shadow-xl rounded-2xl ">
+                <ProfileBookmarksSection />
           </div>
         </div>
       </div>
@@ -257,10 +324,45 @@ const Profile = () => {
               ? "Update your profile information"
               : "Set up your profile to get started"}
           </p>
+          {!userData?.isProfileComplete && (
+            <p className="text-sm text-amber-600 mt-2">
+              📄 Don't forget to upload at least one resume to complete your profile!
+            </p>
+          )}
         </div>
 
         <div className="bg-white/90 backdrop-blur-sm shadow-xl rounded-2xl">
           <div className="p-8">
+            {/* Profile Completion Status */}
+            {!userData?.isProfileComplete && (
+              <div className="mb-6 p-4 bg-gradient-to-r from-amber-50 to-orange-50 rounded-lg border border-amber-200">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h3 className="font-semibold text-amber-800">Profile Completion: {profileCompletion}%</h3>
+                    <p className="text-sm text-amber-600 mt-1">
+                      Upload at least one resume to reach 100% completion
+                    </p>
+                  </div>
+                  <div className="w-16 h-16">
+                    <Doughnut 
+                      data={{
+                        labels: ['Completed', 'Remaining'],
+                        datasets: [{
+                          data: [profileCompletion, 100 - profileCompletion],
+                          backgroundColor: ['#6366f1', '#e0e7ff'],
+                          borderWidth: 0,
+                        }]
+                      }}
+                      options={{
+                        cutout: '70%',
+                        plugins: { legend: { display: false }, tooltip: { enabled: false } }
+                      }}
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
+
             {/* Avatar Selection */}
             <div className="flex flex-col items-center mb-10">
               <div className="relative mb-6 group">
@@ -342,7 +444,6 @@ const Profile = () => {
                 />
               </div>
 
-              {/* Year and Branch */}
               {/* Year and Branch */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 ">
                 {/* Year */}
@@ -449,9 +550,21 @@ const Profile = () => {
                 </button>
               </div>
             </form>
+
+            {/* Resume Section with Important Notice */}
+            <div className="p-6 border-t border-purple-50 mt-8">
+              <div className="mb-4">
+                <h3 className="text-lg font-semibold text-purple-800">Resume Upload</h3>
+                <p className="text-sm text-amber-600 mt-1">
+                  📄 <strong>Important:</strong> Upload at least one resume to complete your profile and access all features.
+                </p>
+              </div>
+              <ResumeUpload />
+            </div>
           </div>
         </div>
       </div>
+      {showPdf && <PdfViewer pdfUrl={url} onClose={() => setShowPdf(false)} />}
     </div>
   );
 };

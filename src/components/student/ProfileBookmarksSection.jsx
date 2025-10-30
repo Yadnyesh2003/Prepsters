@@ -134,7 +134,7 @@ const ProfileBookmarksSection = () => {
     }
 
     return (
-        <div className="border-t border-purple-100 p-8">
+        <div className="p-3">
             <div className="flex justify-between items-center mb-6">
                 <h2 className="text-2xl font-bold text-gray-800">Your Bookmarks</h2>
                 {hasBookmarks() && (
