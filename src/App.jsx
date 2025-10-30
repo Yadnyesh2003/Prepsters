@@ -41,6 +41,8 @@ import AccessForbidden from './components/student/AccessForbidden';
 import Navbar from './components/student/NavBar';
 import Profile from './pages/student/Profile';
 import Bookmarks from './pages/student/Bookmarks';
+import CreateInterview from './pages/student/CreateInterview';
+import ScheduledInterviews from './pages/student/ScheduledInterviews';
 
 
 
@@ -49,6 +51,7 @@ import Bookmarks from './pages/student/Bookmarks';
 
 const ExamPrep = lazy(() => import('./pages/student/ExamPrep'));
 const Resources = lazy(() => import('./pages/student/Resourses'));
+const Interviews = lazy(() => import('./pages/student/Interviews'))
 
 
 // Wrapper for role-based access
@@ -138,6 +141,19 @@ function App() {
               <Route path="loading/:path" element={<Loading />} />
               <Route path="notes" element={<Notes />} />
               <Route path="unauthorized" element={<AccessForbidden />} />
+            </Route>
+
+            <Route
+              path="/interview"
+              element={
+                <ProtectedRoute allowedRole="student">
+                  <Interviews />
+                </ProtectedRoute>
+              }
+            >
+              <Route path="create" element={<CreateInterview />} />
+              <Route path="list" element={<ScheduledInterviews />} />
+
             </Route>
 
 

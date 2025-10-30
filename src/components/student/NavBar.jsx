@@ -24,20 +24,25 @@ const NAV_ITEMS = {
   resources: [
     { text: 'Notes', path: '/resources/notes' },
     { text: 'Courses', path: '/resources/course-list' }
+  ],
+  interviews: [
+    { text: 'Create', path: '/interview/create' },
+    { text: 'Scheduled Interviews', path: '/interview/list' }
   ]
 };
 
 const NavbarHome = () => {
   const { logoutUser, user, signInWithGoogle } = useAuth();
   const [navOpen, setNavOpen] = useState(false);
-  const [dropdown, setDropdown] = useState({ examPrep: false, resources: false, profile: false });
+  const [dropdown, setDropdown] = useState({ examPrep: false, resources: false, profile: false, interviews: false });
   const [userAvatar, setUserAvatar] = useState(null);
   const [loading, setLoading] = useState(true);
 
   const refs = {
     examPrep: useRef(null),
     resources: useRef(null),
-    profile: useRef(null)
+    profile: useRef(null),
+    interviews: useRef(null)
   };
 
   useEffect(() => {
@@ -113,6 +118,22 @@ const NavbarHome = () => {
     <ul className="hidden md:flex space-x-8 ml-auto items-center">
       {user && (
         <>
+          <li className="relative group">
+            <button
+              onClick={() => toggleDropdown('interviews')}
+              className="flex items-center text-lg font-medium hover:text-purple-300 transition-colors duration-200"
+            >
+              AI Mock Interview
+              <svg
+              className={`ml-1 h-4 w-4 transition-transform duration-200 ${dropdown.interviews ? 'rotate-180' : ''}`}
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"                >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+              </svg>
+            </button>
+            {renderDropdown(NAV_ITEMS.interviews, 'interviews', refs.interviews)}
+          </li>
           <li className="relative group">
             <Link to="/bookmarks" className="block">
               <button className="flex items-center text-lg font-medium hover:text-purple-300 transition-colors duration-200">
@@ -302,7 +323,7 @@ const NavbarHome = () => {
 };
 
 const MobileSidebar = ({ open, setOpen, user, userAvatar, logoutUser, signInWithGoogle }) => {
-  const [expanded, setExpanded] = useState({ examPrep: false, resources: false });
+  const [expanded, setExpanded] = useState({ examPrep: false, resources: false, interviews: false });
 
   const toggle = (key) => setExpanded((prev) => ({ ...prev, [key]: !prev[key] }));
 
@@ -411,6 +432,23 @@ const MobileSidebar = ({ open, setOpen, user, userAvatar, logoutUser, signInWith
                 </svg>
               </button>
               {renderList(NAV_ITEMS.resources, 'resources')}
+            </li>
+            <li>
+              <button
+                onClick={() => toggle('interviews')}
+                className="w-full text-left py-3 px-4 rounded-lg text-white hover:bg-purple-800 transition-colors duration-200 flex justify-between items-center"
+              >
+                <span>AI Mock Interview</span>
+                <svg
+                  className={`h-4 w-4 transition-transform duration-200 ${expanded.interviews ? 'rotate-180' : ''}`}
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              {renderList(NAV_ITEMS.interviews, 'interviews')}
             </li>
             <li>
               <Link
