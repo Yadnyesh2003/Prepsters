@@ -289,7 +289,7 @@ const NavbarHome = () => {
             <img
               src={assets.tte_transparent_logo}
               alt="TTE Logo"
-              className="h-10 w-10 object-contain"
+              className="h-10 w-10 object-cover rounded-full"
             />
           </div>
           <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-300 to-indigo-300">

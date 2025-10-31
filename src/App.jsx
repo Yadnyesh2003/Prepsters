@@ -43,7 +43,8 @@ import Profile from './pages/student/Profile';
 import Bookmarks from './pages/student/Bookmarks';
 import CreateInterview from './pages/student/CreateInterview';
 import ScheduledInterviews from './pages/student/ScheduledInterviews';
-
+import InterviewSession from './pages/student/InterviewSession';
+import FeedBack from './pages/student/FeedBack';
 
 
 
@@ -153,7 +154,8 @@ function App() {
             >
               <Route path="create" element={<CreateInterview />} />
               <Route path="list" element={<ScheduledInterviews />} />
-
+              <Route path=":id" element={<InterviewSession />} />
+              <Route path=":id/feedback" element={<FeedBack />} />
             </Route>
 
 

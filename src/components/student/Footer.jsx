@@ -23,9 +23,9 @@ const Footer = () => {
                             src={img}
                             alt="logo"
                         />
-                        <span className="font-bold text-lg sm:text-xl md:text-1xl text-white/60">The Third Tier Engineers</span>
+                        <span className="font-bold text-lg sm:text-xl md:text-1xl text-white/60">Prepsters</span>
                     </div>
-                    <p className='mt-6 text-center md:text-left text-sm text-white/80'>TheThirdTierEngineers made its online presence on 22nd October,2023.
+                    <p className='mt-6 text-center md:text-left text-sm text-white/80'>Prepsters made its online presence on 22nd October,2023.
                         Today is {formattedDate}. Look how far we have reached!</p>
                 </div>
                 <div className='hidden md:flex flex-col items-start w-full'>
@@ -41,7 +41,7 @@ const Footer = () => {
                 </div>
 
             </div>
-            <p className='py-4 text-center text-xs md:text-sm text-white/60'>Copyright 2025 @TheThirdTierEngineers. All Rights Reserved</p>
+            <p className='py-4 text-center text-xs md:text-sm text-white/60'>Copyright 2025 @Prepsters. All Rights Reserved</p>
 
         </footer>
     )

@@ -30,6 +30,7 @@ import yadnyesh from './profile_founder.jpeg'
 import hero_img from './hero_image.jpeg'
 import bookmark from './bookmark.png';
 import bookmark_done from './bookmark_done.png';
+import ai_agent from './ai_agent.png';
 
 import popSoundFile from './pop.mp3';
 
@@ -65,7 +66,8 @@ export const assets = {
   yadnyesh,
   hero_img,
   bookmark,
-  bookmark_done
+  bookmark_done,
+  ai_agent
 }
 
 export const popSound = new Audio(popSoundFile);

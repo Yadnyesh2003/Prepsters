@@ -14,7 +14,7 @@ function AboutUs() {
   const timelineData = [
     {
       date: "23rd October, 2023",
-      title: "🚀 Launch of Our First Google Site – The Third Tier Engineers",
+      title: "🚀 Launch of Our First Google Site – Prepsters",
       description:
         "It all started with a cracked idea during Sem 3 by Yadnyesh, who launched a simple Google Site packed with PYQs and concise notes. Shared among friends in the IT branch, this platform quickly became a hit, helping 60+ students crush their exams! With the motto ‘Minimize Effort, Maximize Output,’ we centralized smart learning—and that was just the beginning!",
       icon: (
@@ -63,7 +63,7 @@ function AboutUs() {
       date: "12th May, 2025",
       title: "🎉 THE BIG DAY – Official Launch of Our Dream Learning Platform!",
       description:
-        "After months of sleepless nights, bug fights, and feature-building chaos, we’re LIVE! 🎯 Our new web-based platform backed by a selfless student community is rolling out for beta testing this exam season. We’re expecting a quadruple surge in users—'cause it’s FREE, effective, and built FOR students BY students. The Third Tier Engineers isn’t just a platform—it’s a MOVEMENT. Let’s make history, amigos 🤝💯",
+        "After months of sleepless nights, bug fights, and feature-building chaos, we’re LIVE! 🎯 Our new web-based platform backed by a selfless student community is rolling out for beta testing this exam season. We’re expecting a quadruple surge in users—'cause it’s FREE, effective, and built FOR students BY students. Prepsters isn’t just a platform—it’s a MOVEMENT. Let’s make history, amigos 🤝💯",
       icon: (
         <svg className="fill-red-500" xmlns="http://www.w3.org/2000/svg" width="16" height="16">
           <path d="M8 0a8 8 0 1 0 8 8 8.009 8.009 0 0 0-8-8Zm0 12a4 4 0 1 1 0-8 4 4 0 0 1 0 8Z" />
@@ -124,7 +124,7 @@ function AboutUs() {
               viewport={{ once: true }}
             >
               <h2 className="text-4xl sm:text-5xl md:text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-sky-300 mb-4 tracking-tight">
-                <span className="font-extrabold">The Third Tier Engineers</span>
+                <span className="font-extrabold">Prepsters</span>
               </h2>
               <div className="h-1 w-24 bg-gradient-to-r from-indigo-400 to-sky-400 rounded-full mb-6"></div>
             </motion.div>
@@ -154,7 +154,7 @@ function AboutUs() {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.6 }}
               >
-                🎓 Hey! Welcome to <span className="font-semibold text-indigo-600">The Third Tier Engineers</span> — the ultimate exam-hack zone built by students, for students!
+                🎓 Hey! Welcome to <span className="font-semibold text-indigo-600">Prepsters</span> — the ultimate exam-hack zone built by students, for students!
               </motion.p>
 
               <motion.p
@@ -209,81 +209,6 @@ function AboutUs() {
           </div>
         </motion.div>
 
-        {/* Founders Section */}
-        <div className="relative max-w-7xl mx-auto px-6 mt-16">
-          {/* Title with Y-Axis Animation */}
-          <motion.h2
-            initial={{ opacity: 0, y: 50 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1.2, type: 'spring', stiffness: 80 }}
-            viewport={{ once: true }}
-            className="text-4xl md:text-5xl font-bold text-indigo-700 text-center mb-16"
-          >
-            Our Founders
-          </motion.h2>
-
-          {/* Founders Layout */}
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            className="flex flex-col md:flex-row items-center justify-center gap-12 md:gap-20 mb-24"
-          >
-            {/* Founder 1 Image (Circular, Slides from Left) */}
-            <motion.div
-              variants={{
-                hidden: { x: '-100%', opacity: 0 },
-                visible: { x: 0, opacity: 1 },
-              }}
-              transition={{ duration: 1.2, type: 'spring', stiffness: 100, delay: 0.2 }}
-              className="relative group flex-shrink-0"
-            >
-              <div className="absolute inset-0 rounded-full bg-gradient-to-br from-indigo-400 via-purple-500 to-pink-500 blur-lg opacity-0 group-hover:opacity-70 transition-opacity duration-500"></div>
-              <img
-                src={assets.yadnyesh}
-                alt="Yadnyesh Firke"
-                className="w-64 h-64 md:w-72 md:h-72 object-cover rounded-full border-4 border-white shadow-lg z-10 relative transition-transform duration-500 group-hover:scale-105 group-hover:shadow-2xl group-hover:shadow-indigo-200/50"
-              />
-              <div className="absolute -inset-2 rounded-full bg-gradient-to-br from-indigo-400 via-purple-500 to-pink-500 opacity-0 group-hover:opacity-100 -z-10 transition-all duration-500 group-hover:animate-pulse-slow"></div>
-            </motion.div>
-
-            {/* Text Card with Y-Axis Animation */}
-            <motion.div
-              initial={{ opacity: 0, y: 50 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 1.2, type: 'spring', stiffness: 80, delay: 0.4 }}
-              className="bg-white/80 backdrop-blur-md p-8 rounded-xl shadow-xl max-w-2xl md:text-left border border-white/30 "
-            >
-              <h3 className="text-2xl md:text-3xl font-semibold text-indigo-600 mb-4">👨‍💻 Meet the Visionaries</h3>
-              <p className="text-base md:text-lg text-gray-700 text-justify">
-                Yadnyesh Firke (SAKEC - IT, Mumbai) & Parth Narkhede (VIIT - Comps, Pune) — we're the minds & coffee-fueled souls ☕ behind <span className="font-semibold text-indigo-600">The Third Tier Engineers</span>. From the Batch of 2026, just two regular engineering students with an irregularly big vision.
-                It all began when Yadnyesh launched a simple Google Site during Sem 3 📅, packed with handwritten notes and PYQs for friends. What started as a “just-helping-bros-out” idea soon helped 60+ students crack their exams with ease 💯. Meanwhile, Parth jumped on board, and
-                together we turned late-night study trends 🌙📚 into a movement — one that makes learning smart, fun, and community-driven.
-
-
-              </p>
-            </motion.div>
-
-            {/* Founder 2 Image (Circular, Slides from Right) */}
-            <motion.div
-              variants={{
-                hidden: { x: '100%', opacity: 0 },
-                visible: { x: 0, opacity: 1 },
-              }}
-              transition={{ duration: 1.2, type: 'spring', stiffness: 100, delay: 0.2 }}
-              className="relative group flex-shrink-0"
-            >
-              <div className="absolute inset-0 rounded-full bg-gradient-to-br from-sky-400 via-teal-500 to-emerald-500 blur-lg opacity-0 group-hover:opacity-70 transition-opacity duration-500"></div>
-              <img
-                src={assets.parth}
-                alt="Dr. Sarah Chen"
-                className="w-64 h-64 md:w-72 md:h-72 object-cover rounded-full border-4 border-white shadow-lg z-10 relative transition-transform duration-500 group-hover:scale-105 group-hover:shadow-2xl group-hover:shadow-sky-200/50"
-              />
-              <div className="absolute -inset-2 rounded-full bg-gradient-to-br from-sky-400 via-teal-500 to-emerald-500 opacity-0 group-hover:opacity-100 -z-10 transition-all duration-500 group-hover:animate-pulse-slow"></div>
-            </motion.div>
-          </motion.div>
-        </div>
-
         {/* Why Join Us Section */}
         <div className="relative max-w-7xl mx-auto px-6 mt-16">
           {/* Section Title with Animation */}
@@ -308,7 +233,7 @@ function AboutUs() {
             <p className="text-base md:text-lg text-gray-700 text-justify">
               Over months, we studied 📖, coded 🧑‍💻, failed 🐞, debugged 💥, and finally built a platform we wish we had from day one. With features like exam-focused notes, analyzed FAQs, year-wise PYQ libraries, and no-nonsense summaries — this isn’t just a project, it's a rebellion against boring textbooks and stressful study marathons 🎯🔥<br /><br />
               We're not just aspiring developers — we're builders of a student-first learning revolution. If you're someone who believes in sharing knowledge, solving problems, and helping others ace their goals… guess what? You belong here 🙌<br /><br />
-              Join us. Contribute. Build. Because <span className="font-semibold text-indigo-600">The Third Tier Engineers</span> is more than a name — it’s a community of underdogs turning into achievers. 🚀🌟
+              Join us. Contribute. Build. Because <span className="font-semibold text-indigo-600">Prepsters</span> is more than a name — it’s a community of underdogs turning into achievers. 🚀🌟
             </p>
           </motion.div>
         </div>

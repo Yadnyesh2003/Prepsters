@@ -254,6 +254,7 @@ const CreateInterview = () => {
         userId: user.uid,
         questions,
         expiresOn,
+        isCompleted: false,
       });
 
       await updateDoc(userRef, {

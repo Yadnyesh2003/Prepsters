@@ -4,6 +4,7 @@ import { collection, getDocs } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import InterviewCard from "../../components/student/InterviewCard";
+import Loading from "../../components/student/Loading";
 
 const ScheduledInterviews = () => {
   const [interviews, setInterviews] = useState([]);
@@ -18,6 +19,7 @@ const ScheduledInterviews = () => {
         const querySnapshot = await getDocs(collection(db, "Interviews"));
         const data = querySnapshot.docs.map((doc) => ({
           id: doc.id,
+          isCompleted: doc.data().isCompleted ?? false,
           ...doc.data(),
         }));
         setInterviews(data);
@@ -33,9 +35,7 @@ const ScheduledInterviews = () => {
 
   if (loading)
     return (
-      <div className="flex justify-center items-center h-screen text-lg">
-        Loading scheduled interviews...
-      </div>
+      <Loading />
     );
 
   return (
@@ -72,7 +72,7 @@ const ScheduledInterviews = () => {
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
               transition={{ duration: 0.3 }}
-              className="bg-white p-6 rounded-2xl max-w-lg w-11/12 relative shadow-xl"
+              className="bg-white p-6 rounded-2xl max-w-lg w-11/12 relative shadow-xl max-h-[80vh] overflow-y-auto"
             >
               <button
                 className="absolute top-3 right-3 text-gray-500 hover:text-gray-800"
@@ -91,9 +91,11 @@ const ScheduledInterviews = () => {
                 <span className="font-medium">Duration:</span>{" "}
                 {selectedInterview.duration}
               </p>
-              <p className="text-sm text-gray-700 mb-6 whitespace-pre-line leading-relaxed">
-                {selectedInterview.JD || "No job description available."}
-              </p>
+              <div className="max-h-60 overflow-y-auto mb-6 border p-2 rounded-md bg-gray-50">
+                <p className="text-sm text-gray-700 whitespace-pre-line leading-relaxed">
+                  {selectedInterview.jobDesc || "No job description available."}
+                </p>
+              </div>
               <div className="flex justify-end gap-3">
                 <button
                   className="px-4 py-2 bg-gray-200 rounded-lg hover:bg-gray-300"
@@ -101,14 +103,22 @@ const ScheduledInterviews = () => {
                 >
                   Close
                 </button>
-                <button
-                  className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
-                  onClick={() =>
-                    navigate(`/interview/${selectedInterview.id}`)
-                  }
-                >
-                  Start Interview
-                </button>
+
+                {selectedInterview.isCompleted ? (
+                  <button
+                    className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition"
+                    onClick={() => navigate(`/interview/${selectedInterview.id}/feedback`)}
+                  >
+                    View Feedback
+                  </button>
+                ) : (
+                  <button
+                    className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition"
+                    onClick={() => navigate(`/interview/${selectedInterview.id}`)}
+                  >
+                    Start Interview
+                  </button>
+                )}
               </div>
             </motion.div>
           </motion.div>
