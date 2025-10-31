@@ -1,26 +1,58 @@
 import React, { useState, useEffect } from "react";
-import { collection, addDoc, Timestamp, doc, getDoc, updateDoc, arrayUnion } from "firebase/firestore";
+import Select from "react-select";
+import makeAnimated from "react-select/animated";
+import toast from "react-hot-toast";
+import {
+  collection,
+  addDoc,
+  Timestamp,
+  doc,
+  getDoc,
+  updateDoc,
+  arrayUnion,
+  query,
+  where,
+  getDocs,
+  limit,
+} from "firebase/firestore";
 import { db } from "../../config/firebase";
 import { useAuth } from "../../context/AuthContext";
 import { parseResumeFromUrl } from "../../utils/resumeParser";
 
-const LEVELS = ["fresher", "newbie", "intern", "junior", "senior"];
-const TYPES = ["technical", "behavioural", "managerial", "mixed"];
-const DURATIONS = ["short", "medium", "long"];
+const LEVELS = [
+  { value: "fresher", label: "Fresher" },
+  { value: "newbie", label: "Newbie" },
+  { value: "intern", label: "Intern" },
+  { value: "junior", label: "Junior" },
+  { value: "senior", label: "Senior" },
+];
+const TYPES = [
+  { value: "technical", label: "Technical" },
+  { value: "behavioural", label: "Behavioural" },
+  { value: "managerial", label: "Managerial" },
+  { value: "mixed", label: "Mixed" },
+];
+const DURATIONS = [
+  { value: "short", label: "Short (4 Qs)" },
+  { value: "medium", label: "Medium (7 Qs)" },
+  { value: "long", label: "Long (10 Qs)" },
+];
+
+const animatedComponents = makeAnimated();
 
 const CreateInterview = () => {
   const { user } = useAuth();
   const [role, setRole] = useState("");
   const [techStack, setTechStack] = useState("");
-  const [level, setLevel] = useState(LEVELS[0]);
-  const [type, setType] = useState(TYPES[0]);
-  const [duration, setDuration] = useState(DURATIONS[0]);
+  const [jobDesc, setJobDesc] = useState("");
+  const [level, setLevel] = useState(null);
+  const [type, setType] = useState(null);
+  const [duration, setDuration] = useState(null);
   const [resumes, setResumes] = useState([]);
-  const [selectedResume, setSelectedResume] = useState("");
+  const [selectedResume, setSelectedResume] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState("");
 
-  // ✅ Fetch resumes uploaded by this user
+  // Fetch user resumes
   useEffect(() => {
     const fetchUserResumes = async () => {
       if (!user) return;
@@ -29,36 +61,118 @@ const CreateInterview = () => {
         const userDoc = await getDoc(userRef);
         if (userDoc.exists()) {
           const data = userDoc.data();
-          // Assuming resumes are stored as an array of objects with display_name + parsedData
-          setResumes(data.resumes || []);
+          setResumes(
+            (data.resumes || []).map((r) => ({
+              value: r.display_name,
+              label: r.display_name,
+            }))
+          );
         }
       } catch (error) {
         console.error("Error fetching resumes:", error);
+        toast.error("Failed to fetch resumes.");
       }
     };
-
     fetchUserResumes();
   }, [user]);
 
-  // ✅ Generate questions using Gemini
-  const generateQuestions = async (resumeParsedData) => {
-    try {
-      const numQuestions = duration === "short" ? 4 : duration === "medium" ? 7 : 10;
-      const prompt = `You are an AI interviewer. Generate ${numQuestions} ${type} interview questions for a ${level} ${role} who knows ${techStack}. Use this resume data to tailor the questions:
-${resumeParsedData}
-Return only the list of questions, each on a separate line, optionally prefixed with numbering.
-Please return only the questions, without any additional text.
-        The questions are going to be read by a voice assistant so do not use "/" or "*" or any other special characters which might break the voice assistant.
-        
-        Thank you! <3`;
+  const checkInterviewLimit = async () => {
+    if (!user) return false;
 
-      const GEMINI_API_KEY = import.meta.env.VITE_GOOGLE_GENERATIVE_AI_API_KEY;
-      if (!GEMINI_API_KEY) {
-        console.error('Missing VITE_GOOGLE_GENERATIVE_AI_API_KEY environment variable');
-        return [];
+    try {
+      // ✅ Query only by userId — no composite index needed
+      const interviewsRef = collection(db, "Interviews");
+      const q = query(interviewsRef, where("userId", "==", user.uid), limit(10));
+      const snapshot = await getDocs(q);
+      // ✅ Filter expired interviews locally
+      const now = Timestamp.now();
+      const activeInterviews = snapshot.docs.filter(
+        (doc) => doc.data().expiresOn?.toMillis() > now.toMillis()
+      ).length;
+
+      if (activeInterviews >= 3) {
+        toast.error(
+          "You already have 3 active interviews. Please wait for them to expire before creating a new one!"
+        );
+        return false;
       }
 
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-001:generateContent?key=${GEMINI_API_KEY}`;
+      return true;
+    } catch (error) {
+      console.error("Error checking interview limit:", error);
+      toast.error("Failed to check interview limit. Try again later.");
+      return false;
+    }
+  };
+
+
+
+  // Generate Gemini questions
+  const generateQuestions = async (resumeParsedData) => {
+    const numQuestions =
+      duration.value === "short"
+        ? 4
+        : duration.value === "medium"
+        ? 7
+        : 10;
+    const prompt = `
+      You are an AI interviewer preparing a ${type.value} interview for a ${level.value} ${role}.
+      Tech Stack: ${techStack}
+      Job Description: ${jobDesc}
+      Resume Data:
+      ${resumeParsedData}
+
+      Generate ${numQuestions} smart, conversational, voice-friendly questions that challenge the student based on their resume, tech stack, and job description.
+      Return only the questions, one per line, no special characters or numbering.
+      `;
+
+    const GEMINI_API_KEY = import.meta.env.VITE_GOOGLE_GENERATIVE_AI_API_KEY;
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-001:generateContent?key=${GEMINI_API_KEY}`;
+
+    try {
+      const response = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] }),
+      });
+      const data = await response.json();
+      const text =
+        data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || "";
+      return text.split("\n").filter((q) => q.trim() !== "");
+    } catch (err) {
+      console.error("Gemini error:", err);
+      toast.error("Failed to generate questions.");
+      return [];
+    }
+  };
+
+
+  // Summarize parsed resume data if too large (to stay under Firestore 1MB)
+  const summarizeResumeData = async (resumeText) => {
+    if (!resumeText || resumeText.trim().length === 0) return "";
+
+    // // If small enough, skip summarization
+    // if (resumeText.length < 500) {
+    //   return resumeText;
+    // }
+
+    try {
+      const GEMINI_API_KEY = import.meta.env.VITE_GOOGLE_GENERATIVE_AI_API_KEY;
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-001:generateContent?key=${GEMINI_API_KEY}`;
+
+      const prompt = `
+        You are an AI resume compressor. Summarize the following resume into a structured JSON-like text with sections: 
+        "About", "Skills", "Experience", "Projects", "Achievements" and "Education". 
+        
+        Keep descriptions conversational yet concise
+        Output a JSON-like text that an interviewer AI can easily understand and reference.
+
+        Keep it under 15000 characters total, focusing only on keywords, achievements, and technologies.
+
+        Resume:
+        ${resumeText}
+        `;
+
       const response = await fetch(url, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -66,209 +180,195 @@ Please return only the questions, without any additional text.
       });
 
       const data = await response.json();
-      // Helpful debug logging so we can inspect failures
-      console.debug('Gemini response', data);
+      const summary =
+        data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || "";
 
-      // try multiple fallback paths depending on API shape
-      const rawText =
-        data?.candidates?.[0]?.content?.parts?.[0]?.text ||
-        data?.candidates?.[0]?.content?.[0]?.text ||
-        data?.result?.content?.[0]?.text ||
-        data?.output?.[0]?.content?.text ||
-        data?.text ||
-        "";
-
-      if (!rawText || rawText.trim().length === 0) {
-        console.warn('Gemini returned empty text. Falling back to basic generator. Full response:', data);
-        // Fallback simple question generation (minimal but useful) so DB still gets something
-        const fallback = Array.from({ length: numQuestions }).map((_, i) => `${i + 1}. Tell me about your experience relevant to ${role} and ${techStack}`);
-        return fallback;
+      if (summary.length > 0) {
+        console.log("✅ Gemini summarized resume length:", summary.length);
+        return summary;
+      } else {
+        console.warn("Gemini returned empty summary. Using fallback.");
+        return resumeText.slice(0, 50000); // fallback truncate
       }
-
-      const questions = rawText
-        .split('\n')
-        .map((q) => q.trim())
-        .filter((q) => q.length > 0)
-        .map((q) => q.replace(/^\d+[\).\s]*/, "").trim());
-
-      return questions;
     } catch (error) {
-        console.error("Gemini generation failed:", error);
-        return [];
+      console.error("Error summarizing resume:", error);
+      return resumeText.slice(0, 50000); // fallback truncate
     }
-    };
+  };
 
 
-  // ✅ Submit form
+  // Submit handler
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!user) return alert("Please log in first.");
-
-    const resumeObj = resumes.find((r) => r.display_name === selectedResume);
-    if (!resumeObj) return alert("Please select a resume.");
+    if (!user) return toast.error("Please log in first!");
+    if (!level || !type || !duration)
+      return toast.error("Please select all dropdown fields!");
+    if (!role || !techStack || !selectedResume || !jobDesc)
+      return toast.error("Please fill all fields!");
+    const canCreate = await checkInterviewLimit();
+      if (!canCreate) return;
 
     setLoading(true);
-    setMessage("");
 
     try {
-      // Ensure we have parsed resume text. If not, try to parse from available URL fields.
+      const userRef = doc(db, "Users", user.uid);
+      const userDoc = await getDoc(userRef);
+      const userData = userDoc.data();
+      const resumeObj = (userData.resumes || []).find(
+        (r) => r.display_name === selectedResume.value
+      );
+      if (!resumeObj) return toast.error("Invalid resume selected.");
+
+      // let parsed = resumeObj.parsedData || (await parseResumeFromUrl(resumeObj.url));
+      // ✅ Ensure parsed resume text exists
       let resumeParsed = resumeObj.parsedData || resumeObj.parsed_data || '';
       if (!resumeParsed || resumeParsed.trim().length === 0) {
-        // try common url fields
-        const possibleUrl = resumeObj.url || resumeObj.fileUrl || resumeObj.link || resumeObj.storageUrl || resumeObj.cloudinaryUrl || '';
-        if (!possibleUrl) {
-          console.warn('No resume parsedData and no URL found on resume object:', resumeObj);
-          setMessage('❌ Resume has no parsed data and no accessible URL to parse.');
-          setLoading(false);
-          return;
-        }
-
-        resumeParsed = await parseResumeFromUrl(possibleUrl);
-
-        // If we managed to parse text, try to cache it back to the user's document (best-effort)
-        if (resumeParsed && resumeParsed.length > 50) {
-          try {
-            // update the user's resumes array by replacing the object with parsedData — best-effort cache
-            const userRef = doc(db, 'Users', user.uid);
-            const userSnap = await getDoc(userRef);
-            if (userSnap.exists()) {
-              const userData = userSnap.data();
-              const updatedResumes = (userData.resumes || []).map((r) => {
-                if (r.display_name === resumeObj.display_name) {
-                  return { ...r, parsedData: resumeParsed };
-                }
-                return r;
-              });
-              try {
-                await updateDoc(userRef, { resumes: updatedResumes });
-              } catch (err) {
-                // ignore caching failures
-                console.debug('Failed to cache parsed resume back to Firestore:', err);
-              }
-            }
-          } catch (err) {
-            console.debug('Failed to read user doc for caching parsed resume:', err);
-          }
+        const possibleUrl =
+          resumeObj.url ||
+          resumeObj.fileUrl ||
+          resumeObj.link ||
+          resumeObj.storageUrl ||
+          '';
+        if (possibleUrl) {
+          resumeParsed = await parseResumeFromUrl(possibleUrl);
         }
       }
+      // ✅ Condense resume data for safe Firestore storage
+      const safeResumeData = await summarizeResumeData(resumeParsed);
 
-      // Generate interview questions using Gemini
-      const questions = await generateQuestions(resumeParsed);
+      const questions = await generateQuestions(safeResumeData);
 
       const createdAt = Timestamp.now();
       const expiresOn = Timestamp.fromMillis(createdAt.toMillis() + 7 * 24 * 60 * 60 * 1000);
 
-      const interviewData = {
+      const interviewRef = await addDoc(collection(db, "Interviews"), {
         createdAt,
-        level,
+        level: level.value,
         role,
         techStack: techStack.split(",").map((t) => t.trim()),
-        type,
-        studentResume: selectedResume,
-        duration,
+        type: type.value,
+        duration: duration.value,
+        studentResume: selectedResume.value,
+        jobDesc,
+        summarizedResume: safeResumeData,
         userId: user.uid,
         questions,
         expiresOn,
-      };
+      });
 
-      // ✅ Create the interview and get its ID
-        const interviewRef = await addDoc(collection(db, "Interviews"), interviewData);
-
-        // ✅ Add the interview ID to user's interviews array
-        const userRef = doc(db, "Users", user.uid);
-        await updateDoc(userRef, {
+      await updateDoc(userRef, {
         interviews: arrayUnion(interviewRef.id),
-        });
+      });
 
-      setMessage("✅ Interview created successfully!");
+      toast.success("Interview created successfully!");
       setRole("");
       setTechStack("");
-      setSelectedResume("");
-    } catch (error) {
-      console.error("Error creating interview:", error);
-      setMessage("❌ Failed to create interview.");
+      setSelectedResume(null);
+      setJobDesc("");
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to create interview!");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="max-w-xl mx-auto mt-10 bg-white p-6 rounded-xl shadow-lg">
-      <h2 className="text-2xl font-bold mb-6 text-center text-purple-700">Create AI Mock Interview</h2>
+    <div className="max-w-2xl mx-auto my-10 bg-white shadow-2xl rounded-2xl p-8 text-gray-700">
+      <h2 className="text-3xl font-bold text-center text-purple-700 mb-3">
+        🚀 Create Your AI Mock Interview
+      </h2>
+      <p className="text-center text-gray-500 mb-8">
+        Get ready to face your next placement interview! Fill the form carefully — our AI will tailor
+        your mock interview questions based on your resume and job description.
+      </p>
 
       <form onSubmit={handleSubmit} className="space-y-5">
-        {/* Role */}
         <div>
-          <label className="block text-gray-700 font-medium mb-2">Role</label>
+          <label className="font-medium block mb-1">Role</label>
           <input
             type="text"
             value={role}
             onChange={(e) => setRole(e.target.value)}
-            required
             className="w-full border rounded-lg p-2"
-            placeholder="e.g., Frontend Developer"
+            placeholder="e.g. Frontend Developer"
+            required
           />
         </div>
 
-        {/* Tech Stack */}
         <div>
-          <label className="block text-gray-700 font-medium mb-2">Tech Stack (comma separated)</label>
+          <label className="font-medium block mb-1">Tech Stack</label>
           <input
             type="text"
             value={techStack}
             onChange={(e) => setTechStack(e.target.value)}
-            required
             className="w-full border rounded-lg p-2"
-            placeholder="e.g., React, Node.js, MongoDB"
+            placeholder="e.g. React, Node.js, MongoDB"
+            required
           />
         </div>
 
-        {/* Level */}
         <div>
-          <label className="block text-gray-700 font-medium mb-2">Level</label>
-          <select value={level} onChange={(e) => setLevel(e.target.value)} className="w-full border rounded-lg p-2">
-            {LEVELS.map((lvl) => (
-              <option key={lvl}>{lvl}</option>
-            ))}
-          </select>
-        </div>
-
-        {/* Type */}
-        <div>
-          <label className="block text-gray-700 font-medium mb-2">Interview Type</label>
-          <select value={type} onChange={(e) => setType(e.target.value)} className="w-full border rounded-lg p-2">
-            {TYPES.map((t) => (
-              <option key={t}>{t}</option>
-            ))}
-          </select>
-        </div>
-
-        {/* Duration */}
-        <div>
-          <label className="block text-gray-700 font-medium mb-2">Duration</label>
-          <select value={duration} onChange={(e) => setDuration(e.target.value)} className="w-full border rounded-lg p-2">
-            {DURATIONS.map((d) => (
-              <option key={d}>{d}</option>
-            ))}
-          </select>
-        </div>
-
-        {/* Resume Selection */}
-        <div>
-          <label className="block text-gray-700 font-medium mb-2">Select Resume</label>
-          <select
-            value={selectedResume}
-            onChange={(e) => setSelectedResume(e.target.value)}
+          <label className="font-medium block mb-1">Job Description</label>
+          <textarea
+            maxLength={10000}
+            value={jobDesc}
+            onChange={(e) => setJobDesc(e.target.value)}
+            placeholder="Paste or describe the job description..."
             required
-            className="w-full border rounded-lg p-2"
-          >
-            <option value="">Select a resume</option>
-            {resumes.map((r, i) => (
-              <option key={i} value={r.display_name}>
-                {r.display_name}
-              </option>
-            ))}
-          </select>
+            className="w-full border rounded-lg p-2 h-24"
+          />
+          <p className="text-sm text-gray-500 mt-1">
+            {jobDesc.length}/10000 characters
+          </p>
+        </div>
+
+        <div>
+          <label className="font-medium block mb-1">Experience Level</label>
+          <Select
+            options={LEVELS}
+            value={level}
+            onChange={setLevel}
+            components={animatedComponents}
+            className="text-black"
+            placeholder="Select experience level..."
+          />
+        </div>
+
+        <div>
+          <label className="font-medium block mb-1">Interview Type</label>
+          <Select
+            options={TYPES}
+            value={type}
+            onChange={setType}
+            components={animatedComponents}
+            className="text-black"
+            placeholder="Select interview type..."
+          />
+        </div>
+
+        <div>
+          <label className="font-medium block mb-1">Duration</label>
+          <Select
+            options={DURATIONS}
+            value={duration}
+            onChange={setDuration}
+            components={animatedComponents}
+            className="text-black"
+            placeholder="Select duration..."
+          />
+        </div>
+
+        <div>
+          <label className="font-medium block mb-1">Select Resume</label>
+          <Select
+            options={resumes}
+            value={selectedResume}
+            onChange={setSelectedResume}
+            components={animatedComponents}
+            className="text-black"
+            placeholder="Select a resume"
+          />
         </div>
 
         <button
@@ -276,11 +376,9 @@ Please return only the questions, without any additional text.
           disabled={loading}
           className="w-full bg-purple-600 text-white py-2 rounded-lg hover:bg-purple-700 transition duration-200 font-semibold"
         >
-          {loading ? "Creating..." : "Create Interview"}
+          {loading ? "Creating Interview..." : "Create Interview"}
         </button>
       </form>
-
-      {message && <p className="mt-4 text-center text-gray-700">{message}</p>}
     </div>
   );
 };
