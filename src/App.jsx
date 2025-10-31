@@ -44,7 +44,7 @@ import Bookmarks from './pages/student/Bookmarks';
 import CreateInterview from './pages/student/CreateInterview';
 import ScheduledInterviews from './pages/student/ScheduledInterviews';
 import InterviewSession from './pages/student/InterviewSession';
-import Feedback from './pages/student/FeedBack';
+import Feedback from './pages/student/Feedback';
 
 
 
