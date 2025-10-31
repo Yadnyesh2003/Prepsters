@@ -144,6 +144,7 @@ const InterviewSession = () => {
       await updateDoc(interviewRef, {
         feedback: feedbackText,
         transcript: finalTranscript,
+        isCompleted: true
       });
 
       // 4. Redirect to feedback page
