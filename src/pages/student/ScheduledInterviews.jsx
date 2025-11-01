@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { db } from "../../config/firebase";
-import { collection, getDocs } from "firebase/firestore";
+import { collection, getDocs, query, where } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
 import { motion, AnimatePresence } from "framer-motion";
 import InterviewCard from "../../components/student/InterviewCard";
 import Loading from "../../components/student/Loading";
 
 const ScheduledInterviews = () => {
+  const { user } = useAuth();
   const [interviews, setInterviews] = useState([]);
   const [selectedInterview, setSelectedInterview] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -15,8 +17,11 @@ const ScheduledInterviews = () => {
   useEffect(() => {
     document.title = "Scheduled Interviews";
     const fetchInterviews = async () => {
+      if (!user?.uid) return;
       try {
-        const querySnapshot = await getDocs(collection(db, "Interviews"));
+        const interviewsRef = collection(db, "Interviews");
+        const q = query(interviewsRef, where("userId", "==", user.uid));
+        const querySnapshot = await getDocs(q);
         const data = querySnapshot.docs.map((doc) => ({
           id: doc.id,
           isCompleted: doc.data().isCompleted ?? false,
